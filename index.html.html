@@ -1,0 +1,2920 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Materiais de Aula — SENAI</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f5f4f0; --surface:#fff; --surface2:#f0efe9;
+  --border:#e2e0d8; --border2:#ccc9be;
+  --text:#1a1916; --text2:#6b6860; --text3:#a09d96;
+  --accent:#2d5be3; --accent-bg:#eef1fd;
+  --green:#2a7d4f; --green-bg:#e8f5ee;
+  --amber:#9a6200; --amber-bg:#fef3dc;
+  --red:#b93232; --red-bg:#fdeaea;
+  --purple:#6b3fa0; --purple-bg:#f3eefa;
+  --radius:8px; --radius-lg:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── LOGIN ─────────────────────────────── */
+.login-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:9999}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:0 8px 40px rgba(0,0,0,.1);width:380px;overflow:hidden}
+.login-top{background:#164194;padding:28px 32px 22px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.login-logo-img{max-height:48px;max-width:180px;object-fit:contain;filter:brightness(0) invert(1);opacity:.9;cursor:pointer}
+.login-brand{font-size:22px;font-weight:800;font-style:italic;color:#fff;letter-spacing:-.04em}
+.login-curso{font-size:14px;font-weight:600;color:#fff;text-align:center;line-height:1.3;max-width:300px}
+.login-sub{font-size:11px;color:rgba(255,255,255,.5);text-align:center}
+.login-body{padding:24px 32px 28px}
+.login-title{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:16px}
+.login-error{background:var(--red-bg);color:var(--red);border-radius:var(--radius);padding:8px 12px;font-size:12px;margin-bottom:12px;display:none}
+.login-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;margin-bottom:10px;transition:border .15s}
+.login-input:focus{border-color:var(--accent);background:var(--surface)}
+.login-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:11px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .15s}
+.login-btn:hover{background:#2450c8}
+.login-toggle{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--text3);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;width:100%;padding:0}
+.login-toggle:hover{color:var(--accent)}
+.login-admin-note{font-size:11px;color:var(--text3);line-height:1.55;margin-top:12px;text-align:center}
+
+/* ── HEADER ────────────────────────────── */
+.app-header{background:#164194;color:#fff;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;min-height:58px;height:auto;position:sticky;top:0;z-index:100;gap:16px}
+.h-left{display:flex;align-items:center;gap:14px;min-width:0;flex:1}
+.h-logo{max-height:32px;max-width:90px;object-fit:contain;filter:brightness(0) invert(1);opacity:.9;cursor:pointer}
+.h-brand{font-size:22px;font-weight:800;font-style:italic;letter-spacing:-.04em}
+.h-divider{width:1px;height:22px;background:rgba(255,255,255,.24);flex-shrink:0}
+.h-title{font-size:14px;font-weight:500;opacity:.9;min-width:0;max-width:none;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.35}
+.h-badge{background:rgba(255,255,255,.18);color:rgba(255,255,255,.9);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0}
+.h-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.h-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:var(--radius);padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.h-btn:hover{background:rgba(255,255,255,.22)}
+
+/* ── BODY ──────────────────────────────── */
+.app-body{max-width:1100px;margin:0 auto;padding:28px 24px 80px}
+
+/* ── BUSCA / FILTROS ────────────────────── */
+.search-bar{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.search-input{flex:1;min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 14px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:border .15s}
+.search-input:focus{border-color:var(--accent)}
+.filter-sel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;cursor:pointer}
+.filter-sel:focus{border-color:var(--accent)}
+
+/* ── SEÇÕES ─────────────────────────────── */
+.disc-section{margin-bottom:36px}
+.disc-hd{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--border)}
+.disc-name{font-size:16px;font-weight:600;color:var(--text)}
+.disc-count{font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1px 8px}
+.tipo-group{margin-bottom:18px}
+.tipo-label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:8px}
+.tipo-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ── CARDS PROFESSOR ───────────────────── */
+.mat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.mat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;display:flex;flex-direction:column;gap:8px;transition:all .15s;text-decoration:none;color:inherit}
+.mat-card:hover{border-color:var(--accent);box-shadow:0 3px 14px rgba(45,91,227,.12);transform:translateY(-1px)}
+.mat-card-top{display:flex;align-items:flex-start;gap:10px}
+.mat-icon{width:36px;height:36px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.mat-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.4}
+.mat-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.mat-footer{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mat-tipo-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
+.mat-source-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);white-space:nowrap}
+.mat-open-btn{font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(45,91,227,.2);border-radius:var(--radius);padding:4px 10px;display:inline-flex;align-items:center;gap:4px;text-decoration:none;transition:all .15s;white-space:nowrap}
+.mat-open-btn:hover{background:var(--accent);color:#fff}
+
+/* ── CARDS ADMIN ───────────────────────── */
+.admin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;transition:all .15s;margin-bottom:8px}
+.admin-card:hover{border-color:var(--border2);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.admin-body{flex:1;min-width:0}
+.admin-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.admin-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--text3);margin-bottom:4px}
+.admin-link{font-size:11px;color:var(--accent);text-decoration:none;word-break:break-all}
+.admin-link:hover{text-decoration:underline}
+.admin-desc{font-size:12px;color:var(--text2)}
+.admin-actions{display:flex;gap:6px;flex-shrink:0}
+.a-btn{background:none;border:1px solid var(--border);border-radius:var(--radius);padding:5px 10px;cursor:pointer;font-size:11px;font-weight:500;color:var(--text2);font-family:'DM Sans',sans-serif;transition:all .12s;white-space:nowrap}
+.a-btn:hover{background:var(--surface2);color:var(--text)}
+.a-btn.danger{color:var(--red);border-color:var(--red)}
+.a-btn.danger:hover{background:var(--red-bg)}
+
+/* ── ADMIN TOOLBAR ─────────────────────── */
+.admin-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.admin-toolbar-right{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ── DISC HEADER ADMIN ─────────────────── */
+.disc-hd-admin{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--border)}
+
+/* ── CONFIG SECTIONS ───────────────────── */
+.cfg-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:20px}
+.cfg-head{background:var(--surface2);padding:14px 18px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text)}
+.cfg-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.form-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);margin-bottom:6px;display:block}
+.form-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:border .12s}
+.form-input:focus{border-color:var(--accent);background:var(--surface)}
+textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{padding:8px 16px;border-radius:var(--radius);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;border:1px solid transparent;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:#2450c8}
+.btn-outline{background:none;border-color:var(--border2);color:var(--text2)}
+.btn-outline:hover{background:var(--surface2);color:var(--text)}
+
+/* ── TABS ──────────────────────────────── */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:28px}
+.tab-btn{background:none;border:none;border-bottom:2px solid transparent;padding:10px 18px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s;margin-bottom:-1px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── MODAL ─────────────────────────────── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius-lg);width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-head{padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:1}
+.modal-head h2{font-size:15px;font-weight:600}
+.close-btn{background:none;border:1px solid var(--border);border-radius:var(--radius);padding:5px 8px;cursor:pointer;color:var(--text2);transition:all .12s;font-size:14px}
+.close-btn:hover{background:var(--surface2)}
+.modal-body{padding:20px 24px}
+.modal-foot{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:var(--surface)}
+.form-group{margin-bottom:14px}
+
+/* ── TIPO SELECTOR ─────────────────────── */
+.tipo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.tipo-opt{border:2px solid var(--border);border-radius:var(--radius);padding:8px 6px;cursor:pointer;text-align:center;font-size:11px;font-weight:500;transition:all .12s;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text2)}
+.tipo-opt:hover{border-color:var(--border2);background:var(--surface2)}
+.tipo-opt.sel{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
+.tipo-opt-icon{font-size:18px}
+
+/* ── CHIPS EDITÁVEIS ───────────────────── */
+.chip-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:500}
+.chip-remove{background:none;border:none;cursor:pointer;opacity:.6;font-size:13px;padding:0 0 0 2px;line-height:1;transition:opacity .1s}
+.chip-remove:hover{opacity:1}
+
+/* ── EMPTY ─────────────────────────────── */
+.empty{text-align:center;padding:70px 24px;color:var(--text3)}
+.empty svg{width:44px;height:44px;margin:0 auto 14px;display:block;opacity:.3}
+.empty h3{font-size:15px;color:var(--text2);margin-bottom:6px}
+.empty p{font-size:13px}
+
+@keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── BIBLIOTECA V6: NAVEGAÇÃO POR DISCIPLINAS/TEMAS ───── */
+.library-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.library-top h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin-bottom:4px}
+.library-top p{font-size:13px;color:var(--text2);line-height:1.5;max-width:720px}
+.summary-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:20px}
+.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px 15px}
+.summary-num{font-size:22px;font-weight:600;line-height:1;margin-bottom:5px}
+.summary-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em}
+.disc-search{margin-bottom:16px}
+.disc-group-block{margin-bottom:28px}
+.disc-group-block:last-child{margin-bottom:0}
+.disc-group-head{display:flex;align-items:center;gap:10px;margin:0 0 12px}
+.disc-group-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2)}
+.disc-group-count{font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:999px;padding:2px 8px}
+.disc-group-empty{background:var(--surface);border:1px dashed var(--border2);border-radius:var(--radius-lg);padding:16px;color:var(--text3);font-size:13px}
+.disc-config-type{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.disc-config-type.presencial{background:var(--accent-bg);color:var(--accent)}
+.disc-config-type.ead{background:var(--purple-bg);color:var(--purple)}
+.disc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.disc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:all .15s;text-align:left;color:inherit;font-family:'DM Sans',sans-serif}
+.disc-card:hover{border-color:var(--accent);box-shadow:0 3px 14px rgba(45,91,227,.1);transform:translateY(-1px)}
+.disc-card.general{border-style:dashed}
+.disc-card-title{font-size:14px;font-weight:600;line-height:1.4;margin-bottom:5px}
+.disc-card-sub{font-size:12px;color:var(--text2);line-height:1.45;margin-bottom:12px;min-height:34px}
+.disc-card-metrics{display:flex;flex-wrap:wrap;gap:5px}
+.mini-pill{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);border-radius:20px;padding:3px 8px;font-size:10px;font-weight:600}
+.mini-pill.pin{background:var(--amber-bg);color:var(--amber);border-color:rgba(154,98,0,.18)}
+.breadcrumb{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin-bottom:16px}
+.breadcrumb button{background:none;border:none;color:var(--accent);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;padding:0}
+.breadcrumb button:hover{text-decoration:underline}
+.inner-toolbar{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.inner-toolbar-title{font-size:18px;font-weight:600;letter-spacing:-.02em;margin-bottom:4px}
+.inner-toolbar-sub{font-size:12px;color:var(--text2);line-height:1.5}
+.inner-actions{display:flex;gap:8px;flex-wrap:wrap}
+.inner-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.inner-filters .search-input{min-width:260px}
+.theme-admin-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.theme-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px}
+.theme-head{background:var(--surface2);border-bottom:1px solid var(--border);padding:13px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.theme-name{font-size:14px;font-weight:600;color:var(--text)}
+.theme-meta{font-size:11px;color:var(--text3);margin-top:3px}
+.theme-actions{display:flex;gap:6px;flex-wrap:wrap}
+.theme-body{padding:14px 16px}
+.theme-empty{border:1px dashed var(--border2);border-radius:var(--radius);padding:16px;font-size:12px;color:var(--text3);background:var(--surface2)}
+.material-group{margin-bottom:18px}
+.material-group:last-child{margin-bottom:0}
+.material-group-title{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:9px}
+.mat-pin{font-size:10px;font-weight:700;background:var(--amber-bg);color:var(--amber);border-radius:20px;padding:2px 7px}
+.admin-card.pinned{border-color:rgba(154,98,0,.28);background:linear-gradient(0deg,var(--surface),#fffaf0)}
+.admin-card-order{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
+.admin-actions.wrap{flex-wrap:wrap;justify-content:flex-end;max-width:220px}
+.small-action{min-width:32px;text-align:center;padding-left:8px;padding-right:8px}
+.cfg-list{display:flex;flex-direction:column;gap:8px}
+.cfg-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface2);padding:10px 12px}
+.cfg-row-main{display:flex;align-items:center;gap:10px;min-width:0}
+.cfg-row-name{font-size:13px;font-weight:500;color:var(--text);word-break:break-word}
+.cfg-row-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.cfg-row-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.color-dot{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.12);flex-shrink:0}
+.cfg-addline{display:flex;gap:8px;flex-wrap:wrap}
+.check-line{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-top:4px}
+.check-line input{accent-color:var(--accent)}
+.form-row.three{grid-template-columns:1fr 1fr 1fr}
+.search-result-head{font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 14px}
+.prof-home-note{background:var(--accent-bg);border:1px solid rgba(45,91,227,.15);border-radius:var(--radius-lg);padding:12px 14px;font-size:12px;color:var(--accent);line-height:1.55;margin-bottom:18px}
+.general-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);background:var(--purple-bg);border-radius:20px;padding:2px 8px}
+.modal-wide{width:620px}
+.hidden{display:none!important}
+/* ── BIBLIOTECA V8: TEMAS RECOLHÍVEIS E MÚLTIPLOS LINKS ─ */
+.collapse-controls{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.theme-head.clickable{cursor:pointer;align-items:center;user-select:none}
+.theme-head.clickable:hover{background:#ece9df}
+.theme-title-wrap{display:flex;align-items:center;gap:10px;min-width:0}
+.theme-toggle-btn{width:30px;height:30px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:14px;transition:all .15s}
+.theme-toggle-btn:hover{border-color:var(--border2);color:var(--text);background:var(--surface2)}
+.theme-section.collapsed .theme-body{display:none}
+.theme-section.collapsed .theme-head{border-bottom:none}
+.theme-collapse-note{font-size:11px;color:var(--text3);margin-top:3px}
+.link-editor{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+.material-link-row{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface2);padding:12px}
+.material-link-grid{display:grid;grid-template-columns:1fr 1.7fr 1fr 38px;gap:8px;align-items:end}
+.material-link-grid .form-group{margin-bottom:0}
+.link-remove-btn{width:38px;height:40px;border:1px solid rgba(185,50,50,.35);background:var(--red-bg);color:var(--red);border-radius:var(--radius);cursor:pointer;font-size:18px;line-height:1;transition:all .12s}
+.link-remove-btn:hover{background:var(--red);color:#fff}
+.add-link-btn{margin-top:2px}
+.mat-links{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.mat-access-btn{font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(45,91,227,.2);border-radius:var(--radius);padding:5px 10px;display:inline-flex;align-items:center;gap:4px;text-decoration:none;transition:all .15s;white-space:nowrap}
+.mat-access-btn:hover{background:var(--accent);color:#fff}
+.mat-access-btn.secondary{color:var(--text2);background:var(--surface2);border-color:var(--border)}
+.mat-access-btn.secondary:hover{background:var(--text);border-color:var(--text);color:#fff}
+.admin-link-list{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.admin-link-pill{font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(45,91,227,.16);border-radius:20px;padding:3px 9px;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.admin-link-pill:hover{background:var(--accent);color:#fff}
+.mat-source-list{display:flex;gap:5px;flex-wrap:wrap}
+.mat-card{cursor:default}
+@media(max-width:900px){.material-link-grid{grid-template-columns:1fr}.link-remove-btn{width:100%}.mat-links{justify-content:flex-start}}
+
+@media(max-width:760px){
+  .form-row,.form-row.three{grid-template-columns:1fr}
+  .disc-grid{grid-template-columns:1fr}
+  .admin-actions.wrap{max-width:none;justify-content:flex-start}
+  .inner-filters .search-input{min-width:100%}
+}
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-top">
+      <img id="loginLogoImg" class="login-logo-img" src="" alt="Logo" style="display:none" onclick="triggerLogoUpload()">
+      <span class="login-brand" id="loginBrandText">SENAI</span>
+      <div class="login-curso" id="loginCurso">Materiais de Aula</div>
+      <div class="login-sub" id="loginSub">Aprendizagem Industrial em Moldador de Plástico por Compressão</div>
+    </div>
+    <div class="login-body">
+      <div class="login-title" id="loginTitle">Acesso administrativo</div>
+      <div class="login-error" id="loginError">Senha incorreta. Tente novamente.</div>
+      <input class="login-input" type="password" id="loginInput" placeholder="Senha de administrador..." onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="login-btn" onclick="doLogin()">Entrar</button>
+      <div class="login-admin-note">Este arquivo é para cadastrar e organizar a biblioteca. O professor recebe a versão gerada para consulta.</div>
+    </div>
+  </div>
+</div>
+<input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
+<input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importarDados(this)">
+
+<!-- HEADER -->
+<header class="app-header" id="appHeader" style="display:none">
+  <div class="h-left">
+    <img id="hLogoImg" class="h-logo" src="" alt="Logo" style="display:none" onclick="triggerLogoUpload()" title="Trocar logo">
+    <span class="h-brand" id="hBrandText" style="display:none">SENAI</span>
+    <div class="h-divider" id="hDivider"></div>
+    <span class="h-title" id="hTitle">Materiais de Aula</span>
+    <span class="h-badge" id="hBadge" style="display:none">Admin</span>
+  </div>
+  <div class="h-right">
+    <button class="h-btn" id="hBtnVoltarAdmin" onclick="voltarDaPreviaProfessor()" style="display:none">← Voltar ao administrador</button>
+    <button class="h-btn" id="hBtnPreview" onclick="visualizarComoProfessor()" style="display:none">👁 Visualizar como professor</button>
+    <button class="h-btn" id="hBtnExport" onclick="exportarDados()" style="display:none">↓ Exportar</button>
+    <button class="h-btn" id="hBtnImport" onclick="importFileInput.click()" style="display:none">↑ Importar</button>
+    <button class="h-btn" id="hBtnGerar" onclick="gerarVersaoProfessor()" style="display:none;background:rgba(42,125,79,.5);border-color:rgba(42,125,79,.7)">📦 Gerar versão para professor</button>
+    <button class="h-btn" onclick="doLogout()">Sair</button>
+  </div>
+</header>
+
+<!-- CORPO PROFESSOR -->
+<div class="app-body" id="viewProfessor" style="display:none">
+  <div id="professorHome">
+    <div class="library-top">
+      <div>
+        <h2>Biblioteca de materiais</h2>
+        <p>Escolha uma disciplina para consultar os arquivos organizados por tema e tipo. A busca também encontra materiais em toda a biblioteca.</p>
+      </div>
+    </div>
+    <div class="prof-home-note">Os links podem levar a arquivos, apresentações, vídeos, formulários ou páginas externas que você tenha compartilhado.</div>
+    <div class="disc-search">
+      <input class="search-input" type="text" id="profGlobalSearch" placeholder="Buscar em toda a biblioteca por título, descrição, disciplina ou tema..." oninput="renderProfessorHome()">
+    </div>
+    <div id="professorHomeContent"></div>
+  </div>
+
+  <div id="professorDiscView" style="display:none">
+    <div class="breadcrumb"><button onclick="voltarProfessorHome()">Biblioteca</button><span>›</span><span id="profBreadcrumbDisc"></span></div>
+    <div class="inner-toolbar">
+      <div>
+        <div class="inner-toolbar-title" id="profDiscTitle"></div>
+        <div class="inner-toolbar-sub" id="profDiscSubtitle"></div>
+      </div>
+    </div>
+    <div class="collapse-controls">
+      <button class="btn btn-outline" onclick="expandirTemasProfessor()">Expandir temas</button>
+      <button class="btn btn-outline" onclick="recolherTemasProfessor()">Recolher temas</button>
+    </div>
+    <div class="inner-filters">
+      <input class="search-input" type="text" id="profDiscSearch" placeholder="Buscar dentro desta disciplina..." oninput="renderProfessorDisc()">
+      <select class="filter-sel" id="profDiscTipo" onchange="renderProfessorDisc()"><option value="">Todos os tipos</option></select>
+      <select class="filter-sel" id="profDiscTema" onchange="renderProfessorDisc()"><option value="">Todos os temas</option></select>
+    </div>
+    <div id="professorDiscContent"></div>
+  </div>
+</div>
+
+<!-- CORPO ADMIN -->
+<div class="app-body" id="viewAdmin" style="display:none">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="setTab('materiais',this)">Materiais</button>
+    <button class="tab-btn" onclick="setTab('configuracoes',this)">Configurações</button>
+  </div>
+
+  <!-- TAB MATERIAIS -->
+  <div id="tabMateriais">
+    <div id="adminHome">
+      <div class="library-top">
+        <div>
+          <h2>Materiais cadastrados</h2>
+          <p>Entre em uma disciplina para cadastrar, editar e organizar os materiais por temas. A área geral serve para documentos que não pertencem a uma matéria específica.</p>
+        </div>
+        <div class="inner-actions">
+          <button class="btn btn-outline" onclick="visualizarComoProfessor()">👁 Visualizar como professor</button>
+          <button class="btn btn-outline" style="color:var(--green);border-color:rgba(42,125,79,.45);background:var(--green-bg)" onclick="gerarVersaoProfessor()">📦 Gerar versão para professor</button>
+          <button class="btn btn-primary" onclick="openModal()">+ Novo material</button>
+        </div>
+      </div>
+      <div class="summary-row" id="adminSummary"></div>
+      <div class="disc-search">
+        <input class="search-input" type="text" id="adminDiscSearch" placeholder="Buscar disciplina..." oninput="renderAdminHome()">
+      </div>
+      <div id="adminHomeContent"></div>
+    </div>
+
+    <div id="adminDiscView" style="display:none">
+      <div class="breadcrumb"><button onclick="voltarAdminHome()">Materiais</button><span>›</span><span id="adminBreadcrumbDisc"></span></div>
+      <div class="inner-toolbar">
+        <div>
+          <div class="inner-toolbar-title" id="adminDiscTitle"></div>
+          <div class="inner-toolbar-sub" id="adminDiscSubtitle"></div>
+        </div>
+        <div class="inner-actions">
+          <button class="btn btn-outline" onclick="openThemeModal()">+ Novo tema</button>
+          <button class="btn btn-primary" onclick="openModal(null, currentAdminDiscId)">+ Novo material</button>
+        </div>
+      </div>
+      <div class="collapse-controls">
+        <button class="btn btn-outline" onclick="expandirTemasAdmin()">Expandir temas</button>
+        <button class="btn btn-outline" onclick="recolherTemasAdmin()">Recolher temas</button>
+      </div>
+      <div class="inner-filters">
+        <input class="search-input" type="text" id="adminMatSearch" placeholder="Buscar material dentro desta disciplina..." oninput="renderAdminDisc()">
+        <select class="filter-sel" id="adminMatTipo" onchange="renderAdminDisc()"><option value="">Todos os tipos</option></select>
+        <select class="filter-sel" id="adminMatTema" onchange="renderAdminDisc()"><option value="">Todos os temas</option></select>
+      </div>
+      <div id="adminDiscContent"></div>
+    </div>
+  </div>
+
+  <!-- TAB CONFIGURAÇÕES -->
+  <div id="tabConfiguracoes" style="display:none">
+
+    <div class="cfg-section">
+      <div class="cfg-head">Nome do curso / turma</div>
+      <div class="cfg-body">
+        <div>
+          <label class="form-label">Texto exibido na tela de login</label>
+          <input type="text" class="form-input" id="cfgNomeCurso">
+        </div>
+        <button class="btn btn-primary" style="align-self:flex-start" onclick="salvarNome()">Salvar nome</button>
+      </div>
+    </div>
+
+    <div class="cfg-section">
+      <div class="cfg-head">Senha do professor</div>
+      <div class="cfg-body">
+        <div>
+          <label class="form-label">Senha atual</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="form-input" id="cfgSenhaAtual" readonly style="font-family:'DM Mono',monospace">
+            <button class="btn btn-outline" onclick="copiarSenha()">Copiar</button>
+          </div>
+        </div>
+        <div>
+          <label class="form-label">Definir nova senha</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="form-input" id="cfgSenhaNova" placeholder="mín. 4 caracteres">
+            <button class="btn btn-primary" onclick="trocarSenha()">Salvar</button>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">Após trocar, informe a nova senha ao professor.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cfg-section">
+      <div class="cfg-head">Logo</div>
+      <div class="cfg-body">
+        <div id="logoPreview"></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline" onclick="triggerLogoUpload()">📁 Selecionar logo</button>
+          <button class="btn btn-outline" style="color:var(--red);border-color:var(--red)" onclick="removerLogo()">Remover</button>
+        </div>
+        <div style="font-size:11px;color:var(--text3)">Aparece na tela de login e no cabeçalho. PNG com fundo transparente fica melhor.</div>
+      </div>
+    </div>
+
+    <div class="cfg-section">
+      <div class="cfg-head">Área geral</div>
+      <div class="cfg-body">
+        <div>
+          <label class="form-label">Nome da área para materiais sem disciplina específica</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input type="text" class="form-input" id="cfgNomeGeral" placeholder="Materiais gerais" style="flex:1;min-width:220px">
+            <button class="btn btn-primary" onclick="salvarNomeGeral()">Salvar</button>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text2)">Essa área também aceita temas próprios, como “Documentos do curso”, “Apoio docente” ou outro agrupamento que fizer sentido.</div>
+      </div>
+    </div>
+
+    <div class="cfg-section">
+      <div class="cfg-head">Tipos de material</div>
+      <div class="cfg-body">
+        <div style="font-size:12px;color:var(--text2)">Você pode criar, editar, reordenar e excluir tipos. Cada tipo tem nome, ícone e cor.</div>
+        <div class="cfg-list" id="tiposConfigList"></div>
+        <button class="btn btn-outline" style="align-self:flex-start" onclick="openTipoModal()">+ Criar tipo de material</button>
+      </div>
+    </div>
+
+    <div class="cfg-section">
+      <div class="cfg-head">Disciplinas</div>
+      <div class="cfg-body">
+        <div style="font-size:12px;color:var(--text2)">As disciplinas aparecem como portas de entrada da biblioteca. Você pode criar, editar, reordenar ou excluir quando não houver materiais/temas vinculados.</div>
+        <div class="cfg-list" id="discsConfigList"></div>
+        <button class="btn btn-outline" style="align-self:flex-start" onclick="openDiscModal()">+ Criar disciplina</button>
+      </div>
+    </div>
+
+    <div class="cfg-section">
+      <div class="cfg-head">Compartilhar com outro professor</div>
+      <div class="cfg-body">
+        <div style="background:var(--green-bg);border:1px solid rgba(42,125,79,.2);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--green);line-height:1.6">
+          <strong>📦 Gerar versão para professor</strong><br>
+          Cria um único arquivo HTML em modo consulta. Os materiais são protegidos no próprio arquivo e só ficam legíveis após digitar a senha do professor — sem painel administrativo, sem importação e sem configuração.
+        </div>
+        <button class="btn btn-primary" style="background:var(--green);border-color:var(--green);align-self:flex-start" onclick="gerarVersaoProfessor()">📦 Gerar versão para professor</button>
+        <hr style="border:none;border-top:1px solid var(--border)">
+        <p style="font-size:12px;color:var(--text2)"><strong>Backup / transferência entre computadores:</strong> exporte um <code>.json</code> e importe em outro computador.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline" onclick="exportarDados()">↓ Exportar backup (.json)</button>
+          <button class="btn btn-outline" onclick="importFileInput.click()">↑ Importar backup (.json)</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL MATERIAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <h2 id="modalTitle">Novo material</h2>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Título *</label>
+        <input type="text" class="form-input" id="mTitulo" placeholder="ex: Aula 3 — Contato de Selo">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Links de acesso *</label>
+        <div id="mLinksList" class="link-editor"></div>
+        <button type="button" class="btn btn-outline add-link-btn" onclick="addMaterialLinkRow()">+ Adicionar outro link</button>
+        <div style="font-size:11px;color:var(--text3);margin-top:7px">Um mesmo material pode reunir vários acessos, como slide no Canva, PDF no Drive e vídeo no YouTube. A plataforma é detectada automaticamente se você não preencher.</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Disciplina / Área *</label>
+          <select class="form-input" id="mDisc" onchange="renderThemeSelectForMaterial()"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tema <span style="font-weight:400;color:var(--text3)">(opcional)</span></label>
+          <select class="form-input" id="mTema"></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo *</label>
+        <div class="tipo-grid" id="tipoGrid"></div>
+      </div>
+      <div class="form-row three">
+        <div class="form-group">
+          <label class="form-label">Ordem</label>
+          <input type="number" class="form-input" id="mOrdem" min="1" placeholder="ex: 1">
+        </div>
+        <div class="form-group" style="display:flex;align-items:flex-end">
+          <label class="check-line"><input type="checkbox" id="mFixado"> Fixar no topo</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição <span style="font-weight:400;color:var(--text3)">(opcional)</span></label>
+        <textarea class="form-input" id="mDesc" placeholder="ex: Slides com exercícios de fixação sobre auto-retenção..."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarMaterial()">Salvar material</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TEMA -->
+<div class="modal-overlay" id="themeModalOverlay">
+  <div class="modal" style="width:480px">
+    <div class="modal-head">
+      <h2 id="themeModalTitle">Novo tema</h2>
+      <button class="close-btn" onclick="closeThemeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nome do tema *</label>
+        <input type="text" class="form-input" id="temaNome" placeholder="ex: Motores e acionamentos">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeThemeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarTema()">Salvar tema</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TIPO -->
+<div class="modal-overlay" id="tipoModalOverlay">
+  <div class="modal" style="width:520px">
+    <div class="modal-head">
+      <h2 id="tipoModalTitle">Novo tipo de material</h2>
+      <button class="close-btn" onclick="closeTipoModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nome *</label>
+        <input type="text" class="form-input" id="tipoNome" placeholder="ex: Roteiro de prática">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ícone</label>
+          <input type="text" class="form-input" id="tipoIcone" placeholder="ex: 🔧">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cor</label>
+          <input type="color" class="form-input" id="tipoCor" value="#2d5be3" style="height:42px;padding:5px">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeTipoModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarTipo()">Salvar tipo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DISCIPLINA -->
+<div class="modal-overlay" id="discModalOverlay">
+  <div class="modal" style="width:520px">
+    <div class="modal-head">
+      <h2 id="discModalTitle">Nova disciplina</h2>
+      <button class="close-btn" onclick="closeDiscModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nome da disciplina *</label>
+        <input type="text" class="form-input" id="discNome" placeholder="ex: Fundamentos da Eletromecânica">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Modalidade *</label>
+        <select class="form-input" id="discModalidade">
+          <option value="presencial">Presencial</option>
+          <option value="ead">EaD</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeDiscModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarDisciplina()">Salvar disciplina</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// DADOS E MIGRAÇÃO
+// ════════════════════════════════════════════════════════
+const SK = 'mat_v8_teste';
+const LEGACY_SK = 'mat_v3';
+const LEGACY_ADMIN_PW_KEY = 'app_password';
+const ADMIN_AUTH_KEY = 'mat_admin_auth_v1';
+const ADMIN_DEFAULT_AUTH = {
+  salt: 'UmtJxnDlltuSFgA5R3eM7A==',
+  hash: 'OOQY12LolKu41Ml5laho6HvwHtqBXmnj8KEOTAQ7Zf4=',
+  iterations: 600000
+};
+const GERAL_ID = 'geral';
+
+function uid(prefix='id') { return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function normalizar(v){ return String(v||'').trim().toLowerCase(); }
+function modalidadeDisciplinaFallback(d){
+  const raw=normalizar(d?.modalidade);
+  if(raw==='ead') return 'ead';
+  if(raw==='presencial') return 'presencial';
+  const nome=normalizar(d?.nome);
+  const eadConhecidas=[
+    'fundamentos da comunicação e informação',
+    'planejamento e organização do trabalho',
+    'raciocínio lógico e análise de dados',
+    'relações socioprofissionais, cidadania e ética',
+    'transformação digital no setor industrial'
+  ];
+  return eadConhecidas.includes(nome)?'ead':'presencial';
+}
+function modalidadeLabel(m){ return m==='ead'?'EaD':'Presencial'; }
+function escH(v) {
+  if (v == null) return '';
+  return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escJsStr(v) {
+  if (v == null) return '';
+  return String(v).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+}
+function colorAlpha(hex, alpha=.12){
+  const h = String(hex||'#888888').replace('#','');
+  const full = h.length===3 ? h.split('').map(x=>x+x).join('') : h.padEnd(6,'8').slice(0,6);
+  const r = parseInt(full.slice(0,2),16)||136, g = parseInt(full.slice(2,4),16)||136, b = parseInt(full.slice(4,6),16)||136;
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function defaults() {
+  return {
+    versao: 8,
+    senhaProfessor: 'convidado2026',
+    nomeCurso: 'Aprendizagem Industrial em Moldador de Plástico por Compressão',
+    nomeGeral: 'Materiais gerais',
+    logo: '',
+    tipos: [
+      {id:'tipo_aula', nome:'Aula', icone:'📖', cor:'#2d5be3', ordem:1},
+      {id:'tipo_atividade', nome:'Atividade', icone:'✏️', cor:'#2a7d4f', ordem:2},
+      {id:'tipo_prova', nome:'Prova', icone:'📝', cor:'#b93232', ordem:3},
+      {id:'tipo_trabalho', nome:'Trabalho', icone:'📋', cor:'#9a6200', ordem:4},
+      {id:'tipo_video', nome:'Vídeo', icone:'🎬', cor:'#8b24b8', ordem:5},
+      {id:'tipo_estudo', nome:'Material de estudo', icone:'📚', cor:'#1a7a8a', ordem:6},
+      {id:'tipo_slide', nome:'Slide', icone:'🖥️', cor:'#164194', ordem:7},
+      {id:'tipo_gabarito', nome:'Gabarito', icone:'✅', cor:'#555555', ordem:8},
+      {id:'tipo_outro', nome:'Outro', icone:'📎', cor:'#888888', ordem:9}
+    ],
+    disciplinas: [
+      {id:'disc_eletromecanica', nome:'Fundamentos da Eletromecânica', ordem:1, modalidade:'presencial'},
+      {id:'disc_ensaios', nome:'Ensaios', ordem:2, modalidade:'presencial'},
+      {id:'disc_qualidade', nome:'Gestão da Qualidade', ordem:3, modalidade:'presencial'},
+      {id:'disc_praticas', nome:'Práticas Inovadoras', ordem:4, modalidade:'presencial'},
+      {id:'disc_processos', nome:'Processos de Transformação de Termoplásticos', ordem:5, modalidade:'presencial'},
+      {id:'disc_tecnologia', nome:'Tecnologia do Plástico', ordem:6, modalidade:'presencial'},
+      {id:'disc_sst', nome:'Saúde e Segurança do Trabalho', ordem:7, modalidade:'presencial'},
+      {id:'disc_comunicacao', nome:'Fundamentos da Comunicação e Informação', ordem:8, modalidade:'ead'},
+      {id:'disc_planejamento', nome:'Planejamento e Organização do Trabalho', ordem:9, modalidade:'ead'},
+      {id:'disc_raciocinio', nome:'Raciocínio Lógico e Análise de Dados', ordem:10, modalidade:'ead'},
+      {id:'disc_relacoes', nome:'Relações Socioprofissionais, Cidadania e Ética', ordem:11, modalidade:'ead'},
+      {id:'disc_digital', nome:'Transformação Digital no Setor Industrial', ordem:12, modalidade:'ead'}
+    ],
+    temas: [
+          {
+                "id": "tema_eletro_grandezas",
+                "disciplinaId": "disc_eletromecanica",
+                "nome": "Grandezas elétricas",
+                "ordem": 1
+          },
+          {
+                "id": "tema_eletro_medicoes",
+                "disciplinaId": "disc_eletromecanica",
+                "nome": "Medições com multímetro",
+                "ordem": 2
+          },
+          {
+                "id": "tema_eletro_comandos",
+                "disciplinaId": "disc_eletromecanica",
+                "nome": "Comandos elétricos",
+                "ordem": 3
+          },
+          {
+                "id": "tema_eletro_motores",
+                "disciplinaId": "disc_eletromecanica",
+                "nome": "Motores e acionamentos",
+                "ordem": 4
+          },
+          {
+                "id": "tema_processos_extrusao",
+                "disciplinaId": "disc_processos",
+                "nome": "Extrusão tubular e filmes",
+                "ordem": 1
+          },
+          {
+                "id": "tema_processos_corona",
+                "disciplinaId": "disc_processos",
+                "nome": "Tratamento corona",
+                "ordem": 2
+          },
+          {
+                "id": "tema_processos_flexo",
+                "disciplinaId": "disc_processos",
+                "nome": "Flexografia",
+                "ordem": 3
+          },
+          {
+                "id": "tema_processos_corte",
+                "disciplinaId": "disc_processos",
+                "nome": "Corte e solda",
+                "ordem": 4
+          },
+          {
+                "id": "tema_ensaios_mfi",
+                "disciplinaId": "disc_ensaios",
+                "nome": "Índice de fluidez",
+                "ordem": 1
+          },
+          {
+                "id": "tema_ensaios_mecanicos",
+                "disciplinaId": "disc_ensaios",
+                "nome": "Ensaios mecânicos",
+                "ordem": 2
+          },
+          {
+                "id": "tema_ensaios_estatistica",
+                "disciplinaId": "disc_ensaios",
+                "nome": "Tratamento de dados",
+                "ordem": 3
+          },
+          {
+                "id": "tema_tecnologia_polimeros",
+                "disciplinaId": "disc_tecnologia",
+                "nome": "Polímeros e propriedades",
+                "ordem": 1
+          },
+          {
+                "id": "tema_qualidade_masp",
+                "disciplinaId": "disc_qualidade",
+                "nome": "Ferramentas da qualidade",
+                "ordem": 1
+          },
+          {
+                "id": "tema_sst_nr12",
+                "disciplinaId": "disc_sst",
+                "nome": "NR-12 e segurança em máquinas",
+                "ordem": 1
+          },
+          {
+                "id": "tema_sst_ergonomia",
+                "disciplinaId": "disc_sst",
+                "nome": "Ergonomia e NR-17",
+                "ordem": 2
+          },
+          {
+                "id": "tema_praticas_projetos",
+                "disciplinaId": "disc_praticas",
+                "nome": "Projetos integradores",
+                "ordem": 1
+          },
+          {
+                "id": "tema_geral_documentos",
+                "disciplinaId": "geral",
+                "nome": "Documentos gerais do curso",
+                "ordem": 1
+          },
+          {
+                "id": "tema_geral_modelos",
+                "disciplinaId": "geral",
+                "nome": "Modelos e formulários",
+                "ordem": 2
+          }
+    ],
+    materiais: [
+          {
+                "id": "mat_001",
+                "titulo": "Aula 01 — Tensão, corrente e resistência",
+                "link": "https://www.canva.com/design/DAF-aula-eletrica-01/view",
+                "origem": "Canva",
+                "links": [
+                {
+                                "id": "lnk_mat001_canva",
+                                "titulo": "Slides no Canva",
+                                "link": "https://www.canva.com/design/DAF-aula-eletrica-01/view",
+                                "origem": "Canva",
+                                "ordem": 1
+                },
+                {
+                                "id": "lnk_mat001_pdf",
+                                "titulo": "PDF para impressão",
+                                "link": "https://drive.google.com/file/d/1AulaEletricaPDF/view",
+                                "origem": "Google Drive",
+                                "ordem": 2
+                },
+                {
+                                "id": "lnk_mat001_video",
+                                "titulo": "Vídeo de apoio",
+                                "link": "https://www.youtube.com/watch?v=ELETRICA-AULA01",
+                                "origem": "YouTube",
+                                "ordem": 3
+                }
+],
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_grandezas",
+                "tipoId": "tipo_slide",
+                "descricao": "Slides usados na explicação inicial das grandezas elétricas.",
+                "ordem": 1,
+                "fixado": true
+          },
+          {
+                "id": "mat_002",
+                "titulo": "Resumo — Corrente alternada e contínua",
+                "link": "https://drive.google.com/file/d/1ResumoCorrenteACDC/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_grandezas",
+                "tipoId": "tipo_estudo",
+                "descricao": "PDF de consulta rápida para os alunos.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_003",
+                "titulo": "Vídeo de apoio — Como a corrente elétrica circula",
+                "link": "https://www.youtube.com/watch?v=ELETRICA001",
+                "origem": "YouTube",
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_grandezas",
+                "tipoId": "tipo_video",
+                "descricao": "Vídeo complementar para revisão em casa.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_004",
+                "titulo": "Atividade de fixação — Grandezas elétricas",
+                "link": "https://drive.google.com/file/d/1AtividadeGrandezas/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_grandezas",
+                "tipoId": "tipo_atividade",
+                "descricao": "Lista curta com questões conceituais.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_005",
+                "titulo": "Gabarito — Grandezas elétricas",
+                "link": "https://drive.google.com/file/d/1GabaritoGrandezas/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_grandezas",
+                "tipoId": "tipo_gabarito",
+                "descricao": "Correção da atividade de fixação.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_006",
+                "titulo": "Aula 02 — Uso do multímetro",
+                "link": "https://www.canva.com/design/DAF-multimetro-aula/view",
+                "origem": "Canva",
+                "links": [
+                {
+                                "id": "lnk_mat006_canva",
+                                "titulo": "Apresentação",
+                                "link": "https://www.canva.com/design/DAF-multimetro-aula/view",
+                                "origem": "Canva",
+                                "ordem": 1
+                },
+                {
+                                "id": "lnk_mat006_roteiro",
+                                "titulo": "Roteiro complementar",
+                                "link": "https://drive.google.com/file/d/1ComplementoMultimetro/view",
+                                "origem": "Google Drive",
+                                "ordem": 2
+                }
+],
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_medicoes",
+                "tipoId": "tipo_slide",
+                "descricao": "Escalas, pontas de prova e cuidados de segurança.",
+                "ordem": 1,
+                "fixado": true
+          },
+          {
+                "id": "mat_007",
+                "titulo": "Roteiro de prática — Medir tensão em tomada e pilha",
+                "link": "https://drive.google.com/file/d/1RoteiroMultimetro/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_medicoes",
+                "tipoId": "tipo_atividade",
+                "descricao": "Passo a passo da prática realizada em grupo.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_008",
+                "titulo": "Formulário de revisão — Multímetro",
+                "link": "https://docs.google.com/forms/d/e/1FAIpQLSdMultimetro/viewform",
+                "origem": "Google Forms",
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_medicoes",
+                "tipoId": "tipo_atividade",
+                "descricao": "Quiz para revisar antes da prática.",
+                "ordem": 2,
+                "fixado": false
+          },
+          {
+                "id": "mat_009",
+                "titulo": "Vídeo — Como selecionar escala no multímetro",
+                "link": "https://youtu.be/MULTIMETRO02",
+                "origem": "YouTube",
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_medicoes",
+                "tipoId": "tipo_video",
+                "descricao": "Demonstração visual rápida.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_010",
+                "titulo": "Aula 05 — Contator, selo e botoeiras",
+                "link": "https://www.canva.com/design/DAF-comandos-eletricos/view",
+                "origem": "Canva",
+                "links": [
+                {
+                                "id": "lnk_mat010_canva",
+                                "titulo": "Slides",
+                                "link": "https://www.canva.com/design/DAF-comandos-eletricos/view",
+                                "origem": "Canva",
+                                "ordem": 1
+                },
+                {
+                                "id": "lnk_mat010_drive",
+                                "titulo": "Diagrama em PDF",
+                                "link": "https://drive.google.com/file/d/1DiagramaContatoSelo/view",
+                                "origem": "Google Drive",
+                                "ordem": 2
+                },
+                {
+                                "id": "lnk_mat010_video",
+                                "titulo": "Vídeo demonstrativo",
+                                "link": "https://youtu.be/CONTATOR-SELO",
+                                "origem": "YouTube",
+                                "ordem": 3
+                }
+],
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_comandos",
+                "tipoId": "tipo_slide",
+                "descricao": "Explicação da lógica de comando e intertravamento.",
+                "ordem": 1,
+                "fixado": true
+          },
+          {
+                "id": "mat_011",
+                "titulo": "Diagrama — Comando com selo",
+                "link": "https://drive.google.com/file/d/1DiagramaSelo/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_comandos",
+                "tipoId": "tipo_estudo",
+                "descricao": "Diagrama para consulta em aula.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_012",
+                "titulo": "Trabalho em dupla — Diagnóstico de falha",
+                "link": "https://drive.google.com/file/d/1TrabalhoComandos/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_comandos",
+                "tipoId": "tipo_trabalho",
+                "descricao": "Cenários para investigação de circuitos.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_013",
+                "titulo": "Prova prática — Comandos elétricos",
+                "link": "https://drive.google.com/file/d/1ProvaPraticaComandos/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_comandos",
+                "tipoId": "tipo_prova",
+                "descricao": "Versão da prova aplicada.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_014",
+                "titulo": "Gabarito orientador — Prova prática",
+                "link": "https://drive.google.com/file/d/1GabaritoProvaComandos/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_comandos",
+                "tipoId": "tipo_gabarito",
+                "descricao": "Critérios de correção e respostas esperadas.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_015",
+                "titulo": "Aula 08 — Motor trifásico e placa de bornes",
+                "link": "https://www.canva.com/design/DAF-motor-trifasico/view",
+                "origem": "Canva",
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_motores",
+                "tipoId": "tipo_slide",
+                "descricao": "Leitura da placa e ligações estrela/triângulo.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_016",
+                "titulo": "Vídeo — Ligação estrela e triângulo",
+                "link": "https://www.youtube.com/watch?v=MOTORTRIANGULO",
+                "origem": "YouTube",
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_motores",
+                "tipoId": "tipo_video",
+                "descricao": "Conteúdo de apoio para revisão.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_017",
+                "titulo": "Resumo visual — Soft Starter x Inversor",
+                "link": "https://drive.google.com/file/d/1SoftStarterXInversor/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_eletromecanica",
+                "temaId": "tema_eletro_motores",
+                "tipoId": "tipo_estudo",
+                "descricao": "Quadro comparativo simples.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_018",
+                "titulo": "Aula — Extrusão tubular",
+                "link": "https://www.canva.com/design/DAF-extrusao-tubular/view",
+                "origem": "Canva",
+                "disciplinaId": "disc_processos",
+                "temaId": "tema_processos_extrusao",
+                "tipoId": "tipo_slide",
+                "descricao": "Componentes da extrusora e formação da bolha.",
+                "ordem": 1,
+                "fixado": true
+          },
+          {
+                "id": "mat_019",
+                "titulo": "Vídeo técnico — Extrusão de filme plástico",
+                "link": "https://www.youtube.com/watch?v=EXTRUSAOFILME",
+                "origem": "YouTube",
+                "disciplinaId": "disc_processos",
+                "temaId": "tema_processos_extrusao",
+                "tipoId": "tipo_video",
+                "descricao": "Vídeo de processo industrial.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_020",
+                "titulo": "Material de estudo — Defeitos em filmes flexíveis",
+                "link": "https://drive.google.com/file/d/1DefeitosFilmes/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_processos",
+                "temaId": "tema_processos_extrusao",
+                "tipoId": "tipo_estudo",
+                "descricao": "Consulta sobre borda caída, bobina colada e outros defeitos.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_021",
+                "titulo": "Atividade — Identificação de defeitos de extrusão",
+                "link": "https://docs.google.com/presentation/d/1AtividadeDefeitos/edit",
+                "origem": "Google Slides",
+                "links": [
+                {
+                                "id": "lnk_mat021_canva",
+                                "titulo": "Slides sobre corona",
+                                "link": "https://www.canva.com/design/DAF-corona-aula/view",
+                                "origem": "Canva",
+                                "ordem": 1
+                },
+                {
+                                "id": "lnk_mat021_artigo",
+                                "titulo": "Texto de consulta",
+                                "link": "https://drive.google.com/file/d/1CoronaConsulta/view",
+                                "origem": "Google Drive",
+                                "ordem": 2
+                }
+],
+                "disciplinaId": "disc_processos",
+                "temaId": "tema_processos_extrusao",
+                "tipoId": "tipo_atividade",
+                "descricao": "Apresentação com imagens para classificação.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_022",
+                "titulo": "Aula — Tratamento corona",
+                "link": "https://www.canva.com/design/DAF-tratamento-corona/view",
+                "origem": "Canva",
+                "disciplinaId": "disc_processos",
+                "temaId": "tema_processos_corona",
+                "tipoId": "tipo_slide",
+                "descricao": "Energia superficial, dinas/cm e aplicação em filmes.",
+                "ordem": 1,
+                "fixado": true
+          },
+          {
+                "id": "mat_023",
+                "titulo": "Pesquisa em grupo — Tratamento corona",
+                "link": "https://drive.google.com/file/d/1PesquisaCorona/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_processos",
+                "temaId": "tema_processos_corona",
+                "tipoId": "tipo_atividade",
+                "descricao": "Roteiro da pesquisa aplicada em sala.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_024",
+                "titulo": "Vídeo — Corona treatment animation",
+                "link": "https://youtu.be/CORONATREATMENT",
+                "origem": "YouTube",
+                "disciplinaId": "disc_processos",
+                "temaId": "tema_processos_corona",
+                "tipoId": "tipo_video",
+                "descricao": "Animação para ilustrar o fenômeno.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_025",
+                "titulo": "Aula — Fundamentos de flexografia",
+                "link": "https://www.canva.com/design/DAF-flexografia/view",
+                "origem": "Canva",
+                "disciplinaId": "disc_processos",
+                "temaId": "tema_processos_flexo",
+                "tipoId": "tipo_slide",
+                "descricao": "Clichê, anilox, secagem e registro.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_026",
+                "titulo": "Material de consulta — Defeitos na flexografia",
+                "link": "https://drive.google.com/file/d/1DefeitosFlexo/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_processos",
+                "temaId": "tema_processos_flexo",
+                "tipoId": "tipo_estudo",
+                "descricao": "Tabela de defeitos, causas e correções.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_027",
+                "titulo": "Atividade — Fluxo produtivo de impressão",
+                "link": "https://www.canva.com/design/DAF-atividade-flexo/view",
+                "origem": "Canva",
+                "disciplinaId": "disc_processos",
+                "temaId": "tema_processos_flexo",
+                "tipoId": "tipo_atividade",
+                "descricao": "Atividade visual para organizar etapas do processo.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_028",
+                "titulo": "Aula — Corte e solda",
+                "link": "https://www.canva.com/design/DAF-corte-solda/view",
+                "origem": "Canva",
+                "disciplinaId": "disc_processos",
+                "temaId": "tema_processos_corte",
+                "tipoId": "tipo_slide",
+                "descricao": "Riscos, variáveis e exemplos de defeitos.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_029",
+                "titulo": "Checklist de observação — Corte e solda",
+                "link": "https://docs.google.com/forms/d/e/1FAIpQLSChecklistCorte/viewform",
+                "origem": "Google Forms",
+                "disciplinaId": "disc_processos",
+                "temaId": "tema_processos_corte",
+                "tipoId": "tipo_atividade",
+                "descricao": "Formulário para acompanhamento da visita técnica simulada.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_030",
+                "titulo": "Aula — Índice de fluidez (MFI)",
+                "link": "https://www.canva.com/design/DAF-mfi-aula/view",
+                "origem": "Canva",
+                "disciplinaId": "disc_ensaios",
+                "temaId": "tema_ensaios_mfi",
+                "tipoId": "tipo_slide",
+                "descricao": "Conceito, procedimento e interpretação.",
+                "ordem": 1,
+                "fixado": true
+          },
+          {
+                "id": "mat_031",
+                "titulo": "Planilha de dados — MFI",
+                "link": "https://docs.google.com/spreadsheets/d/1PlanilhaMFI/edit",
+                "origem": "Google Planilhas",
+                "disciplinaId": "disc_ensaios",
+                "temaId": "tema_ensaios_mfi",
+                "tipoId": "tipo_atividade",
+                "descricao": "Tabela para os alunos calcular média e comparar amostras.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_032",
+                "titulo": "Vídeo — Ensaio de índice de fluidez",
+                "link": "https://www.youtube.com/watch?v=INDICEFLUIDEZ",
+                "origem": "YouTube",
+                "disciplinaId": "disc_ensaios",
+                "temaId": "tema_ensaios_mfi",
+                "tipoId": "tipo_video",
+                "descricao": "Demonstração do ensaio.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_033",
+                "titulo": "Aula — Impacto, dureza e rasgamento",
+                "link": "https://www.canva.com/design/DAF-ensaios-mecanicos/view",
+                "origem": "Canva",
+                "disciplinaId": "disc_ensaios",
+                "temaId": "tema_ensaios_mecanicos",
+                "tipoId": "tipo_slide",
+                "descricao": "Principais ensaios mecânicos aplicados a polímeros.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_034",
+                "titulo": "Roteiro de prática — Queda de dardo",
+                "link": "https://drive.google.com/file/d/1QuedaDardo/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_ensaios",
+                "temaId": "tema_ensaios_mecanicos",
+                "tipoId": "tipo_atividade",
+                "descricao": "Procedimento de avaliação do impacto em filme.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_035",
+                "titulo": "Prova — Ensaios em polímeros",
+                "link": "https://drive.google.com/file/d/1ProvaEnsaios/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_ensaios",
+                "temaId": "tema_ensaios_mecanicos",
+                "tipoId": "tipo_prova",
+                "descricao": "Avaliação teórica com múltipla escolha e questões abertas.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_036",
+                "titulo": "Aula — Média, variação e interpretação de resultados",
+                "link": "https://www.canva.com/design/DAF-estatistica-ensaios/view",
+                "origem": "Canva",
+                "disciplinaId": "disc_ensaios",
+                "temaId": "tema_ensaios_estatistica",
+                "tipoId": "tipo_slide",
+                "descricao": "Estatística básica aplicada aos dados de laboratório.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_037",
+                "titulo": "Atividade em planilha — Tratamento de resultados",
+                "link": "https://docs.google.com/spreadsheets/d/1ResultadosEnsaios/edit",
+                "origem": "Google Planilhas",
+                "disciplinaId": "disc_ensaios",
+                "temaId": "tema_ensaios_estatistica",
+                "tipoId": "tipo_atividade",
+                "descricao": "Arquivo para cálculo e geração de gráfico.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_038",
+                "titulo": "Aula — Termoplásticos e termofixos",
+                "link": "https://www.canva.com/design/DAF-polimeros-classes/view",
+                "origem": "Canva",
+                "disciplinaId": "disc_tecnologia",
+                "temaId": "tema_tecnologia_polimeros",
+                "tipoId": "tipo_slide",
+                "descricao": "Classificação e comportamento dos materiais.",
+                "ordem": 1,
+                "fixado": true
+          },
+          {
+                "id": "mat_039",
+                "titulo": "Mapa mental — Propriedades dos polímeros",
+                "link": "https://drive.google.com/file/d/1MapaPolimeros/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_tecnologia",
+                "temaId": "tema_tecnologia_polimeros",
+                "tipoId": "tipo_estudo",
+                "descricao": "Resumo visual para revisão.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_040",
+                "titulo": "Vídeo — Estrutura molecular e processamento",
+                "link": "https://youtu.be/POLIMEROSPROC",
+                "origem": "YouTube",
+                "disciplinaId": "disc_tecnologia",
+                "temaId": "tema_tecnologia_polimeros",
+                "tipoId": "tipo_video",
+                "descricao": "Apoio conceitual.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_041",
+                "titulo": "Aula — MASP, PDCA e DMAIC",
+                "link": "https://www.canva.com/design/DAF-qualidade-masp/view",
+                "origem": "Canva",
+                "disciplinaId": "disc_qualidade",
+                "temaId": "tema_qualidade_masp",
+                "tipoId": "tipo_slide",
+                "descricao": "Comparação das metodologias de melhoria.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_042",
+                "titulo": "Caso aplicado — Reclamação de embalagem",
+                "link": "https://drive.google.com/file/d/1CasoQualidade/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_qualidade",
+                "temaId": "tema_qualidade_masp",
+                "tipoId": "tipo_atividade",
+                "descricao": "Situação-problema para trabalho em grupo.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_043",
+                "titulo": "Formulário de autoavaliação do grupo",
+                "link": "https://forms.office.com/r/AutoavaliacaoGrupo",
+                "origem": "Microsoft Forms",
+                "disciplinaId": "disc_qualidade",
+                "temaId": "tema_qualidade_masp",
+                "tipoId": "tipo_atividade",
+                "descricao": "Avaliação rápida após apresentação.",
+                "ordem": 2,
+                "fixado": false
+          },
+          {
+                "id": "mat_044",
+                "titulo": "Aula — NR-12 em máquinas industriais",
+                "link": "https://www.canva.com/design/DAF-nr12/view",
+                "origem": "Canva",
+                "disciplinaId": "disc_sst",
+                "temaId": "tema_sst_nr12",
+                "tipoId": "tipo_slide",
+                "descricao": "Dispositivos de segurança e boas práticas.",
+                "ordem": 1,
+                "fixado": true
+          },
+          {
+                "id": "mat_045",
+                "titulo": "Consulta — Texto da NR-12",
+                "link": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/nr-12",
+                "origem": "Site oficial",
+                "disciplinaId": "disc_sst",
+                "temaId": "tema_sst_nr12",
+                "tipoId": "tipo_estudo",
+                "descricao": "Link externo de consulta à norma.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_046",
+                "titulo": "Atividade — Identificar riscos em máquinas",
+                "link": "https://drive.google.com/file/d/1AtividadeNR12/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_sst",
+                "temaId": "tema_sst_nr12",
+                "tipoId": "tipo_atividade",
+                "descricao": "Imagens para análise de situações inseguras.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_047",
+                "titulo": "Aula — Ergonomia e NR-17",
+                "link": "https://www.canva.com/design/DAF-ergonomia-nr17/view",
+                "origem": "Canva",
+                "disciplinaId": "disc_sst",
+                "temaId": "tema_sst_ergonomia",
+                "tipoId": "tipo_slide",
+                "descricao": "Postura, AET e ferramentas de análise.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_048",
+                "titulo": "Vídeo — Ergonomia no posto de trabalho",
+                "link": "https://www.youtube.com/watch?v=ERGONOMIA17",
+                "origem": "YouTube",
+                "disciplinaId": "disc_sst",
+                "temaId": "tema_sst_ergonomia",
+                "tipoId": "tipo_video",
+                "descricao": "Material de apoio para discussão em sala.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_049",
+                "titulo": "Orientação — Projeto integrador",
+                "link": "https://drive.google.com/file/d/1ProjetoIntegrador/view",
+                "origem": "Google Drive",
+                "disciplinaId": "disc_praticas",
+                "temaId": "tema_praticas_projetos",
+                "tipoId": "tipo_trabalho",
+                "descricao": "Documento com escopo, critérios e entregas.",
+                "ordem": 1,
+                "fixado": true
+          },
+          {
+                "id": "mat_050",
+                "titulo": "Modelo de apresentação do projeto",
+                "link": "https://www.canva.com/design/DAF-modelo-projeto/view",
+                "origem": "Canva",
+                "disciplinaId": "disc_praticas",
+                "temaId": "tema_praticas_projetos",
+                "tipoId": "tipo_slide",
+                "descricao": "Modelo editável para orientação visual.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_051",
+                "titulo": "Planilha de acompanhamento das equipes",
+                "link": "https://docs.google.com/spreadsheets/d/1AcompanhamentoEquipes/edit",
+                "origem": "Google Planilhas",
+                "disciplinaId": "disc_praticas",
+                "temaId": "tema_praticas_projetos",
+                "tipoId": "tipo_outro",
+                "descricao": "Controle interno do andamento.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_052",
+                "titulo": "Cronograma geral da turma",
+                "link": "https://drive.google.com/file/d/1CronogramaTurma/view",
+                "origem": "Google Drive",
+                "disciplinaId": "geral",
+                "temaId": "tema_geral_documentos",
+                "tipoId": "tipo_estudo",
+                "descricao": "Documento de consulta sobre as datas principais.",
+                "ordem": 1,
+                "fixado": true
+          },
+          {
+                "id": "mat_053",
+                "titulo": "Página de acesso ao portal institucional",
+                "link": "https://www.senaimg.com.br/",
+                "origem": "Site SENAI",
+                "disciplinaId": "geral",
+                "temaId": "tema_geral_documentos",
+                "tipoId": "tipo_outro",
+                "descricao": "Link de apoio institucional.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_054",
+                "titulo": "Modelo de capa para trabalhos",
+                "link": "https://www.canva.com/design/DAF-capa-trabalho/view",
+                "origem": "Canva",
+                "disciplinaId": "geral",
+                "temaId": "tema_geral_modelos",
+                "tipoId": "tipo_outro",
+                "descricao": "Modelo visual para compartilhamento com alunos.",
+                "ordem": 1,
+                "fixado": false
+          },
+          {
+                "id": "mat_055",
+                "titulo": "Formulário de avaliação da aula",
+                "link": "https://docs.google.com/forms/d/e/1FAIpQLSAvaliacaoAula/viewform",
+                "origem": "Google Forms",
+                "disciplinaId": "geral",
+                "temaId": "tema_geral_modelos",
+                "tipoId": "tipo_outro",
+                "descricao": "Formulário para feedback pontual.",
+                "ordem": 1,
+                "fixado": false
+          }
+    ]
+  };
+}
+
+let D = defaults();
+
+function coerceData(raw) {
+  const base = defaults();
+  const src = raw && typeof raw === 'object' ? raw : {};
+  const out = {...base, ...src};
+  out.nomeGeral = src.nomeGeral || base.nomeGeral;
+  out.tipos = Array.isArray(src.tipos) ? src.tipos : base.tipos;
+  out.disciplinas = Array.isArray(src.disciplinas) ? src.disciplinas : base.disciplinas;
+  out.temas = Array.isArray(src.temas) ? src.temas : [];
+  out.materiais = Array.isArray(src.materiais) ? src.materiais : [];
+
+  // Migração de tipos antigos em string
+  if (out.tipos.length && typeof out.tipos[0] === 'string') {
+    const cores = ['#2d5be3','#2a7d4f','#b93232','#9a6200','#8b24b8','#1a7a8a','#164194','#555555','#888888'];
+    const icons = ['📖','✏️','📝','📋','🎬','📚','🖥️','✅','📎'];
+    out.tipos = out.tipos.map((nome,i)=>({id:uid('tipo'), nome, icone:icons[i]||'📎', cor:cores[i]||'#888888', ordem:i+1}));
+  } else {
+    out.tipos = out.tipos.map((t,i)=>({
+      id:t.id||uid('tipo'),
+      nome:t.nome||'Tipo sem nome',
+      icone:t.icone||'📎',
+      cor:t.cor||'#888888',
+      ordem:Number.isFinite(Number(t.ordem))?Number(t.ordem):i+1
+    }));
+  }
+
+  // Migração de disciplinas antigas em string
+  if (out.disciplinas.length && typeof out.disciplinas[0] === 'string') {
+    out.disciplinas = out.disciplinas.map((nome,i)=>({id:uid('disc'), nome, ordem:i+1, modalidade:modalidadeDisciplinaFallback({nome})}));
+  } else {
+    out.disciplinas = out.disciplinas.map((d,i)=>({
+      id:d.id||uid('disc'),
+      nome:d.nome||'Disciplina sem nome',
+      ordem:Number.isFinite(Number(d.ordem))?Number(d.ordem):i+1,
+      modalidade:modalidadeDisciplinaFallback(d)
+    }));
+  }
+
+  // Dicionários para migrar materiais antigos por texto
+  const discByName = new Map(out.disciplinas.map(d=>[normalizar(d.nome), d.id]));
+  const tipoByName = new Map(out.tipos.map(t=>[normalizar(t.nome), t.id]));
+
+  // Temas
+  out.temas = out.temas.map((t,i)=>({
+    id:t.id||uid('tema'),
+    disciplinaId:t.disciplinaId || t.disc || GERAL_ID,
+    nome:t.nome||'Tema sem nome',
+    ordem:Number.isFinite(Number(t.ordem))?Number(t.ordem):i+1
+  }));
+
+  // Materiais
+  out.materiais = out.materiais.map((m,i)=>{
+    let disciplinaId = m.disciplinaId || '';
+    if (!disciplinaId && m.disciplina) {
+      disciplinaId = discByName.get(normalizar(m.disciplina)) || GERAL_ID;
+    }
+    if (!disciplinaId) disciplinaId = GERAL_ID;
+
+    let tipoId = m.tipoId || '';
+    if (!tipoId && m.tipo) tipoId = tipoByName.get(normalizar(m.tipo)) || (out.tipos[0]?.id || 'tipo_outro');
+    if (!tipoId) tipoId = out.tipos[0]?.id || 'tipo_outro';
+
+    const rawLinks = Array.isArray(m.links) && m.links.length
+      ? m.links
+      : ((m.link || '').trim() ? [{ titulo:m.linkTitulo||'', link:m.link, origem:m.origem||m.plataforma||'' }] : []);
+    const links = rawLinks
+      .filter(l => l && String(l.link||'').trim())
+      .map((l,idx)=>({
+        id:l.id||uid('lnk'),
+        titulo:String(l.titulo||l.nome||'').trim(),
+        link:String(l.link||'').trim(),
+        origem:String(l.origem||l.plataforma||'').trim(),
+        ordem:Number.isFinite(Number(l.ordem)) ? Number(l.ordem) : idx+1
+      }))
+      .sort((a,b)=>(a.ordem||0)-(b.ordem||0));
+    const principal = links[0] || {link:'', origem:''};
+
+    return {
+      id:m.id||uid('mat'),
+      titulo:m.titulo||'Material sem título',
+      link:principal.link||'',
+      origem:principal.origem||'',
+      links,
+      disciplinaId,
+      temaId:m.temaId||'',
+      tipoId,
+      descricao:m.descricao||'',
+      ordem:Number.isFinite(Number(m.ordem)) ? Number(m.ordem) : i+1,
+      fixado:!!m.fixado
+    };
+  });
+
+  return out;
+}
+
+function carregar() {
+  try {
+    const current = localStorage.getItem(SK);
+    if (current) {
+      D = coerceData(JSON.parse(current));
+      salvar();
+      return;
+    }
+    const legacy = localStorage.getItem(LEGACY_SK);
+    if (legacy) {
+      D = coerceData(JSON.parse(legacy));
+      salvar();
+      return;
+    }
+  } catch(e) {}
+  D = defaults();
+}
+function salvar() { localStorage.setItem(SK, JSON.stringify(D)); }
+
+// ════════════════════════════════════════════════════════
+// LOOKUPS / ORDENAÇÃO / MÉTRICAS
+// ════════════════════════════════════════════════════════
+function tiposOrdenados(){ return [...D.tipos].sort((a,b)=>(a.ordem||0)-(b.ordem||0)||a.nome.localeCompare(b.nome,'pt-BR')); }
+function discsOrdenadas(){ return [...D.disciplinas].sort((a,b)=>(a.ordem||0)-(b.ordem||0)||a.nome.localeCompare(b.nome,'pt-BR')); }
+function modalidadeDisciplina(d){ return modalidadeDisciplinaFallback(d); }
+function discsPorModalidade(m){ return discsOrdenadas().filter(d=>modalidadeDisciplina(d)===m); }
+function temasDaDisc(discId){ return D.temas.filter(t=>t.disciplinaId===discId).sort((a,b)=>(a.ordem||0)-(b.ordem||0)||a.nome.localeCompare(b.nome,'pt-BR')); }
+function getDisc(id){ return id===GERAL_ID ? {id:GERAL_ID,nome:D.nomeGeral||'Materiais gerais', ordem:0, geral:true} : D.disciplinas.find(d=>d.id===id); }
+function getTipo(id){ return D.tipos.find(t=>t.id===id) || {id:'',nome:'Outro',icone:'📎',cor:'#888888'}; }
+function getTema(id){ return D.temas.find(t=>t.id===id); }
+function labelDisc(id){ return getDisc(id)?.nome || 'Sem disciplina'; }
+function labelTema(id){ return getTema(id)?.nome || 'Sem tema'; }
+function labelTipo(id){ return getTipo(id)?.nome || 'Outro'; }
+function tipoIcon(id){ return getTipo(id).icone || '📎'; }
+function tipoCor(id){ return getTipo(id).cor || '#888888'; }
+function tipoBg(id){ return colorAlpha(tipoCor(id), .12); }
+function detectarOrigem(link){
+  const l=String(link||'').toLowerCase();
+  if(l.includes('canva.com')) return 'Canva';
+  if(l.includes('youtube.com')||l.includes('youtu.be')) return 'YouTube';
+  if(l.includes('docs.google.com/forms')) return 'Google Forms';
+  if(l.includes('docs.google.com/presentation')||l.includes('slides.google.com')) return 'Google Slides';
+  if(l.includes('docs.google.com/document')) return 'Google Docs';
+  if(l.includes('docs.google.com/spreadsheets')||l.includes('sheets.google.com')) return 'Google Planilhas';
+  if(l.includes('drive.google.com')) return 'Google Drive';
+  if(l.includes('forms.office.com')) return 'Microsoft Forms';
+  if(l.includes('onedrive.live.com')||l.includes('1drv.ms')) return 'OneDrive';
+  return 'Link externo';
+}
+function materialLinks(m){
+  if(Array.isArray(m?.links) && m.links.length) return m.links.filter(l=>l && String(l.link||'').trim());
+  if(String(m?.link||'').trim()) return [{id:'legacy',titulo:'',link:m.link,origem:m.origem||'',ordem:1}];
+  return [];
+}
+function origemLink(l){ return String(l?.origem||'').trim() || detectarOrigem(l?.link||''); }
+function origemMaterial(m){ return origemLink(materialLinks(m)[0] || {link:m?.link||'',origem:m?.origem||''}); }
+function origensMaterial(m){ return [...new Set(materialLinks(m).map(origemLink).filter(Boolean))]; }
+function tituloLink(l, idx=0){ return String(l?.titulo||'').trim() || origemLink(l) || `Link ${idx+1}`; }
+function sourceBadgesHtml(m){ return origensMaterial(m).map(o=>`<span class="mat-source-badge">${escH(o)}</span>`).join(''); }
+function materialLinksSearchText(m){ return materialLinks(m).map((l,idx)=>[tituloLink(l,idx),origemLink(l),l.link].join(' ')).join(' '); }
+function matsDaDisc(discId){ return D.materiais.filter(m=>m.disciplinaId===discId); }
+function countTema(discId){ return D.temas.filter(t=>t.disciplinaId===discId).length; }
+function countFixados(discId){ return D.materiais.filter(m=>m.disciplinaId===discId && m.fixado).length; }
+function sortMats(lista){
+  return [...lista].sort((a,b)=>
+    Number(!!b.fixado)-Number(!!a.fixado) ||
+    (Number(a.ordem)||999999)-(Number(b.ordem)||999999) ||
+    (a.titulo||'').localeCompare(b.titulo||'','pt-BR')
+  );
+}
+function nextOrderFor(disciplinaId, temaId, tipoId){
+  const ords = D.materiais.filter(m=>m.disciplinaId===disciplinaId && (m.temaId||'')===(temaId||'') && m.tipoId===tipoId).map(m=>Number(m.ordem)||0);
+  return (ords.length ? Math.max(...ords) : 0) + 1;
+}
+function totalByType(discId){
+  const map = new Map();
+  matsDaDisc(discId).forEach(m=>map.set(m.tipoId,(map.get(m.tipoId)||0)+1));
+  return [...map.entries()].map(([tipoId,total])=>({tipoId,total}));
+}
+function searchable(m){
+  return normalizar([
+    m.titulo,m.descricao,materialLinksSearchText(m),labelDisc(m.disciplinaId),labelTema(m.temaId),labelTipo(m.tipoId)
+  ].join(' '));
+}
+function filterMats(list, {search='', tipoId='', temaId=''}={}){
+  const s = normalizar(search);
+  return sortMats(list.filter(m=>{
+    if (tipoId && m.tipoId!==tipoId) return false;
+    if (temaId && (m.temaId||'')!==temaId) return false;
+    if (s && !searchable(m).includes(s)) return false;
+    return true;
+  }));
+}
+
+// ════════════════════════════════════════════════════════
+// LOGIN
+// ════════════════════════════════════════════════════════
+let modoAdmin = false;
+async function doLogin() {
+  const val = document.getElementById('loginInput').value;
+  const errEl = document.getElementById('loginError');
+  const ok = await verificarSenhaAdmin(val);
+  if (ok) {
+    sessionStorage.setItem('mat_mode', 'admin');
+    abrirApp();
+  } else {
+    loginErro(errEl, 'Senha de administrador incorreta.');
+  }
+}
+function b64ParaBytes(b64){
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+  return arr;
+}
+function bytesParaB64(bytes){
+  let bin = '';
+  bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin);
+}
+function compararBytesConstante(a,b){
+  if(a.length !== b.length) return false;
+  let diff = 0;
+  for(let i=0;i<a.length;i++) diff |= a[i] ^ b[i];
+  return diff === 0;
+}
+function lerRegistroAdmin(){
+  try{
+    const raw = localStorage.getItem(ADMIN_AUTH_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed || !parsed.salt || !parsed.hash || !parsed.iterations) return null;
+    return parsed;
+  }catch(e){ return null; }
+}
+async function derivarHashSenhaAdmin(senha, saltB64, iterations){
+  if(!window.crypto || !window.crypto.subtle) return null;
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', enc.encode(String(senha || '')), {name:'PBKDF2'}, false, ['deriveBits']
+  );
+  const bits = await crypto.subtle.deriveBits(
+    {name:'PBKDF2', salt:b64ParaBytes(saltB64), iterations:Number(iterations)||600000, hash:'SHA-256'},
+    keyMaterial,
+    256
+  );
+  return new Uint8Array(bits);
+}
+async function verificarSenhaAdmin(senha){
+  const registro = lerRegistroAdmin() || ADMIN_DEFAULT_AUTH;
+  try{
+    const derivado = await derivarHashSenhaAdmin(senha, registro.salt, registro.iterations);
+    if(derivado){
+      const esperado = b64ParaBytes(registro.hash);
+      if(compararBytesConstante(derivado, esperado)) return true;
+    }
+  }catch(e){}
+
+  // Compatibilidade com senhas antigas já salvas localmente pelo sistema principal.
+  const legado = localStorage.getItem(LEGACY_ADMIN_PW_KEY);
+  return !!legado && String(senha || '') === legado;
+}
+
+function loginErro(el,msg){ el.textContent=msg; el.style.display=''; const i=document.getElementById('loginInput'); i.value=''; i.focus(); }
+function doLogout(){ sessionStorage.removeItem('mat_mode'); location.reload(); }
+function checkLogin(){
+  const mode=sessionStorage.getItem('mat_mode');
+  if(mode==='admin') abrirApp();
+  else setTimeout(()=>document.getElementById('loginInput').focus(),100);
+}
+function abrirApp(){
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('appHeader').style.display='';
+  applyLogo();
+  const hTitle=document.getElementById('hTitle');
+  hTitle.textContent='Materiais — '+(D.nomeCurso||'SENAI');
+  document.title='Materiais — '+(D.nomeCurso||'SENAI');
+
+  document.getElementById('hBadge').style.display='';
+  document.getElementById('hBadge').textContent='Admin';
+  document.getElementById('hBtnPreview').style.display='';
+  document.getElementById('hBtnExport').style.display='';
+  document.getElementById('hBtnImport').style.display='';
+  document.getElementById('hBtnGerar').style.display='';
+  document.getElementById('hBtnVoltarAdmin').style.display='none';
+
+  document.getElementById('viewAdmin').style.display='';
+  document.getElementById('viewProfessor').style.display='none';
+
+  renderAdminHome();
+  renderConfigTab();
+}
+
+function visualizarComoProfessor(){
+  document.getElementById('viewAdmin').style.display='none';
+  document.getElementById('viewProfessor').style.display='';
+
+  document.getElementById('hBadge').style.display='';
+  document.getElementById('hBadge').textContent='Prévia';
+  document.getElementById('hBtnVoltarAdmin').style.display='';
+  document.getElementById('hBtnPreview').style.display='none';
+  document.getElementById('hBtnExport').style.display='none';
+  document.getElementById('hBtnImport').style.display='none';
+  document.getElementById('hBtnGerar').style.display='';
+
+  document.getElementById('professorHome').style.display='';
+  document.getElementById('professorDiscView').style.display='none';
+  currentProfessorDiscId = null;
+  const globalSearch = document.getElementById('profGlobalSearch');
+  if(globalSearch) globalSearch.value = '';
+  renderProfessorHome();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function voltarDaPreviaProfessor(){
+  document.getElementById('viewProfessor').style.display='none';
+  document.getElementById('viewAdmin').style.display='';
+
+  document.getElementById('hBadge').style.display='';
+  document.getElementById('hBadge').textContent='Admin';
+  document.getElementById('hBtnVoltarAdmin').style.display='none';
+  document.getElementById('hBtnPreview').style.display='';
+  document.getElementById('hBtnExport').style.display='';
+  document.getElementById('hBtnImport').style.display='';
+  document.getElementById('hBtnGerar').style.display='';
+
+  renderAdminHome();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ════════════════════════════════════════════════════════
+// LOGO
+// ════════════════════════════════════════════════════════
+function triggerLogoUpload(){ if(sessionStorage.getItem('mat_mode')==='admin') document.getElementById('logoFileInput').click(); }
+function handleLogoUpload(input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{ D.logo=e.target.result; salvar(); applyLogo(); renderConfigTab(); showToast('Logo atualizada!'); };
+  reader.readAsDataURL(file); input.value='';
+}
+function applyLogo(){
+  const b64=D.logo;
+  const li=document.getElementById('loginLogoImg'), lb=document.getElementById('loginBrandText');
+  const hi=document.getElementById('hLogoImg'), hb=document.getElementById('hBrandText');
+  if(b64){ li.src=b64; li.style.display=''; lb.style.display='none'; hi.src=b64; hi.style.display=''; hb.style.display='none'; }
+  else { li.style.display='none'; lb.style.display=''; hi.style.display='none'; hb.style.display=''; }
+}
+function removerLogo(){
+  if(!confirm('Remover a logo?')) return;
+  D.logo=''; salvar(); applyLogo(); renderConfigTab(); showToast('Logo removida.');
+}
+
+// ════════════════════════════════════════════════════════
+// ABAS
+// ════════════════════════════════════════════════════════
+function setTab(tab, btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tabMateriais').style.display=tab==='materiais'?'':'none';
+  document.getElementById('tabConfiguracoes').style.display=tab==='configuracoes'?'':'none';
+  if(tab==='materiais') renderAdminHome();
+  if(tab==='configuracoes') renderConfigTab();
+}
+
+// ════════════════════════════════════════════════════════
+// PROFESSOR - HOME / DISCIPLINA
+// ════════════════════════════════════════════════════════
+let currentProfessorDiscId = null;
+const collapsedProfessorThemes = new Set();
+function themeCollapseKey(scope, discId, themeId){ return `${scope}:${discId||'none'}:${themeId||'semtema'}`; }
+function isThemeCollapsedProfessor(themeId){ return collapsedProfessorThemes.has(themeCollapseKey('prof', currentProfessorDiscId, themeId)); }
+function toggleThemeProfessor(themeId){ const k=themeCollapseKey('prof', currentProfessorDiscId, themeId); collapsedProfessorThemes.has(k)?collapsedProfessorThemes.delete(k):collapsedProfessorThemes.add(k); renderProfessorDisc(); }
+function recolherTemasProfessor(){ [...temasDaDisc(currentProfessorDiscId),{id:''}].forEach(t=>collapsedProfessorThemes.add(themeCollapseKey('prof', currentProfessorDiscId, t.id||''))); renderProfessorDisc(); }
+function expandirTemasProfessor(){ [...temasDaDisc(currentProfessorDiscId),{id:''}].forEach(t=>collapsedProfessorThemes.delete(themeCollapseKey('prof', currentProfessorDiscId, t.id||''))); renderProfessorDisc(); }
+
+function renderProfessorHome(){
+  currentProfessorDiscId=null;
+  document.getElementById('professorHome').style.display='';
+  document.getElementById('professorDiscView').style.display='none';
+  const s = normalizar(document.getElementById('profGlobalSearch')?.value || '');
+  const el = document.getElementById('professorHomeContent');
+
+  if(s){
+    const mats = filterMats(D.materiais,{search:s});
+    el.innerHTML = `<div class="search-result-head">${mats.length} resultado${mats.length!==1?'s':''} encontrado${mats.length!==1?'s':''}</div>` + renderProfessorSearchResults(mats);
+    return;
+  }
+
+  const geral=discCardHtml(getDisc(GERAL_ID),true);
+  const presList=discsPorModalidade('presencial');
+  const eadList=discsPorModalidade('ead');
+  const pres=presList.map(d=>discCardHtml(d,true)).join('');
+  const ead=eadList.map(d=>discCardHtml(d,true)).join('');
+  el.innerHTML = [
+    geral?renderDiscGroupHtml('Materiais gerais', geral, 1, false):'',
+    renderDiscGroupHtml('Disciplinas presenciais', pres, presList.length, true),
+    renderDiscGroupHtml('Disciplinas EaD', ead, eadList.length, true)
+  ].filter(Boolean).join('');
+}
+
+function renderDiscGroupHtml(titulo,cardsHtml,total,mostrarContador=true){
+  return `<section class="disc-group-block">
+    <div class="disc-group-head">
+      <div class="disc-group-title">${escH(titulo)}</div>
+      ${mostrarContador?`<div class="disc-group-count">${total} ${total===1?'disciplina':'disciplinas'}</div>`:''}
+    </div>
+    ${cardsHtml?`<div class="disc-grid">${cardsHtml}</div>`:'<div class="disc-group-empty">Nenhuma disciplina nesta seção.</div>'}
+  </section>`;
+}
+
+function discCardHtml(d, professor=false){
+  const mats=matsDaDisc(d.id);
+  const temas=countTema(d.id);
+  const fix=countFixados(d.id);
+  const tipos = totalByType(d.id).slice(0,3).map(x=>`${escH(labelTipo(x.tipoId))}: ${x.total}`).join(' · ');
+  const sub = d.id===GERAL_ID ? 'Documentos e referências que não precisam ficar ligados a uma disciplina.' : (tipos || 'Nenhum material cadastrado ainda.');
+  const action = professor ? `onclick="abrirProfessorDisc('${escJsStr(d.id)}')"` : `onclick="abrirAdminDisc('${escJsStr(d.id)}')"`;
+  return `<button class="disc-card${d.id===GERAL_ID?' general':''}" ${action}>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+      <div class="disc-card-title">${escH(d.nome)}</div>
+      ${d.id===GERAL_ID?'<span class="general-label">Geral</span>':''}
+    </div>
+    <div class="disc-card-sub">${escH(sub)}</div>
+    <div class="disc-card-metrics">
+      <span class="mini-pill">${mats.length} material${mats.length!==1?'is':''}</span>
+      <span class="mini-pill">${temas} tema${temas!==1?'s':''}</span>
+      ${fix?`<span class="mini-pill pin">📌 ${fix} fixado${fix!==1?'s':''}</span>`:''}
+    </div>
+  </button>`;
+}
+function renderProfessorSearchResults(mats){
+  if(!mats.length) return `<div class="empty"><h3>Nenhum material encontrado.</h3><p>Tente outro termo.</p></div>`;
+  return `<div class="mat-grid">${mats.map(m=>profCardHtml(m,true)).join('')}</div>`;
+}
+function abrirProfessorDisc(discId){
+  currentProfessorDiscId=discId;
+  document.getElementById('professorHome').style.display='none';
+  document.getElementById('professorDiscView').style.display='';
+  document.getElementById('profDiscSearch').value='';
+  document.getElementById('profDiscTipo').value='';
+  document.getElementById('profDiscTema').value='';
+  renderProfessorDiscSelectors();
+  renderProfessorDisc();
+}
+function voltarProfessorHome(){ renderProfessorHome(); }
+function renderProfessorDiscSelectors(){
+  const tipos = tiposOrdenados().filter(t=>matsDaDisc(currentProfessorDiscId).some(m=>m.tipoId===t.id));
+  const temas = temasDaDisc(currentProfessorDiscId);
+  document.getElementById('profDiscTipo').innerHTML='<option value="">Todos os tipos</option>'+tipos.map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
+  document.getElementById('profDiscTema').innerHTML='<option value="">Todos os temas</option>'+temas.map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('')+'<option value="__semtema__">Sem tema</option>';
+}
+function renderProfessorDisc(){
+  const disc=getDisc(currentProfessorDiscId); if(!disc) return voltarProfessorHome();
+  document.getElementById('profBreadcrumbDisc').textContent=disc.nome;
+  document.getElementById('profDiscTitle').textContent=disc.nome;
+  const total=matsDaDisc(disc.id).length, temas=countTema(disc.id);
+  document.getElementById('profDiscSubtitle').textContent=`${total} material${total!==1?'is':''} · ${temas} tema${temas!==1?'s':''}`;
+  const search=document.getElementById('profDiscSearch').value;
+  const tipoId=document.getElementById('profDiscTipo').value;
+  let temaId=document.getElementById('profDiscTema').value;
+  const list=filterMats(matsDaDisc(disc.id),{search,tipoId,temaId:temaId==='__semtema__'?'':temaId});
+  document.getElementById('professorDiscContent').innerHTML=renderProfessorGrouped(list, disc.id);
+}
+function renderProfessorGrouped(list, discId){
+  if(!list.length) return `<div class="empty"><h3>Nenhum material encontrado.</h3><p>Altere os filtros ou volte para a biblioteca.</p></div>`;
+  const orderedThemes=[...temasDaDisc(discId), {id:'',nome:'Sem tema',ordem:999999}];
+  return orderedThemes.map(theme=>{
+    const mats=list.filter(m=>(m.temaId||'')===(theme.id||''));
+    if(!mats.length) return '';
+    const byTipo = tiposOrdenados().map(tipo=>{
+      const items=mats.filter(m=>m.tipoId===tipo.id);
+      if(!items.length) return '';
+      return `<div class="material-group">
+        <div class="material-group-title"><div class="tipo-dot" style="background:${tipoCor(tipo.id)}"></div>${escH(tipo.nome)}</div>
+        <div class="mat-grid">${items.map(m=>profCardHtml(m)).join('')}</div>
+      </div>`;
+    }).join('');
+    const collapsed=isThemeCollapsedProfessor(theme.id||'');
+    return `<section class="theme-section${collapsed?' collapsed':''}">
+      <div class="theme-head clickable" onclick="toggleThemeProfessor('${escJsStr(theme.id||'')}')">
+        <div class="theme-title-wrap">
+          <button class="theme-toggle-btn" type="button" onclick="event.stopPropagation();toggleThemeProfessor('${escJsStr(theme.id||'')}')">${collapsed?'▸':'▾'}</button>
+          <div>
+            <div class="theme-name">${escH(theme.nome)}</div>
+            <div class="theme-meta">${mats.length} material${mats.length!==1?'is':''}</div>
+          </div>
+        </div>
+      </div>
+      <div class="theme-body">${byTipo}</div>
+    </section>`;
+  }).join('');
+}
+function profCardHtml(m, showContext=false){
+  const tipo=getTipo(m.tipoId);
+  const links=materialLinks(m);
+  const linkButtons=links.map((l,idx)=>`<a class="mat-access-btn${idx>0?' secondary':''}" href="${escH(l.link)}" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>${escH(tituloLink(l,idx))}</a>`).join('');
+  return `<div class="mat-card">
+    <div class="mat-card-top">
+      <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'📎')}</div>
+      <div>
+        <div class="mat-title">${m.fixado?'<span class="mat-pin">📌</span> ':''}${escH(m.titulo)}</div>
+        ${showContext?`<div class="mat-desc">${escH(labelDisc(m.disciplinaId))}${m.temaId?' · '+escH(labelTema(m.temaId)):''}</div>`:''}
+        ${m.descricao?`<div class="mat-desc">${escH(m.descricao)}</div>`:''}
+      </div>
+    </div>
+    <div class="mat-footer">
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <span class="mat-tipo-badge" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.nome)}</span>
+        ${sourceBadgesHtml(m)}
+      </div>
+      <div class="mat-links">${linkButtons || '<span class="mat-source-badge">Sem link</span>'}</div>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+// ADMIN - HOME / DISCIPLINA
+// ════════════════════════════════════════════════════════
+let currentAdminDiscId = null;
+const collapsedAdminThemes = new Set();
+function isThemeCollapsedAdmin(themeId){ return collapsedAdminThemes.has(themeCollapseKey('admin', currentAdminDiscId, themeId)); }
+function toggleThemeAdmin(themeId){ const k=themeCollapseKey('admin', currentAdminDiscId, themeId); collapsedAdminThemes.has(k)?collapsedAdminThemes.delete(k):collapsedAdminThemes.add(k); renderAdminDisc(); }
+function recolherTemasAdmin(){ [...temasDaDisc(currentAdminDiscId),{id:''}].forEach(t=>collapsedAdminThemes.add(themeCollapseKey('admin', currentAdminDiscId, t.id||''))); renderAdminDisc(); }
+function expandirTemasAdmin(){ [...temasDaDisc(currentAdminDiscId),{id:''}].forEach(t=>collapsedAdminThemes.delete(themeCollapseKey('admin', currentAdminDiscId, t.id||''))); renderAdminDisc(); }
+
+function renderAdminHome(){
+  currentAdminDiscId=null;
+  document.getElementById('adminHome').style.display='';
+  document.getElementById('adminDiscView').style.display='none';
+  const totalM=D.materiais.length, totalD=D.disciplinas.length, totalT=D.temas.length, totalF=D.materiais.filter(m=>m.fixado).length;
+  document.getElementById('adminSummary').innerHTML = [
+    [totalD,'disciplinas'],
+    [totalT,'temas'],
+    [totalM,'materiais'],
+    [totalF,'fixados']
+  ].map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
+  const q=normalizar(document.getElementById('adminDiscSearch')?.value||'');
+  const geralDisc=getDisc(GERAL_ID);
+  const geral=!q||normalizar(geralDisc.nome).includes(q)?discCardHtml(geralDisc,false):'';
+  const passa=d=>!q||normalizar(d.nome+' '+modalidadeLabel(modalidadeDisciplina(d))).includes(q);
+  const presList=discsPorModalidade('presencial').filter(passa);
+  const eadList=discsPorModalidade('ead').filter(passa);
+  const pres=presList.map(d=>discCardHtml(d,false)).join('');
+  const ead=eadList.map(d=>discCardHtml(d,false)).join('');
+  const blocks=[
+    geral?renderDiscGroupHtml('Materiais gerais', geral, 1, false):'',
+    renderDiscGroupHtml('Disciplinas presenciais', pres, presList.length, true),
+    renderDiscGroupHtml('Disciplinas EaD', ead, eadList.length, true)
+  ].filter(Boolean).join('');
+  document.getElementById('adminHomeContent').innerHTML = blocks || `<div class="empty"><h3>Nenhuma disciplina encontrada.</h3></div>`;
+}
+function abrirAdminDisc(discId){
+  currentAdminDiscId=discId;
+  document.getElementById('adminHome').style.display='none';
+  document.getElementById('adminDiscView').style.display='';
+  document.getElementById('adminMatSearch').value='';
+  document.getElementById('adminMatTipo').value='';
+  document.getElementById('adminMatTema').value='';
+  renderAdminDiscSelectors();
+  renderAdminDisc();
+}
+function voltarAdminHome(){ renderAdminHome(); }
+function renderAdminDiscSelectors(){
+  const tipos=tiposOrdenados();
+  const temas=temasDaDisc(currentAdminDiscId);
+  document.getElementById('adminMatTipo').innerHTML='<option value="">Todos os tipos</option>'+tipos.map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
+  document.getElementById('adminMatTema').innerHTML='<option value="">Todos os temas</option>'+temas.map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('')+'<option value="__semtema__">Sem tema</option>';
+}
+function renderAdminDisc(){
+  const disc=getDisc(currentAdminDiscId); if(!disc) return voltarAdminHome();
+  document.getElementById('adminBreadcrumbDisc').textContent=disc.nome;
+  document.getElementById('adminDiscTitle').textContent=disc.nome;
+  const total=matsDaDisc(disc.id).length, temas=countTema(disc.id), fix=countFixados(disc.id);
+  document.getElementById('adminDiscSubtitle').textContent=`${total} material${total!==1?'is':''} · ${temas} tema${temas!==1?'s':''}${fix?` · ${fix} fixado${fix!==1?'s':''}`:''}`;
+  const search=document.getElementById('adminMatSearch').value;
+  const tipoId=document.getElementById('adminMatTipo').value;
+  let temaId=document.getElementById('adminMatTema').value;
+  const list=filterMats(matsDaDisc(disc.id),{search,tipoId,temaId:temaId==='__semtema__'?'':temaId});
+  document.getElementById('adminDiscContent').innerHTML=renderAdminGrouped(list,disc.id);
+}
+function renderAdminGrouped(list,discId){
+  const realThemes=temasDaDisc(discId);
+  const orderedThemes=[...realThemes,{id:'',nome:'Sem tema',ordem:999999}];
+  if(!list.length && !realThemes.length) return `<div class="empty"><h3>Nenhum material ou tema nesta área.</h3><p>Crie um tema ou cadastre o primeiro material.</p></div>`;
+  return orderedThemes.map(theme=>{
+    const mats=list.filter(m=>(m.temaId||'')===(theme.id||''));
+    const shouldShow = theme.id ? true : mats.length>0 || !realThemes.length;
+    if(!shouldShow) return '';
+    const groups=tiposOrdenados().map(tipo=>{
+      const items=mats.filter(m=>m.tipoId===tipo.id);
+      if(!items.length) return '';
+      return `<div class="material-group">
+        <div class="material-group-title"><div class="tipo-dot" style="background:${tipoCor(tipo.id)}"></div>${escH(tipo.nome)}</div>
+        ${items.map(m=>adminCardHtml(m)).join('')}
+      </div>`;
+    }).join('');
+    const actions = theme.id ? `<div class="theme-actions" onclick="event.stopPropagation()">
+      <button class="a-btn" onclick="openThemeModal('${escJsStr(theme.id)}')">Editar tema</button>
+      <button class="a-btn danger" onclick="excluirTema('${escJsStr(theme.id)}')">Excluir tema</button>
+    </div>` : '';
+    const collapsed=isThemeCollapsedAdmin(theme.id||'');
+    return `<section class="theme-section${collapsed?' collapsed':''}">
+      <div class="theme-head clickable" onclick="toggleThemeAdmin('${escJsStr(theme.id||'')}')">
+        <div class="theme-title-wrap">
+          <button class="theme-toggle-btn" type="button" onclick="event.stopPropagation();toggleThemeAdmin('${escJsStr(theme.id||'')}')">${collapsed?'▸':'▾'}</button>
+          <div>
+            <div class="theme-name">${escH(theme.nome)}</div>
+            <div class="theme-meta">${mats.length} material${mats.length!==1?'is':''}</div>
+          </div>
+        </div>
+        ${actions}
+      </div>
+      <div class="theme-body">${groups || '<div class="theme-empty">Nenhum material neste tema.</div>'}</div>
+    </section>`;
+  }).join('');
+}
+function adminCardHtml(m){
+  const tipo=getTipo(m.tipoId);
+  const linkPills=materialLinks(m).map((l,idx)=>`<a class="admin-link-pill" href="${escH(l.link)}" target="_blank" rel="noopener">↗ ${escH(tituloLink(l,idx))}</a>`).join('');
+  return `<div class="admin-card${m.fixado?' pinned':''}">
+    <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'📎')}</div>
+    <div class="admin-body">
+      <div class="admin-title">${m.fixado?'<span class="mat-pin">📌 Fixado</span> ':''}${escH(m.titulo)}</div>
+      <div class="admin-meta">
+        <span class="mat-tipo-badge" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.nome)}</span>
+        ${sourceBadgesHtml(m)}
+      </div>
+      <div class="admin-link-list">${linkPills || '<span class="mat-source-badge">Sem link</span>'}</div>
+      ${m.descricao?`<div class="admin-desc">${escH(m.descricao)}</div>`:''}
+    </div>
+    <div class="admin-actions wrap">
+      <button class="a-btn small-action" onclick="moverMaterial('${escJsStr(m.id)}',-1)" title="Subir">↑</button>
+      <button class="a-btn small-action" onclick="moverMaterial('${escJsStr(m.id)}',1)" title="Descer">↓</button>
+      <button class="a-btn" onclick="duplicarMaterial('${escJsStr(m.id)}')">Duplicar</button>
+      <button class="a-btn" onclick="openModal('${escJsStr(m.id)}')">Editar</button>
+      <button class="a-btn danger" onclick="excluirMaterial('${escJsStr(m.id)}')">Excluir</button>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+// MATERIAIS
+// ════════════════════════════════════════════════════════
+let editingMaterialId=null;
+function materialLinkRowHtml(l={}){
+  return `<div class="material-link-row" data-link-row>
+    <div class="material-link-grid">
+      <div class="form-group">
+        <label class="form-label">Nome do link</label>
+        <input type="text" class="form-input link-title-input" placeholder="ex: Slides, PDF, Vídeo" value="${escH(l.titulo||'')}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Link *</label>
+        <input type="url" class="form-input link-url-input" placeholder="https://..." value="${escH(l.link||'')}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Plataforma</label>
+        <input type="text" class="form-input link-origin-input" placeholder="Canva, Drive, YouTube..." value="${escH(l.origem||'')}">
+      </div>
+      <button type="button" class="link-remove-btn" onclick="removeMaterialLinkRow(this)" title="Remover link">×</button>
+    </div>
+  </div>`;
+}
+function addMaterialLinkRow(l={}){ document.getElementById('mLinksList').insertAdjacentHTML('beforeend', materialLinkRowHtml(l)); }
+function removeMaterialLinkRow(btn){
+  const rows=[...document.querySelectorAll('#mLinksList [data-link-row]')];
+  if(rows.length<=1){
+    rows[0]?.querySelector('.link-title-input') && (rows[0].querySelector('.link-title-input').value='');
+    rows[0]?.querySelector('.link-url-input') && (rows[0].querySelector('.link-url-input').value='');
+    rows[0]?.querySelector('.link-origin-input') && (rows[0].querySelector('.link-origin-input').value='');
+    return;
+  }
+  btn.closest('[data-link-row]')?.remove();
+}
+function collectModalLinks(){
+  return [...document.querySelectorAll('#mLinksList [data-link-row]')]
+    .map((row,idx)=>({
+      id:uid('lnk'),
+      titulo:row.querySelector('.link-title-input')?.value.trim()||'',
+      link:row.querySelector('.link-url-input')?.value.trim()||'',
+      origem:row.querySelector('.link-origin-input')?.value.trim()||'',
+      ordem:idx+1
+    }))
+    .filter(l=>l.link);
+}
+function openModal(id=null, preferredDiscId=null){
+  editingMaterialId=id||null;
+  const m=id?D.materiais.find(x=>x.id===id):null;
+  document.getElementById('modalTitle').textContent=m?'Editar material':'Novo material';
+  document.getElementById('mTitulo').value=m?.titulo||'';
+  document.getElementById('mDesc').value=m?.descricao||'';
+  document.getElementById('mOrdem').value=m?.ordem||'';
+  document.getElementById('mFixado').checked=!!m?.fixado;
+  const linksWrap=document.getElementById('mLinksList');
+  linksWrap.innerHTML='';
+  const links=materialLinks(m);
+  (links.length?links:[{}]).forEach(l=>addMaterialLinkRow(l));
+
+  const selectedDisc=m?.disciplinaId || preferredDiscId || currentAdminDiscId || GERAL_ID;
+  const sel=document.getElementById('mDisc');
+  sel.innerHTML=`<option value="${GERAL_ID}">${escH(D.nomeGeral||'Materiais gerais')}</option>`+discsOrdenadas().map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`).join('');
+  sel.value=selectedDisc;
+  renderThemeSelectForMaterial(m?.temaId||'');
+
+  const tipoSel=m?.tipoId||tiposOrdenados()[0]?.id||'';
+  document.getElementById('tipoGrid').innerHTML=tiposOrdenados().map(t=>`
+    <div class="tipo-opt${t.id===tipoSel?' sel':''}" onclick="selecionarTipo(this)" data-tipo="${escH(t.id)}">
+      <div class="tipo-opt-icon">${escH(t.icone||'📎')}</div><span>${escH(t.nome)}</span>
+    </div>`).join('');
+
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('mTitulo').focus(),60);
+}
+function renderThemeSelectForMaterial(preselect=''){
+  const discId=document.getElementById('mDisc').value||GERAL_ID;
+  const temas=temasDaDisc(discId);
+  const sel=document.getElementById('mTema');
+  sel.innerHTML='<option value="">Sem tema</option>'+temas.map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
+  if(preselect) sel.value=preselect;
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); editingMaterialId=null; }
+function selecionarTipo(el){ document.querySelectorAll('.tipo-opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); }
+function salvarMaterial(){
+  const titulo=document.getElementById('mTitulo').value.trim();
+  const links=collectModalLinks();
+  const disciplinaId=document.getElementById('mDisc').value||GERAL_ID;
+  const temaId=document.getElementById('mTema').value||'';
+  const tipoId=document.querySelector('.tipo-opt.sel')?.dataset.tipo||'';
+  const descricao=document.getElementById('mDesc').value.trim();
+  const fixado=document.getElementById('mFixado').checked;
+  let ordem=Number(document.getElementById('mOrdem').value);
+  if(!titulo){ showToast('Preencha o título.',true); return document.getElementById('mTitulo').focus(); }
+  if(!links.length){ showToast('Adicione pelo menos um link de acesso.',true); return document.querySelector('.link-url-input')?.focus(); }
+  if(!tipoId){ showToast('Selecione o tipo.',true); return; }
+  if(!Number.isFinite(ordem)||ordem<=0) ordem=nextOrderFor(disciplinaId,temaId,tipoId);
+  const principal=links[0]||{link:'',origem:''};
+  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,ordem,fixado};
+  if(editingMaterialId){
+    const idx=D.materiais.findIndex(x=>x.id===editingMaterialId);
+    if(idx>=0) D.materiais[idx]=mat; else D.materiais.push(mat);
+  } else D.materiais.push(mat);
+  salvar(); closeModal();
+  if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); } else renderAdminHome();
+  showToast(editingMaterialId?'Material atualizado!':'Material adicionado!');
+}
+function excluirMaterial(id){
+  const m=D.materiais.find(x=>x.id===id); if(!m) return;
+  if(!confirm(`Excluir "${m.titulo}"?`)) return;
+  D.materiais=D.materiais.filter(x=>x.id!==id); salvar(); renderAdminDisc(); renderAdminHome(); showToast('Material excluído.');
+}
+function duplicarMaterial(id){
+  const m=D.materiais.find(x=>x.id===id); if(!m) return;
+  const c={...m,id:uid('mat'),titulo:m.titulo+' — cópia',links:materialLinks(m).map((l,idx)=>({...l,id:uid('lnk'),ordem:idx+1})),ordem:nextOrderFor(m.disciplinaId,m.temaId,m.tipoId)}; if(c.links[0]){c.link=c.links[0].link;c.origem=c.links[0].origem||'';}
+  D.materiais.push(c); salvar(); renderAdminDisc(); showToast('Material duplicado!');
+}
+function moverMaterial(id,dir){
+  const m=D.materiais.find(x=>x.id===id); if(!m) return;
+  const siblings=sortMats(D.materiais.filter(x=>x.disciplinaId===m.disciplinaId && (x.temaId||'')===(m.temaId||'') && x.tipoId===m.tipoId));
+  const i=siblings.findIndex(x=>x.id===id), j=i+dir;
+  if(i<0||j<0||j>=siblings.length) return;
+  const a=siblings[i], b=siblings[j];
+  const tmp=Number(a.ordem)||i+1; a.ordem=Number(b.ordem)||j+1; b.ordem=tmp;
+  salvar(); renderAdminDisc(); showToast('Ordem atualizada.');
+}
+
+// ════════════════════════════════════════════════════════
+// TEMAS
+// ════════════════════════════════════════════════════════
+let editingThemeId=null;
+function openThemeModal(id=null){
+  if(!currentAdminDiscId) return showToast('Abra uma disciplina para criar temas.',true);
+  editingThemeId=id||null;
+  const t=id?D.temas.find(x=>x.id===id):null;
+  document.getElementById('themeModalTitle').textContent=t?'Editar tema':'Novo tema';
+  document.getElementById('temaNome').value=t?.nome||'';
+  document.getElementById('themeModalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('temaNome').focus(),50);
+}
+function closeThemeModal(){ document.getElementById('themeModalOverlay').classList.remove('open'); editingThemeId=null; }
+function salvarTema(){
+  const nome=document.getElementById('temaNome').value.trim();
+  if(!nome){ showToast('Preencha o nome do tema.',true); return; }
+  const duplicate=D.temas.some(t=>t.disciplinaId===currentAdminDiscId && normalizar(t.nome)===normalizar(nome) && t.id!==editingThemeId);
+  if(duplicate){ showToast('Já existe um tema com esse nome nesta disciplina.',true); return; }
+  if(editingThemeId){
+    const t=D.temas.find(x=>x.id===editingThemeId); if(t) t.nome=nome;
+  } else {
+    const max=Math.max(0,...temasDaDisc(currentAdminDiscId).map(t=>Number(t.ordem)||0));
+    D.temas.push({id:uid('tema'),disciplinaId:currentAdminDiscId,nome,ordem:max+1});
+  }
+  salvar(); closeThemeModal(); renderAdminDiscSelectors(); renderAdminDisc(); showToast(editingThemeId?'Tema atualizado!':'Tema criado!');
+}
+function excluirTema(id){
+  const t=D.temas.find(x=>x.id===id); if(!t) return;
+  const used=D.materiais.filter(m=>m.temaId===id).length;
+  if(used){ showToast(`Não dá para excluir: há ${used} material${used!==1?'is':''} neste tema.`,true); return; }
+  if(!confirm(`Excluir o tema "${t.nome}"?`)) return;
+  D.temas=D.temas.filter(x=>x.id!==id); salvar(); renderAdminDiscSelectors(); renderAdminDisc(); showToast('Tema excluído.');
+}
+
+// ════════════════════════════════════════════════════════
+// CONFIGURAÇÕES
+// ════════════════════════════════════════════════════════
+function renderConfigTab(){
+  document.getElementById('cfgNomeCurso').value=D.nomeCurso||'';
+  document.getElementById('cfgSenhaAtual').value=D.senhaProfessor||'';
+  document.getElementById('cfgNomeGeral').value=D.nomeGeral||'Materiais gerais';
+
+  const lp=document.getElementById('logoPreview');
+  lp.innerHTML=D.logo
+    ? `<img src="${D.logo}" style="max-height:48px;max-width:200px;object-fit:contain;border:1px solid var(--border);border-radius:4px;margin-bottom:8px">`
+    : `<div style="font-size:12px;color:var(--text3);font-style:italic;margin-bottom:8px">Nenhuma logo.</div>`;
+
+  document.getElementById('tiposConfigList').innerHTML=tiposOrdenados().map((t,i,arr)=>`
+    <div class="cfg-row">
+      <div class="cfg-row-main">
+        <span class="color-dot" style="background:${escH(t.cor)}"></span>
+        <div style="font-size:18px">${escH(t.icone||'📎')}</div>
+        <div>
+          <div class="cfg-row-name">${escH(t.nome)}</div>
+          <div class="cfg-row-sub">${D.materiais.filter(m=>m.tipoId===t.id).length} material${D.materiais.filter(m=>m.tipoId===t.id).length!==1?'is':''}</div>
+        </div>
+      </div>
+      <div class="cfg-row-actions">
+        <button class="a-btn small-action" onclick="moverTipo('${escJsStr(t.id)}',-1)" ${i===0?'disabled':''}>↑</button>
+        <button class="a-btn small-action" onclick="moverTipo('${escJsStr(t.id)}',1)" ${i===arr.length-1?'disabled':''}>↓</button>
+        <button class="a-btn" onclick="openTipoModal('${escJsStr(t.id)}')">Editar</button>
+        <button class="a-btn danger" onclick="excluirTipo('${escJsStr(t.id)}')">Excluir</button>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('discsConfigList').innerHTML=discsOrdenadas().map((d,i,arr)=>`
+    <div class="cfg-row">
+      <div class="cfg-row-main">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div class="cfg-row-name">${escH(d.nome)}</div>
+            <span class="disc-config-type ${modalidadeDisciplina(d)}">${modalidadeLabel(modalidadeDisciplina(d))}</span>
+          </div>
+          <div class="cfg-row-sub">${matsDaDisc(d.id).length} material${matsDaDisc(d.id).length!==1?'is':''} · ${countTema(d.id)} tema${countTema(d.id)!==1?'s':''}</div>
+        </div>
+      </div>
+      <div class="cfg-row-actions">
+        <button class="a-btn small-action" onclick="moverDisc('${escJsStr(d.id)}',-1)" ${i===0?'disabled':''}>↑</button>
+        <button class="a-btn small-action" onclick="moverDisc('${escJsStr(d.id)}',1)" ${i===arr.length-1?'disabled':''}>↓</button>
+        <button class="a-btn" onclick="openDiscModal('${escJsStr(d.id)}')">Editar</button>
+        <button class="a-btn danger" onclick="excluirDisc('${escJsStr(d.id)}')">Excluir</button>
+      </div>
+    </div>`).join('');
+}
+function salvarNome(){
+  D.nomeCurso=document.getElementById('cfgNomeCurso').value.trim()||D.nomeCurso;
+  salvar(); document.getElementById('hTitle').textContent='Materiais — '+D.nomeCurso; document.title='Materiais — '+D.nomeCurso; showToast('Nome salvo!');
+}
+function salvarNomeGeral(){
+  const v=document.getElementById('cfgNomeGeral').value.trim();
+  if(!v){ showToast('Preencha o nome da área geral.',true); return; }
+  D.nomeGeral=v; salvar(); renderConfigTab(); renderAdminHome(); showToast('Nome da área geral salvo!');
+}
+function trocarSenha(){
+  const nova=document.getElementById('cfgSenhaNova').value.trim();
+  if(!nova||nova.length<4){ showToast('Mínimo 4 caracteres.',true); return; }
+  D.senhaProfessor=nova; salvar(); document.getElementById('cfgSenhaAtual').value=nova; document.getElementById('cfgSenhaNova').value=''; showToast('Senha atualizada! Informe ao professor.');
+}
+function copiarSenha(){ navigator.clipboard.writeText(D.senhaProfessor).then(()=>showToast('Senha copiada!')).catch(()=>showToast('Não foi possível copiar.',true)); }
+
+// Tipos
+let editingTipoId=null;
+function openTipoModal(id=null){
+  editingTipoId=id||null;
+  const t=id?D.tipos.find(x=>x.id===id):null;
+  document.getElementById('tipoModalTitle').textContent=t?'Editar tipo de material':'Novo tipo de material';
+  document.getElementById('tipoNome').value=t?.nome||'';
+  document.getElementById('tipoIcone').value=t?.icone||'📎';
+  document.getElementById('tipoCor').value=t?.cor||'#2d5be3';
+  document.getElementById('tipoModalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('tipoNome').focus(),50);
+}
+function closeTipoModal(){ document.getElementById('tipoModalOverlay').classList.remove('open'); editingTipoId=null; }
+function salvarTipo(){
+  const nome=document.getElementById('tipoNome').value.trim();
+  const icone=document.getElementById('tipoIcone').value.trim()||'📎';
+  const cor=document.getElementById('tipoCor').value||'#2d5be3';
+  if(!nome){ showToast('Preencha o nome do tipo.',true); return; }
+  const duplicate=D.tipos.some(t=>normalizar(t.nome)===normalizar(nome)&&t.id!==editingTipoId);
+  if(duplicate){ showToast('Já existe um tipo com esse nome.',true); return; }
+  if(editingTipoId){
+    const t=D.tipos.find(x=>x.id===editingTipoId); if(t){t.nome=nome;t.icone=icone;t.cor=cor;}
+  } else {
+    const max=Math.max(0,...D.tipos.map(t=>Number(t.ordem)||0));
+    D.tipos.push({id:uid('tipo'),nome,icone,cor,ordem:max+1});
+  }
+  salvar(); closeTipoModal(); renderConfigTab(); if(currentAdminDiscId) renderAdminDisc(); showToast(editingTipoId?'Tipo atualizado!':'Tipo criado!');
+}
+function excluirTipo(id){
+  const t=D.tipos.find(x=>x.id===id); if(!t) return;
+  const used=D.materiais.filter(m=>m.tipoId===id).length;
+  if(used){ showToast(`Não dá para excluir: há ${used} material${used!==1?'is':''} usando esse tipo.`,true); return; }
+  if(D.tipos.length<=1){ showToast('Mantenha ao menos um tipo.',true); return; }
+  if(!confirm(`Excluir o tipo "${t.nome}"?`)) return;
+  D.tipos=D.tipos.filter(x=>x.id!==id); salvar(); renderConfigTab(); showToast('Tipo excluído.');
+}
+function moverTipo(id,dir){ moverOrdem(D.tipos,id,dir); salvar(); renderConfigTab(); }
+
+// Disciplinas
+let editingDiscId=null;
+function openDiscModal(id=null){
+  editingDiscId=id||null;
+  const d=id?D.disciplinas.find(x=>x.id===id):null;
+  document.getElementById('discModalTitle').textContent=d?'Editar disciplina':'Nova disciplina';
+  document.getElementById('discNome').value=d?.nome||'';
+  document.getElementById('discModalidade').value=d?modalidadeDisciplina(d):'presencial';
+  document.getElementById('discModalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('discNome').focus(),50);
+}
+function closeDiscModal(){ document.getElementById('discModalOverlay').classList.remove('open'); editingDiscId=null; }
+function salvarDisciplina(){
+  const nome=document.getElementById('discNome').value.trim();
+  const modalidade=document.getElementById('discModalidade').value==='ead'?'ead':'presencial';
+  if(!nome){ showToast('Preencha o nome da disciplina.',true); return; }
+  const duplicate=D.disciplinas.some(d=>normalizar(d.nome)===normalizar(nome)&&d.id!==editingDiscId);
+  if(duplicate){ showToast('Já existe uma disciplina com esse nome.',true); return; }
+  if(editingDiscId){
+    const d=D.disciplinas.find(x=>x.id===editingDiscId); if(d){ d.nome=nome; d.modalidade=modalidade; }
+  } else {
+    const max=Math.max(0,...D.disciplinas.map(d=>Number(d.ordem)||0));
+    D.disciplinas.push({id:uid('disc'),nome,ordem:max+1,modalidade});
+  }
+  salvar(); closeDiscModal(); renderConfigTab(); renderAdminHome(); showToast(editingDiscId?'Disciplina atualizada!':'Disciplina criada!');
+}
+function excluirDisc(id){
+  const d=D.disciplinas.find(x=>x.id===id); if(!d) return;
+  const mats=matsDaDisc(id).length, temas=countTema(id);
+  if(mats||temas){ showToast(`Não dá para excluir: há ${mats} material${mats!==1?'is':''} e ${temas} tema${temas!==1?'s':''} vinculados.`,true); return; }
+  if(!confirm(`Excluir a disciplina "${d.nome}"?`)) return;
+  D.disciplinas=D.disciplinas.filter(x=>x.id!==id); salvar(); renderConfigTab(); renderAdminHome(); showToast('Disciplina excluída.');
+}
+function moverDisc(id,dir){ moverOrdem(D.disciplinas,id,dir); salvar(); renderConfigTab(); renderAdminHome(); }
+function moverOrdem(arr,id,dir){
+  const ordered=[...arr].sort((a,b)=>(a.ordem||0)-(b.ordem||0));
+  const i=ordered.findIndex(x=>x.id===id), j=i+dir; if(i<0||j<0||j>=ordered.length) return;
+  const a=ordered[i], b=ordered[j], tmp=Number(a.ordem)||i+1; a.ordem=Number(b.ordem)||j+1; b.ordem=tmp;
+}
+
+// ════════════════════════════════════════════════════════
+// EXPORTAR / IMPORTAR / VERSÃO PROFESSOR
+// ════════════════════════════════════════════════════════
+function exportarDados(){
+  const blob=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='materiais_backup.json'; a.click();
+  showToast('Backup exportado!');
+}
+function importarDados(input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const p=coerceData(JSON.parse(e.target.result));
+      if(!Array.isArray(p.materiais)){ showToast('Arquivo inválido.',true); return; }
+      if(!confirm(`Importar ${p.materiais.length} materiais? Os dados atuais serão substituídos.`)) return;
+      D=p; salvar(); renderAdminHome(); renderConfigTab(); showToast(`${D.materiais.length} materiais importados!`);
+    }catch(err){ showToast('Erro ao ler o arquivo.',true); }
+  };
+  reader.readAsText(file); input.value='';
+}
+
+async function gerarVersaoProfessor(){
+  if(!window.crypto || !window.crypto.subtle){
+    showToast('Abra esta página em um navegador atualizado com suporte à criptografia para gerar a versão do professor.', true);
+    return;
+  }
+
+  const senha = String(D.senhaProfessor || '').trim();
+  if(!senha){
+    showToast('Defina uma senha do professor antes de gerar a versão.', true);
+    return;
+  }
+
+  const enc = new TextEncoder();
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const iterations = 250000;
+
+  function bytesToB64(bytes){
+    let bin = '';
+    bytes.forEach(b => bin += String.fromCharCode(b));
+    return btoa(bin);
+  }
+
+  try{
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw',
+      enc.encode(senha),
+      {name:'PBKDF2'},
+      false,
+      ['deriveKey']
+    );
+
+    const key = await crypto.subtle.deriveKey(
+      {name:'PBKDF2', salt, iterations, hash:'SHA-256'},
+      keyMaterial,
+      {name:'AES-GCM', length:256},
+      false,
+      ['encrypt']
+    );
+
+    const plaintext = enc.encode(JSON.stringify(D));
+    const ciphertext = new Uint8Array(await crypto.subtle.encrypt(
+      {name:'AES-GCM', iv},
+      key,
+      plaintext
+    ));
+
+    const bundle = {
+      version: 1,
+      kdf: 'PBKDF2-SHA-256',
+      cipher: 'AES-GCM-256',
+      iterations,
+      salt: bytesToB64(salt),
+      iv: bytesToB64(iv),
+      ciphertext: bytesToB64(ciphertext)
+    };
+
+    const publicMeta = {
+      nomeCurso: D.nomeCurso || 'SENAI',
+      logo: D.logo || ''
+    };
+
+    const css=document.querySelector('style').outerHTML;
+    const fonts=document.querySelector('link[href*="fonts.googleapis"]').outerHTML;
+    const secureBundle=JSON.stringify(bundle).replace(/</g,'\\u003c');
+    const safeMeta=JSON.stringify(publicMeta).replace(/</g,'\\u003c');
+    const name='materiais_'+(D.nomeCurso||'professor').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,48)+'.html';
+
+    const logoLoginHtml = publicMeta.logo
+      ? `<img id="loginLogoImg" class="login-logo-img" src="${publicMeta.logo}" alt="Logo">`
+      : `<img id="loginLogoImg" class="login-logo-img" src="" alt="Logo" style="display:none">`;
+    const brandLoginStyle = publicMeta.logo ? 'display:none' : '';
+    const logoHeaderHtml = publicMeta.logo
+      ? `<img id="hLogoImg" class="h-logo" src="${publicMeta.logo}" alt="Logo">`
+      : `<img id="hLogoImg" class="h-logo" src="" alt="Logo" style="display:none">`;
+    const brandHeaderStyle = publicMeta.logo ? 'display:none' : '';
+
+    const professorHtml=`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Materiais — ${escH(publicMeta.nomeCurso)}</title>
+${fonts}
+${css}
+<style>
+/* Ajustes específicos da versão gerada para professor */
+.search-results-title{font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 14px}
+.prof-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.theme-toggle{width:100%;background:var(--surface2);border:none;border-bottom:1px solid var(--border);padding:13px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;color:var(--text);font-family:'DM Sans',sans-serif;transition:background .12s}
+.theme-toggle:hover{background:#ece9df}
+.theme-caret{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text2);font-size:14px;transition:transform .15s;flex-shrink:0}
+.theme-section.collapsed .theme-caret{transform:rotate(-90deg)}
+.theme-title{font-size:14px;font-weight:600;flex:1}
+.theme-count{font-size:11px;color:var(--text3);white-space:nowrap}
+.professor-version-note{font-size:11px;color:var(--text3);line-height:1.5;margin-top:10px;text-align:center}
+@media (max-width: 900px){
+  .app-header{align-items:flex-start;flex-direction:column}
+  .h-right{width:100%;justify-content:flex-start}
+  .disc-grid,.prof-card-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-top">
+      ${logoLoginHtml}
+      <span class="login-brand" id="loginBrandText" style="${brandLoginStyle}">SENAI</span>
+      <div class="login-curso">Materiais de Aula</div>
+      <div class="login-sub" id="loginSub">${escH(publicMeta.nomeCurso)}</div>
+    </div>
+    <div class="login-body">
+      <div class="login-title">Entrar</div>
+      <div class="login-error" id="loginError">Senha incorreta. Tente novamente.</div>
+      <input class="login-input" type="password" id="loginInput" placeholder="Digite a senha..." onkeydown="if(event.key==='Enter')doLoginProfessor()">
+      <button class="login-btn" onclick="doLoginProfessor()">Entrar</button>
+      <div class="professor-version-note">
+        A biblioteca é aberta somente após validar a senha de acesso.
+      </div>
+    </div>
+  </div>
+</div>
+<header class="app-header" id="appHeader" style="display:none">
+  <div class="h-left">
+    ${logoHeaderHtml}
+    <span class="h-brand" id="hBrandText" style="${brandHeaderStyle}">SENAI</span>
+    <div class="h-divider"></div>
+    <span class="h-title">Materiais — ${escH(publicMeta.nomeCurso)}</span>
+  </div>
+  <div class="h-right"><button class="h-btn" onclick="logoutProfessor()">Sair</button></div>
+</header>
+<div class="app-body" id="viewProfessor" style="display:none">
+  <div id="professorHome">
+    <div class="library-top"><div><h2>Biblioteca de materiais</h2><p>Escolha uma disciplina para consultar os arquivos organizados por tema e tipo. A busca também encontra materiais em toda a biblioteca.</p></div></div>
+    <div class="prof-home-note">Os links podem abrir apresentações, arquivos, vídeos, formulários ou páginas externas compartilhadas pela professora.</div>
+    <div class="disc-search"><input class="search-input" type="text" id="profGlobalSearch" placeholder="Buscar em toda a biblioteca..." oninput="renderHomeProfessorOnly()"></div>
+    <div id="professorHomeContent"></div>
+  </div>
+  <div id="professorDiscView" style="display:none">
+    <div class="breadcrumb"><button onclick="voltarHomeProfessorOnly()">Biblioteca</button><span>›</span><span id="profBreadcrumbDisc"></span></div>
+    <div class="inner-toolbar"><div><div class="inner-toolbar-title" id="profDiscTitle"></div><div class="inner-toolbar-sub" id="profDiscSubtitle"></div></div></div>
+    <div class="collapse-controls"><button class="btn btn-outline" onclick="expandirTemasProfessorOnly()">Expandir temas</button><button class="btn btn-outline" onclick="recolherTemasProfessorOnly()">Recolher temas</button></div>
+    <div class="inner-filters">
+      <input class="search-input" type="text" id="profDiscSearch" placeholder="Buscar dentro desta disciplina..." oninput="renderDiscProfessorOnly()">
+      <select class="filter-sel" id="profDiscTipo" onchange="renderDiscProfessorOnly()"><option value="">Todos os tipos</option></select>
+      <select class="filter-sel" id="profDiscTema" onchange="renderDiscProfessorOnly()"><option value="">Todos os temas</option></select>
+    </div>
+    <div id="professorDiscContent"></div>
+  </div>
+</div>
+<script>
+const SECURE_BUNDLE=${secureBundle};
+const PUBLIC_META=${safeMeta};
+const GERAL_ID='geral';
+let DATA=null;
+let currentDisc=null;
+${professorOnlyJs()}
+<\/script>
+</body></html>`;
+
+    const blob=new Blob([professorHtml],{type:'text/html;charset=utf-8'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=name;
+    a.click();
+    showToast(`Arquivo "${name}" gerado com proteção por senha.`);
+  }catch(err){
+    console.error(err);
+    showToast('Não foi possível gerar a versão protegida do professor.', true);
+  }
+}
+
+function professorOnlyJs(){ return `
+function escH(v){if(v==null)return '';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function norm(v){return String(v||'').trim().toLowerCase()}
+function modalidadeDisciplinaFallback(d){
+  const raw=norm(d&&d.modalidade);
+  if(raw==='ead') return 'ead';
+  if(raw==='presencial') return 'presencial';
+  const nome=norm(d&&d.nome);
+  const eadConhecidas=[
+    'fundamentos da comunicação e informação',
+    'planejamento e organização do trabalho',
+    'raciocínio lógico e análise de dados',
+    'relações socioprofissionais, cidadania e ética',
+    'transformação digital no setor industrial'
+  ];
+  return eadConhecidas.includes(nome)?'ead':'presencial';
+}
+function modalidadeDisciplina(d){return modalidadeDisciplinaFallback(d)}
+function modalidadeLabel(m){return m==='ead'?'EaD':'Presencial'}
+function colorAlpha(hex,alpha=.12){const h=String(hex||'#888888').replace('#','');const full=h.length===3?h.split('').map(x=>x+x).join(''):h.padEnd(6,'8').slice(0,6);const r=parseInt(full.slice(0,2),16)||136,g=parseInt(full.slice(2,4),16)||136,b=parseInt(full.slice(4,6),16)||136;return 'rgba('+r+','+g+','+b+','+alpha+')'}
+function discs(){return [...DATA.disciplinas].sort((a,b)=>(a.ordem||0)-(b.ordem||0)||a.nome.localeCompare(b.nome,'pt-BR'))}
+function discsPorModalidade(m){return discs().filter(d=>modalidadeDisciplina(d)===m)}
+function tipos(){return [...DATA.tipos].sort((a,b)=>(a.ordem||0)-(b.ordem||0)||a.nome.localeCompare(b.nome,'pt-BR'))}
+function disc(id){return id===GERAL_ID?{id:GERAL_ID,nome:DATA.nomeGeral||'Materiais gerais'}:DATA.disciplinas.find(d=>d.id===id)}
+function tipo(id){return DATA.tipos.find(t=>t.id===id)||{nome:'Outro',icone:'📎',cor:'#888888'}}
+function tema(id){return DATA.temas.find(t=>t.id===id)}
+function themes(id){return DATA.temas.filter(t=>t.disciplinaId===id).sort((a,b)=>(a.ordem||0)-(b.ordem||0)||a.nome.localeCompare(b.nome,'pt-BR'))}
+function mats(id){return DATA.materiais.filter(m=>m.disciplinaId===id)}
+function sortM(list){return [...list].sort((a,b)=>Number(!!b.fixado)-Number(!!a.fixado)||(Number(a.ordem)||999999)-(Number(b.ordem)||999999)||(a.titulo||'').localeCompare(b.titulo||'','pt-BR'))}
+function detectarOrigem(link){const l=String(link||'').toLowerCase();if(l.includes('canva.com'))return 'Canva';if(l.includes('youtube.com')||l.includes('youtu.be'))return 'YouTube';if(l.includes('docs.google.com/forms'))return 'Google Forms';if(l.includes('docs.google.com/presentation')||l.includes('slides.google.com'))return 'Google Slides';if(l.includes('docs.google.com/document'))return 'Google Docs';if(l.includes('docs.google.com/spreadsheets')||l.includes('sheets.google.com'))return 'Google Planilhas';if(l.includes('drive.google.com'))return 'Google Drive';if(l.includes('forms.office.com'))return 'Microsoft Forms';if(l.includes('onedrive.live.com')||l.includes('1drv.ms'))return 'OneDrive';return 'Link externo'}
+function links(m){if(Array.isArray(m.links)&&m.links.length)return m.links.filter(l=>l&&String(l.link||'').trim());if(String(m.link||'').trim())return[{titulo:'',link:m.link,origem:m.origem||'',ordem:1}];return[]}
+function origemLink(l){return String(l.origem||'').trim()||detectarOrigem(l.link||'')}
+function tituloLink(l,idx=0){return String(l.titulo||'').trim()||origemLink(l)||('Link '+(idx+1))}
+function origens(m){return [...new Set(links(m).map(origemLink).filter(Boolean))]}
+function sourceBadges(m){return origens(m).map(o=>'<span class="mat-source-badge">'+escH(o)+'</span>').join('')}
+function searchable(m){return norm([m.titulo,m.descricao,links(m).map((l,i)=>tituloLink(l,i)+' '+origemLink(l)+' '+l.link).join(' '),disc(m.disciplinaId)?.nome,tema(m.temaId)?.nome,tipo(m.tipoId)?.nome].join(' '))}
+function filtered(list,{search='',tipoId='',temaId=''}={}){const s=norm(search);return sortM(list.filter(m=>{if(tipoId&&m.tipoId!==tipoId)return false;if(temaId&&(m.temaId||'')!==temaId)return false;if(s&&!searchable(m).includes(s))return false;return true}))}
+function bg(id){return colorAlpha(tipo(id).cor,.12)}
+function cor(id){return tipo(id).cor||'#888888'}
+const collapsedProfessorOnlyThemes=new Set();
+function themeKey(id){return (currentDisc||'none')+':'+(id||'semtema')}
+function isCollapsedTheme(id){return collapsedProfessorOnlyThemes.has(themeKey(id))}
+function toggleThemeProfessorOnly(id){const k=themeKey(id);collapsedProfessorOnlyThemes.has(k)?collapsedProfessorOnlyThemes.delete(k):collapsedProfessorOnlyThemes.add(k);renderDiscProfessorOnly()}
+function recolherTemasProfessorOnly(){[...themes(currentDisc),{id:''}].forEach(t=>collapsedProfessorOnlyThemes.add(themeKey(t.id||'')));renderDiscProfessorOnly()}
+function expandirTemasProfessorOnly(){[...themes(currentDisc),{id:''}].forEach(t=>collapsedProfessorOnlyThemes.delete(themeKey(t.id||'')));renderDiscProfessorOnly()}
+
+function b64ToBytes(b64){
+  const bin=atob(b64);
+  const arr=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+  return arr;
+}
+async function deriveProfessorKey(password){
+  const enc=new TextEncoder();
+  const keyMaterial=await crypto.subtle.importKey('raw',enc.encode(password),{name:'PBKDF2'},false,['deriveKey']);
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2',salt:b64ToBytes(SECURE_BUNDLE.salt),iterations:SECURE_BUNDLE.iterations,hash:'SHA-256'},
+    keyMaterial,
+    {name:'AES-GCM',length:256},
+    false,
+    ['decrypt']
+  );
+}
+async function decryptProfessorData(password){
+  const key=await deriveProfessorKey(password);
+  const decrypted=await crypto.subtle.decrypt(
+    {name:'AES-GCM',iv:b64ToBytes(SECURE_BUNDLE.iv)},
+    key,
+    b64ToBytes(SECURE_BUNDLE.ciphertext)
+  );
+  return JSON.parse(new TextDecoder().decode(decrypted));
+}
+async function doLoginProfessor(){
+  const v=document.getElementById('loginInput').value;
+  const err=document.getElementById('loginError');
+  err.style.display='none';
+  if(!window.crypto||!window.crypto.subtle){
+    err.textContent='Este navegador não conseguiu abrir a biblioteca protegida. Use um navegador atualizado.';
+    err.style.display='';
+    return;
+  }
+  try{
+    DATA=await decryptProfessorData(v);
+    sessionStorage.setItem('mat_prof_secure_session',JSON.stringify(DATA));
+    openProfessorOnly();
+  }catch(e){
+    err.textContent='Senha incorreta. Tente novamente.';
+    err.style.display='';
+    document.getElementById('loginInput').value='';
+    document.getElementById('loginInput').focus();
+  }
+}
+function logoutProfessor(){sessionStorage.removeItem('mat_prof_secure_session');location.reload()}
+function applyLogoProfessorOnly(){
+  const li=document.getElementById('loginLogoImg'),lb=document.getElementById('loginBrandText'),hi=document.getElementById('hLogoImg'),hb=document.getElementById('hBrandText');
+  if(PUBLIC_META.logo){
+    if(li){li.src=PUBLIC_META.logo;li.style.display=''}
+    if(lb)lb.style.display='none';
+    if(hi){hi.src=PUBLIC_META.logo;hi.style.display=''}
+    if(hb)hb.style.display='none';
+  }else{
+    if(li)li.style.display='none';
+    if(lb)lb.style.display='';
+    if(hi)hi.style.display='none';
+    if(hb)hb.style.display='';
+  }
+}
+function openProfessorOnly(){
+  if(!DATA)return;
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('appHeader').style.display='';
+  document.getElementById('viewProfessor').style.display='';
+  applyLogoProfessorOnly();
+  renderHomeProfessorOnly();
+}
+function renderHomeProfessorOnly(){
+  const s=norm(document.getElementById('profGlobalSearch')?.value||'');
+  if(s){searchCards(s);return}
+  const geral=cardDisc(GERAL_ID);
+  const presList=discsPorModalidade('presencial');
+  const eadList=discsPorModalidade('ead');
+  const pres=presList.map(d=>cardDisc(d.id)).filter(Boolean).join('');
+  const ead=eadList.map(d=>cardDisc(d.id)).filter(Boolean).join('');
+  const blocks=[
+    geral?groupBlockProfessorOnly('Materiais gerais',geral,1,false):'',
+    groupBlockProfessorOnly('Disciplinas presenciais',pres,presList.length,true),
+    groupBlockProfessorOnly('Disciplinas EaD',ead,eadList.length,true)
+  ].filter(Boolean).join('');
+  document.getElementById('professorHomeContent').innerHTML=blocks;
+}
+function groupBlockProfessorOnly(title,cards,total,showCount=true){
+  return '<section class="disc-group-block"><div class="disc-group-head"><div class="disc-group-title">'+escH(title)+'</div>'+(showCount?'<div class="disc-group-count">'+total+' '+(total===1?'disciplina':'disciplinas')+'</div>':'')+'</div>'+(cards?'<div class="disc-grid">'+cards+'</div>':'<div class="disc-group-empty">Nenhuma disciplina nesta seção.</div>')+'</section>';
+}
+function totalByTypeProfessorOnly(id){
+  const counts={};
+  mats(id).forEach(m=>counts[m.tipoId]=(counts[m.tipoId]||0)+1);
+  return Object.entries(counts)
+    .map(([tipoId,total])=>({tipoId,total,nome:tipo(tipoId).nome}))
+    .sort((a,b)=>b.total-a.total || a.nome.localeCompare(b.nome,'pt-BR'));
+}
+function cardDisc(id){
+  const d=disc(id);if(!d)return '';
+  const list=mats(id);
+  const temas=themes(id).length;
+  const fix=list.filter(m=>m.fixado).length;
+  const tipos=totalByTypeProfessorOnly(id).slice(0,3).map(x=>escH(x.nome)+': '+x.total).join(' · ');
+  const sub=id===GERAL_ID
+    ? 'Documentos e referências que não precisam ficar ligados a uma disciplina.'
+    : (tipos || 'Nenhum material cadastrado ainda.');
+  return '<button class="disc-card'+(id===GERAL_ID?' general':'')+'" onclick="openDiscProfessorOnly(\\''+id+'\\')">'
+    +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">'
+      +'<div class="disc-card-title">'+escH(d.nome)+'</div>'
+      +(id===GERAL_ID?'<span class="general-label">Geral</span>':'')
+    +'</div>'
+    +'<div class="disc-card-sub">'+escH(sub)+'</div>'
+    +'<div class="disc-card-metrics">'
+      +'<span class="mini-pill">'+list.length+' material'+(list.length!==1?'is':'')+'</span>'
+      +'<span class="mini-pill">'+temas+' tema'+(temas!==1?'s':'')+'</span>'
+      +(fix?'<span class="mini-pill pin">📌 '+fix+' fixado'+(fix!==1?'s':'')+'</span>':'')
+    +'</div>'
+  +'</button>';
+}
+function searchCards(s){
+  const list=sortM(DATA.materiais.filter(m=>searchable(m).includes(s)));
+  const el=document.getElementById('professorHomeContent');
+  if(!list.length){el.innerHTML='<div class="empty"><h3>Nenhum material encontrado.</h3><p>Tente outra palavra.</p></div>';return}
+  el.innerHTML='<div class="search-results-title">Resultados da busca</div><div class="prof-card-grid">'+list.map(cardMat).join('')+'</div>';
+}
+function openDiscProfessorOnly(id){
+  currentDisc=id;document.getElementById('professorHome').style.display='none';document.getElementById('professorDiscView').style.display='';
+  const d=disc(id);document.getElementById('profBreadcrumbDisc').textContent=d?.nome||'';document.getElementById('profDiscTitle').textContent=d?.nome||'';renderSelectorsProfessorOnly();renderDiscProfessorOnly();
+}
+function voltarHomeProfessorOnly(){currentDisc=null;document.getElementById('professorDiscView').style.display='none';document.getElementById('professorHome').style.display='';renderHomeProfessorOnly()}
+function renderSelectorsProfessorOnly(){
+  const st=document.getElementById('profDiscTipo'), sm=document.getElementById('profDiscTema');const oldT=st.value,oldM=sm.value;
+  st.innerHTML='<option value="">Todos os tipos</option>'+tipos().map(t=>'<option value="'+escH(t.id)+'">'+escH(t.nome)+'</option>').join('');
+  sm.innerHTML='<option value="">Todos os temas</option>'+themes(currentDisc).map(t=>'<option value="'+escH(t.id)+'">'+escH(t.nome)+'</option>').join('')+'<option value="__semtema__">Sem tema</option>';
+  if(oldT)st.value=oldT;if(oldM)sm.value=oldM;
+}
+function renderDiscProfessorOnly(){
+  const search=document.getElementById('profDiscSearch').value;const tipoId=document.getElementById('profDiscTipo').value;const temaSel=document.getElementById('profDiscTema').value;
+  const base=mats(currentDisc);const list=filtered(base,{search,tipoId,temaId:temaSel==='__semtema__'?'':temaSel});
+  document.getElementById('profDiscSubtitle').textContent=list.length+' material'+(list.length!==1?'is':'')+' exibido'+(list.length!==1?'s':'');
+  const el=document.getElementById('professorDiscContent');
+  if(!list.length){el.innerHTML='<div class="empty"><h3>Nenhum material encontrado.</h3><p>Ajuste os filtros ou escolha outra disciplina.</p></div>';return}
+  if(search||tipoId||temaSel){el.innerHTML='<div class="prof-card-grid">'+list.map(cardMat).join('')+'</div>';return}
+  el.innerHTML=grouped(list);
+}
+function grouped(list){
+  const map={};list.forEach(m=>{const k=m.temaId||'__semtema__';if(!map[k])map[k]=[];map[k].push(m)});
+  const ordered=[...themes(currentDisc).map(t=>t.id),'__semtema__'].filter(k=>map[k]?.length);
+  return ordered.map(k=>{const theme=k==='__semtema__'?{id:'',nome:'Sem tema'}:tema(k);const tm=map[k];const col=isCollapsedTheme(theme.id);const by={};tm.forEach(m=>{const t=m.tipoId||'outro';if(!by[t])by[t]=[];by[t].push(m)});const body=Object.keys(by).sort((a,b)=>tipos().findIndex(t=>t.id===a)-tipos().findIndex(t=>t.id===b)).map(tid=>'<div class="tipo-group"><div class="tipo-label"><div class="tipo-dot" style="background:'+cor(tid)+'"></div>'+escH(tipo(tid).nome)+'</div><div class="prof-card-grid">'+sortM(by[tid]).map(cardMat).join('')+'</div></div>').join('');return '<section class="theme-section'+(col?' collapsed':'')+'"><button class="theme-toggle" onclick="toggleThemeProfessorOnly(\\''+escH(theme.id||'')+'\\')"><span class="theme-caret">⌄</span><span class="theme-title">'+escH(theme.nome)+'</span><span class="theme-count">'+tm.length+' material'+(tm.length!==1?'is':'')+'</span></button><div class="theme-body">'+body+'</div></section>'}).join('');
+}
+function cardMat(m){
+  const t=tipo(m.tipoId), th=tema(m.temaId), dl=links(m);
+  const linksHtml=dl.map((l,i)=>'<a class="mat-open-btn" href="'+escH(l.link)+'" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>'+escH(tituloLink(l,i))+'</a>').join('');
+  return '<article class="mat-card"><div class="mat-card-top"><div class="mat-icon" style="background:'+bg(m.tipoId)+'">'+escH(t.icone||'📎')+'</div><div><div class="mat-title">'+escH(m.titulo)+'</div>'+((m.descricao)?'<div class="mat-desc">'+escH(m.descricao)+'</div>':'')+'</div></div><div class="mat-footer"><span class="mat-tipo-badge" style="background:'+bg(m.tipoId)+';color:'+cor(m.tipoId)+'">'+escH(t.nome)+'</span>'+sourceBadges(m)+(m.fixado?'<span class="pin-pill">📌 Fixado</span>':'')+'</div>'+((th?.nome)?'<div class="mat-context">'+escH(th.nome)+'</div>':'')+(linksHtml?'<div class="mat-links">'+linksHtml+'</div>':'')+'</article>';
+}
+function showToast(msg,err){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;right:24px;background:'+(err?'var(--red)':'var(--text)')+';color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)}
+applyLogoProfessorOnly();
+try{
+  const session=sessionStorage.getItem('mat_prof_secure_session');
+  if(session){DATA=JSON.parse(session);openProfessorOnly()}
+  else setTimeout(()=>document.getElementById('loginInput').focus(),100);
+}catch(e){
+  sessionStorage.removeItem('mat_prof_secure_session');
+  setTimeout(()=>document.getElementById('loginInput').focus(),100);
+}
+`; }
+function showToast(msg, err){
+  const t=document.createElement('div');
+  t.style.cssText=`position:fixed;bottom:24px;right:24px;background:${err?'var(--red)':'var(--text)'};color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;animation:fadeInUp .2s;box-shadow:0 4px 20px rgba(0,0,0,.2)`;
+  t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
+}
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+carregar();
+applyLogo();
+checkLogin();
+</script>
+</body>
+</html>
