@@ -40,6 +40,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .login-toggle{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--text3);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;width:100%;padding:0}
 .login-toggle:hover{color:var(--accent)}
 .login-admin-note{font-size:11px;color:var(--text3);line-height:1.55;margin-top:12px;text-align:center}
+.login-role-toggle{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:4px}
+.login-role-btn{border:none;background:transparent;border-radius:6px;padding:8px 10px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer}
+.login-role-btn.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.08)}
 
 /* ── HEADER ────────────────────────────── */
 .app-header{background:#164194;color:#fff;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;min-height:58px;height:auto;position:sticky;top:0;z-index:100;gap:16px}
@@ -302,6 +305,10 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div class="login-body">
       <div class="login-title" id="loginTitle">Acesso administrativo</div>
       <div class="login-error" id="loginError">Senha incorreta. Tente novamente.</div>
+      <div class="login-role-toggle">
+        <button class="login-role-btn active" id="loginRoleAdmin" onclick="setLoginRole('admin')" type="button">Administrador</button>
+        <button class="login-role-btn" id="loginRoleProfessor" onclick="setLoginRole('professor')" type="button">Professor</button>
+      </div>
       <input class="login-input" type="password" id="loginInput" placeholder="Senha de administrador..." onkeydown="if(event.key==='Enter')doLogin()">
       <button class="login-btn" onclick="doLogin()">Entrar</button>
       <div class="login-admin-note">Este arquivo é para cadastrar e organizar a biblioteca. O professor recebe a versão gerada para consulta.</div>
@@ -1843,15 +1850,30 @@ function filterMats(list, {search='', tipoId='', temaId=''}={}){
 // LOGIN
 // ════════════════════════════════════════════════════════
 let modoAdmin = false;
+let loginRole = 'admin';
+function setLoginRole(role){
+  loginRole = role === 'professor' ? 'professor' : 'admin';
+  document.getElementById('loginRoleAdmin')?.classList.toggle('active', loginRole==='admin');
+  document.getElementById('loginRoleProfessor')?.classList.toggle('active', loginRole==='professor');
+  document.getElementById('loginTitle').textContent = loginRole==='admin' ? 'Acesso administrativo' : 'Acesso do professor';
+  document.getElementById('loginInput').placeholder = loginRole==='admin' ? 'Senha de administrador...' : 'Senha do professor...';
+  document.querySelector('.login-admin-note').textContent = loginRole==='admin'
+    ? 'Use o acesso administrativo para cadastrar, editar e configurar a biblioteca.'
+    : 'Use o acesso do professor para consultar os materiais sempre atualizados, sem edição.';
+  document.getElementById('loginError').style.display='none';
+  document.getElementById('loginInput').value='';
+  document.getElementById('loginInput').focus();
+}
 async function doLogin() {
   const val = document.getElementById('loginInput').value;
   const errEl = document.getElementById('loginError');
-  const ok = await verificarSenhaAdmin(val);
+  const ok = loginRole === 'admin' ? await verificarSenhaAdmin(val) : verificarSenhaProfessor(val);
   if (ok) {
-    sessionStorage.setItem('mat_mode', 'admin');
-    abrirApp();
+    sessionStorage.setItem('mat_mode', loginRole);
+    if(loginRole === 'admin') abrirApp();
+    else abrirProfessorOnline();
   } else {
-    loginErro(errEl, 'Senha de administrador incorreta.');
+    loginErro(errEl, loginRole==='admin' ? 'Senha de administrador incorreta.' : 'Senha do professor incorreta.');
   }
 }
 function b64ParaBytes(b64){
@@ -1907,12 +1929,16 @@ async function verificarSenhaAdmin(senha){
   const legado = localStorage.getItem(LEGACY_ADMIN_PW_KEY);
   return !!legado && String(senha || '') === legado;
 }
+function verificarSenhaProfessor(senha){
+  return String(senha || '') === String(D.senhaProfessor || '');
+}
 
 function loginErro(el,msg){ el.textContent=msg; el.style.display=''; const i=document.getElementById('loginInput'); i.value=''; i.focus(); }
-function doLogout(){ sessionStorage.removeItem('mat_mode'); location.reload(); }
+function doLogout(){ sessionStorage.removeItem('mat_mode'); sessionStorage.removeItem('mat_prof_secure_session'); location.reload(); }
 function checkLogin(){
   const mode=sessionStorage.getItem('mat_mode');
   if(mode==='admin') abrirApp();
+  else if(mode==='professor') abrirProfessorOnline();
   else setTimeout(()=>document.getElementById('loginInput').focus(),100);
 }
 function abrirApp(){
@@ -1958,6 +1984,30 @@ function visualizarComoProfessor(){
   if(globalSearch) globalSearch.value = '';
   renderProfessorHome();
   window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function abrirProfessorOnline(){
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('appHeader').style.display='';
+  applyLogo();
+  document.getElementById('hTitle').textContent='Materiais — '+(D.nomeCurso||'SENAI');
+  document.title='Materiais — '+(D.nomeCurso||'SENAI');
+  document.getElementById('hBadge').style.display='';
+  document.getElementById('hBadge').textContent='Professor';
+  document.getElementById('hBtnVoltarAdmin').style.display='none';
+  document.getElementById('hBtnPreview').style.display='none';
+  document.getElementById('hBtnExport').style.display='none';
+  document.getElementById('hBtnImport').style.display='none';
+  document.getElementById('hBtnGerar').style.display='none';
+  document.getElementById('viewAdmin').style.display='none';
+  document.getElementById('viewProfessor').style.display='';
+  document.getElementById('professorHome').style.display='';
+  document.getElementById('professorDiscView').style.display='none';
+  currentProfessorDiscId=null;
+  const globalSearch=document.getElementById('profGlobalSearch');
+  if(globalSearch) globalSearch.value='';
+  renderProfessorHome();
+  startCloudAutoSync();
 }
 
 function voltarDaPreviaProfessor(){
@@ -3084,6 +3134,26 @@ async function syncToCloud(manual=false){
     if(manual) showToast('Não consegui enviar agora. A cópia local continua salva.',true);
   }
 }
+function renderAfterCloudLoad(){
+  applyLogo();
+  document.getElementById('hTitle').textContent='Materiais — '+(D.nomeCurso||'');
+  document.title='Materiais — '+(D.nomeCurso||'');
+  const mode=sessionStorage.getItem('mat_mode');
+  const professorVisible=document.getElementById('viewProfessor')?.style.display !== 'none';
+  const adminVisible=document.getElementById('viewAdmin')?.style.display !== 'none';
+  if(mode==='professor' || (professorVisible && !adminVisible)){
+    if(currentProfessorDiscId){
+      renderProfessorDiscSelectors();
+      renderProfessorDisc();
+    } else {
+      renderProfessorHome();
+    }
+    return;
+  }
+  renderAdminHome();
+  renderConfigTab();
+  if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); }
+}
 async function syncFromCloud(manual=false){
   if(!cloudConfigured()){
     if(manual) showToast('Configure a URL do Apps Script antes de carregar.',true);
@@ -3127,12 +3197,7 @@ async function syncFromCloud(manual=false){
     D=incoming;
     localStorage.setItem(SK,JSON.stringify(D));
     localStorage.setItem(CLOUD_LOADED_AT_KEY,new Date().toISOString());
-    applyLogo();
-    document.getElementById('hTitle').textContent='Materiais — '+(D.nomeCurso||'');
-    document.title='Materiais — '+(D.nomeCurso||'');
-    renderAdminHome();
-    renderConfigTab();
-    if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); }
+    renderAfterCloudLoad();
     setSyncBadge('ok');
     if(manual) showToast(`${D.materiais.length} materiais carregados da nuvem.`);
     else showToast('Biblioteca atualizada pela nuvem.');
