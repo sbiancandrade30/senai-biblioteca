@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Materiais de Aula — SENAI</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <style>
 :root {
   --bg:#f5f4f0; --surface:#fff; --surface2:#f0efe9;
@@ -392,6 +392,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         </div>
         <div class="inner-actions">
           <button class="btn btn-outline" onclick="openThemeModal()">+ Novo tema</button>
+          <button class="btn btn-outline" onclick="baixarModeloPlanilhaMateriais(currentAdminDiscId)">Baixar modelo</button>
+          <button class="btn btn-outline" onclick="bulkSheetInput.click()">Importar planilha</button>
           <button class="btn btn-primary" onclick="openModal(null, currentAdminDiscId)">+ Novo material</button>
         </div>
       </div>
@@ -2648,18 +2650,21 @@ function montarLinksDaPlanilha(row, header){
   }
   return links;
 }
-function baixarModeloPlanilhaMateriais(){
+function baixarModeloPlanilhaMateriais(disciplinaId=''){
   if(!window.XLSX){
     showToast('Não consegui carregar o gerador de Excel. Verifique a conexão e tente novamente.',true);
     return;
   }
+  const disc=getDisc(disciplinaId);
+  const nomeDisc=disc && disciplinaId ? disc.nome : 'Ensaios';
+  const modalidade=disc && disciplinaId ? modalidadeLabel(modalidadeDisciplina(disc)) : 'Presencial';
   const headers=[
     'Disciplina','Modalidade','Tema','Tipo','Título','Link','Origem','Título do link',
     'Link 2','Origem 2','Título do link 2','Descrição','Fixado'
   ];
   const exemplos=[
     [
-      'Ensaios','Presencial','Ensaio de tração','Slide','Aula 01 - Ensaio de tração',
+      nomeDisc,modalidade,'Ensaio de tração','Slide','Aula 01 - Ensaio de tração',
       'https://www.canva.com/design/exemplo','Canva','Abrir slides',
       'https://drive.google.com/exemplo','Google Drive','Material de apoio',
       'Slides principais da aula, com conceitos e roteiro de discussão.','sim'
@@ -2682,7 +2687,39 @@ function baixarModeloPlanilhaMateriais(){
   ];
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet([headers,...exemplos]);
-  ws['!cols']=headers.map(h=>({wch:Math.max(14,h.length+2)}));
+  ws['!cols']=[
+    {wch:26},{wch:13},{wch:24},{wch:14},{wch:34},{wch:44},{wch:18},
+    {wch:22},{wch:44},{wch:18},{wch:22},{wch:58},{wch:12}
+  ];
+  ws['!rows']=[{hpt:22},{hpt:34},{hpt:34}];
+  ws['!autofilter']={ref:'A1:M1'};
+  ws['!freeze']={xSplit:0,ySplit:1,topLeftCell:'A2',activePane:'bottomLeft',state:'frozen'};
+  const headerStyle={
+    fill:{fgColor:{rgb:'164194'}},
+    font:{color:{rgb:'FFFFFF'},bold:true},
+    alignment:{horizontal:'center',vertical:'center'},
+    border:{
+      top:{style:'thin',color:{rgb:'0B2A63'}},bottom:{style:'thin',color:{rgb:'0B2A63'}},
+      left:{style:'thin',color:{rgb:'0B2A63'}},right:{style:'thin',color:{rgb:'0B2A63'}}
+    }
+  };
+  const bodyStyle={
+    alignment:{vertical:'top',wrapText:true},
+    border:{
+      top:{style:'thin',color:{rgb:'D9D9D9'}},bottom:{style:'thin',color:{rgb:'D9D9D9'}},
+      left:{style:'thin',color:{rgb:'D9D9D9'}},right:{style:'thin',color:{rgb:'D9D9D9'}}
+    }
+  };
+  for(let c=0;c<headers.length;c++){
+    const cell=XLSX.utils.encode_cell({r:0,c});
+    if(ws[cell]) ws[cell].s=headerStyle;
+  }
+  for(let r=1;r<=exemplos.length;r++){
+    for(let c=0;c<headers.length;c++){
+      const cell=XLSX.utils.encode_cell({r,c});
+      if(ws[cell]) ws[cell].s=bodyStyle;
+    }
+  }
   const info=XLSX.utils.aoa_to_sheet(instrucoes);
   info['!cols']=[{wch:90}];
   XLSX.utils.book_append_sheet(wb,ws,'Materiais');
@@ -2726,7 +2763,7 @@ function importarPlanilhaMateriais(input){
         if(!titulo || !links.length) return;
         const disciplina=valorLinha(row, header, ['disciplina','materia','unidade_curricular','uc']);
         const modalidade=valorLinha(row, header, ['modalidade','tipo_de_aula']);
-        const disciplinaId=findOrCreateDiscByName(disciplina, modalidade);
+        const disciplinaId=disciplina ? findOrCreateDiscByName(disciplina, modalidade) : (currentAdminDiscId || GERAL_ID);
         const tema=valorLinha(row, header, ['tema','assunto','topico','conteudo']);
         const temaId=findOrCreateTemaByName(tema, disciplinaId);
         const tipo=valorLinha(row, header, ['tipo','tipo_de_material','categoria']);
