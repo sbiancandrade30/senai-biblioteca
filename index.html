@@ -391,6 +391,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 <div class="app-body" id="viewAdmin" style="display:none">
   <div class="tabs">
     <button class="tab-btn active" onclick="setTab('materiais',this)">Materiais</button>
+    <button class="tab-btn" onclick="setTab('revisao',this)">Revisão</button>
     <button class="tab-btn" onclick="setTab('configuracoes',this)">Configurações</button>
   </div>
 
@@ -441,6 +442,28 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       </div>
       <div id="adminDiscContent"></div>
     </div>
+  </div>
+
+  <!-- TAB REVISÃO -->
+  <div id="tabRevisao" style="display:none">
+    <div class="library-top">
+      <div>
+        <h2>Revisão de materiais</h2>
+        <p>Confira materiais marcados para revisar, substituir ou sem atualização recente. Use esta área para manter a biblioteca confiável antes de compartilhar com outras turmas.</p>
+      </div>
+    </div>
+    <div class="summary-row" id="reviewSummary"></div>
+    <div class="inner-filters">
+      <input class="search-input" type="text" id="reviewSearch" placeholder="Buscar por título, disciplina, turma, status..." oninput="renderReviewTab()">
+      <select class="filter-sel" id="reviewFilter" onchange="renderReviewTab()">
+        <option value="review">A revisar</option>
+        <option value="stale">Desatualizados</option>
+        <option value="substituir">Substituir</option>
+        <option value="revisar">Marcados como revisar</option>
+        <option value="all">Todos os materiais</option>
+      </select>
+    </div>
+    <div id="reviewContent"></div>
   </div>
 
   <!-- TAB CONFIGURAÇÕES -->
@@ -2134,6 +2157,7 @@ function abrirApp(){
   document.getElementById('viewProfessor').style.display='none';
 
   renderAdminHome();
+  if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
   renderConfigTab();
   startCloudAutoSync();
 }
@@ -2233,8 +2257,10 @@ function setTab(tab, btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tabMateriais').style.display=tab==='materiais'?'':'none';
+  document.getElementById('tabRevisao').style.display=tab==='revisao'?'':'none';
   document.getElementById('tabConfiguracoes').style.display=tab==='configuracoes'?'':'none';
   if(tab==='materiais') renderAdminHome();
+  if(tab==='revisao') renderReviewTab();
   if(tab==='configuracoes') renderConfigTab();
 }
 
@@ -2498,6 +2524,96 @@ function renderAdminGrouped(list,discId){
     </section>`;
   }).join('');
 }
+function materialReviewReason(m){
+  if(m.statusMaterial==='substituir') return 'Marcado para substituir';
+  if(m.statusMaterial==='revisar') return 'Marcado para revisar';
+  if(isMaterialStale(m)){
+    const days=daysSinceDate(m.updatedAt || m.createdAt);
+    return `${days} dias sem atualização`;
+  }
+  if(m.statusMaterial==='pronto') return 'Pronto';
+  return 'Sem alerta';
+}
+function reviewList(){
+  const q=normalizar(document.getElementById('reviewSearch')?.value||'');
+  const f=document.getElementById('reviewFilter')?.value||'review';
+  return sortMats(D.materiais.filter(m=>{
+    if(f==='review' && !needsMaterialReview(m)) return false;
+    if(f==='stale' && !isMaterialStale(m)) return false;
+    if(f==='substituir' && m.statusMaterial!=='substituir') return false;
+    if(f==='revisar' && m.statusMaterial!=='revisar') return false;
+    if(q && !searchable(m).includes(q)) return false;
+    return true;
+  }));
+}
+function renderReviewTab(){
+  const all=D.materiais;
+  const stale=all.filter(isMaterialStale).length;
+  const review=all.filter(needsMaterialReview).length;
+  const substituir=all.filter(m=>m.statusMaterial==='substituir').length;
+  const revisar=all.filter(m=>m.statusMaterial==='revisar').length;
+  document.getElementById('reviewSummary').innerHTML=[
+    [review,'a revisar'],
+    [stale,'desatualizados'],
+    [revisar,'marcados revisar'],
+    [substituir,'substituir']
+  ].map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
+  const list=reviewList();
+  const el=document.getElementById('reviewContent');
+  if(!list.length){
+    el.innerHTML='<div class="empty"><h3>Nenhum material nesta revisão.</h3><p>Ajuste os filtros ou continue cadastrando seus materiais.</p></div>';
+    return;
+  }
+  el.innerHTML=`<div class="theme-section">
+    <div class="theme-head">
+      <div>
+        <div class="theme-name">${list.length} material${list.length!==1?'is':''}</div>
+        <div class="theme-meta">Ordenados por fixados, ordem e título</div>
+      </div>
+    </div>
+    <div class="theme-body">${list.map(reviewCardHtml).join('')}</div>
+  </div>`;
+}
+function reviewCardHtml(m){
+  const tipo=getTipo(m.tipoId);
+  const reason=materialReviewReason(m);
+  const days=daysSinceDate(m.updatedAt || m.createdAt);
+  const context=[labelDisc(m.disciplinaId),m.temaId?labelTema(m.temaId):'',tipo.nome].filter(Boolean).join(' · ');
+  return `<div class="admin-card${needsMaterialReview(m)?' pinned':''}">
+    <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'📎')}</div>
+    <div class="admin-body">
+      <div class="admin-title">${escH(m.titulo)}</div>
+      <div class="admin-meta">
+        <span class="pedagogy-pill ${m.statusMaterial==='substituir'?'review-pill danger':(needsMaterialReview(m)?'review-pill':'')}">${escH(reason)}</span>
+        ${days!=null?`<span class="pedagogy-pill">${days} dia${days!==1?'s':''}</span>`:''}
+      </div>
+      <div class="admin-desc">${escH(context)}</div>
+      ${pedagogyMetaHtml(m)}
+    </div>
+    <div class="admin-actions wrap">
+      <button class="a-btn" onclick="openMaterialFromReview('${escJsStr(m.id)}')">Abrir</button>
+      <button class="a-btn" onclick="markMaterialReady('${escJsStr(m.id)}')">Marcar pronto</button>
+      <button class="a-btn" onclick="openModal('${escJsStr(m.id)}')">Editar</button>
+    </div>
+  </div>`;
+}
+function openMaterialFromReview(id){
+  const m=D.materiais.find(x=>x.id===id); if(!m) return;
+  const tabBtn=[...document.querySelectorAll('.tab-btn')].find(b=>b.getAttribute('onclick')?.includes("'materiais'")) || document.querySelector('.tab-btn');
+  setTab('materiais',tabBtn);
+  abrirAdminDisc(m.disciplinaId||GERAL_ID);
+  document.getElementById('adminMatSearch').value=m.titulo||'';
+  renderAdminDisc();
+}
+function markMaterialReady(id){
+  const m=D.materiais.find(x=>x.id===id); if(!m) return;
+  m.statusMaterial='pronto';
+  m.updatedAt=isoNow();
+  salvar();
+  renderReviewTab();
+  renderAdminHome();
+  showToast('Material marcado como pronto.');
+}
 function adminCardHtml(m){
   const tipo=getTipo(m.tipoId);
   const linkPills=materialLinks(m).map((l,idx)=>`<a class="admin-link-pill" href="${escH(l.link)}" target="_blank" rel="noopener">↗ ${escH(tituloLink(l,idx))}</a>`).join('');
@@ -2678,6 +2794,7 @@ function salvarMaterial(options={}){
   lastMaterialDefaults={disciplinaId,temaId,tipoId};
   salvar();
   if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); } else renderAdminHome();
+  if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
   showToast(wasEditing?'Material atualizado!':'Material adicionado!');
   if(options.keepOpen && !wasEditing){
     openModal(null,disciplinaId);
@@ -2691,13 +2808,13 @@ function salvarMaterial(options={}){
 function excluirMaterial(id){
   const m=D.materiais.find(x=>x.id===id); if(!m) return;
   if(!confirm(`Excluir "${m.titulo}"?`)) return;
-  D.materiais=D.materiais.filter(x=>x.id!==id); salvar(); renderAdminDisc(); renderAdminHome(); showToast('Material excluído.');
+  D.materiais=D.materiais.filter(x=>x.id!==id); salvar(); renderAdminDisc(); renderAdminHome(); if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab(); showToast('Material excluído.');
 }
 function duplicarMaterial(id){
   const m=D.materiais.find(x=>x.id===id); if(!m) return;
   const now=isoNow();
   const c={...m,id:uid('mat'),titulo:m.titulo+' — cópia',links:materialLinks(m).map((l,idx)=>({...l,id:uid('lnk'),ordem:idx+1})),createdAt:now,updatedAt:now,ordem:nextOrderFor(m.disciplinaId,m.temaId,m.tipoId)}; if(c.links[0]){c.link=c.links[0].link;c.origem=c.links[0].origem||'';}
-  D.materiais.push(c); salvar(); renderAdminDisc(); showToast('Material duplicado!');
+  D.materiais.push(c); salvar(); renderAdminDisc(); if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab(); showToast('Material duplicado!');
 }
 function moverMaterial(id,dir){
   const m=D.materiais.find(x=>x.id===id); if(!m) return;
