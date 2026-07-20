@@ -518,6 +518,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           <label class="form-label">Chave de sincronização</label>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <input type="password" class="form-input" id="cfgCloudToken" placeholder="Mesma chave configurada no Apps Script" style="flex:1;min-width:260px">
+            <button class="btn btn-outline" onclick="toggleCloudToken()">Mostrar</button>
+            <button class="btn btn-outline" onclick="copiarCloudToken()">Copiar</button>
             <button class="btn btn-outline" onclick="gerarCloudToken()">Gerar chave</button>
             <button class="btn btn-primary" onclick="salvarCloudToken()">Salvar chave</button>
           </div>
@@ -2656,6 +2658,34 @@ function gerarCloudToken(){
   const token=Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join('');
   if(input) input.value=token;
   showToast('Chave gerada. Salve e copie a mesma chave para o Apps Script.');
+}
+function toggleCloudToken(){
+  const input=document.getElementById('cfgCloudToken');
+  if(!input) return;
+  input.type=input.type==='password'?'text':'password';
+}
+function copiarCloudToken(){
+  const input=document.getElementById('cfgCloudToken');
+  const token=(input?.value||getCloudToken()).trim();
+  if(!token){
+    showToast('Gere ou salve uma chave antes de copiar.',true);
+    return;
+  }
+  if(input) {
+    input.type='text';
+    input.focus();
+    input.select();
+  }
+  navigator.clipboard.writeText(token)
+    .then(()=>showToast('Chave copiada!'))
+    .catch(()=>{
+      try {
+        document.execCommand('copy');
+        showToast('Chave copiada!');
+      } catch(e) {
+        showToast('Não consegui copiar automaticamente. Selecione a chave e copie com Ctrl+C.',true);
+      }
+    });
 }
 function salvarCloudToken(){
   const input=document.getElementById('cfgCloudToken');
