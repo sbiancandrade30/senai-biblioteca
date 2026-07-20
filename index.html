@@ -495,6 +495,26 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       </div>
     </div>
 
+    <div class="cfg-section">
+      <div class="cfg-head">Sincronização entre computadores</div>
+      <div class="cfg-body">
+        <p style="font-size:12px;color:var(--text2);line-height:1.6">Configure uma URL de Google Apps Script para salvar a Biblioteca em uma planilha. O navegador continua guardando uma cópia local, e a nuvem serve para acessar os mesmos materiais no notebook pessoal e no notebook do trabalho.</p>
+        <div>
+          <label class="form-label">URL do Apps Script</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input type="url" class="form-input" id="cfgCloudUrl" placeholder="https://script.google.com/macros/s/.../exec" style="flex:1;min-width:260px">
+            <button class="btn btn-primary" onclick="salvarCloudUrl()">Salvar URL</button>
+            <button class="btn btn-outline" onclick="limparCloudUrl()">Limpar</button>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6" id="cloudStatusBox"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline" onclick="syncToCloud(true)">↑ Enviar para nuvem</button>
+          <button class="btn btn-outline" onclick="syncFromCloud(true)">↓ Carregar da nuvem</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -636,6 +656,9 @@ const SK = 'mat_v8_teste';
 const LEGACY_SK = 'mat_v3';
 const LEGACY_ADMIN_PW_KEY = 'app_password';
 const ADMIN_AUTH_KEY = 'mat_admin_auth_v1';
+const CLOUD_URL_KEY = 'mat_cloud_apps_script_url_v1';
+const CLOUD_PUSHED_AT_KEY = 'mat_cloud_last_push_at_v1';
+const CLOUD_LOADED_AT_KEY = 'mat_cloud_last_load_at_v1';
 const ADMIN_DEFAULT_AUTH = {
   salt: 'UmtJxnDlltuSFgA5R3eM7A==',
   hash: 'OOQY12LolKu41Ml5laho6HvwHtqBXmnj8KEOTAQ7Zf4=',
@@ -1571,6 +1594,7 @@ function coerceData(raw) {
   out.disciplinas = Array.isArray(src.disciplinas) ? src.disciplinas : base.disciplinas;
   out.temas = Array.isArray(src.temas) ? src.temas : [];
   out.materiais = Array.isArray(src.materiais) ? src.materiais : [];
+  out._syncMeta = src._syncMeta && typeof src._syncMeta === 'object' ? {...src._syncMeta} : (out._syncMeta || {});
 
   // Migração de tipos antigos em string
   if (out.tipos.length && typeof out.tipos[0] === 'string') {
@@ -1653,6 +1677,7 @@ function coerceData(raw) {
     };
   });
 
+  if(!out._syncMeta || typeof out._syncMeta !== 'object') out._syncMeta = {};
   return out;
 }
 
@@ -1661,7 +1686,7 @@ function carregar() {
     const current = localStorage.getItem(SK);
     if (current) {
       D = coerceData(JSON.parse(current));
-      salvar();
+      salvar({mark:false});
       return;
     }
     const legacy = localStorage.getItem(LEGACY_SK);
@@ -1673,7 +1698,11 @@ function carregar() {
   } catch(e) {}
   D = defaults();
 }
-function salvar() { localStorage.setItem(SK, JSON.stringify(D)); }
+function salvar(options={}) {
+  if(options.mark!==false) markCloudUpdated();
+  localStorage.setItem(SK, JSON.stringify(D));
+  if(options.sync!==false) queueCloudSave();
+}
 
 // ════════════════════════════════════════════════════════
 // LOOKUPS / ORDENAÇÃO / MÉTRICAS
@@ -2363,6 +2392,9 @@ function renderConfigTab(){
   document.getElementById('cfgNomeCurso').value=D.nomeCurso||'';
   document.getElementById('cfgSenhaAtual').value=D.senhaProfessor||'';
   document.getElementById('cfgNomeGeral').value=D.nomeGeral||'Materiais gerais';
+  const cloudUrlInput=document.getElementById('cfgCloudUrl');
+  if(cloudUrlInput) cloudUrlInput.value=getCloudUrl();
+  renderCloudStatus();
 
   const lp=document.getElementById('logoPreview');
   lp.innerHTML=D.logo
@@ -2520,6 +2552,130 @@ function importarDados(input){
     }catch(err){ showToast('Erro ao ler o arquivo.',true); }
   };
   reader.readAsText(file); input.value='';
+}
+
+let cloudSaveTimer=null;
+function getCloudUrl(){ return (localStorage.getItem(CLOUD_URL_KEY)||'').trim(); }
+function cloudConfigured(){ return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(getCloudUrl()); }
+function getDeviceId(){
+  let id=localStorage.getItem('mat_cloud_device_id_v1');
+  if(!id){
+    id='device_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+    localStorage.setItem('mat_cloud_device_id_v1',id);
+  }
+  return id;
+}
+function markCloudUpdated(){
+  if(!D || typeof D!=='object') return;
+  if(!D._syncMeta || typeof D._syncMeta!=='object') D._syncMeta={};
+  D._syncMeta.updatedAt=new Date().toISOString();
+  D._syncMeta.originId=getDeviceId();
+}
+function updatedMs(data){
+  const raw=data?._syncMeta?.updatedAt||'';
+  const ms=raw?Date.parse(raw):0;
+  return Number.isFinite(ms)?ms:0;
+}
+function fmtCloudTime(raw){
+  if(!raw) return 'Ainda não registrado';
+  const d=new Date(raw);
+  if(Number.isNaN(d.getTime())) return 'Ainda não registrado';
+  return d.toLocaleString('pt-BR');
+}
+function renderCloudStatus(){
+  const box=document.getElementById('cloudStatusBox');
+  if(!box) return;
+  const configured=cloudConfigured();
+  const localTime=D?._syncMeta?.updatedAt||'';
+  const pushed=localStorage.getItem(CLOUD_PUSHED_AT_KEY)||'';
+  const loaded=localStorage.getItem(CLOUD_LOADED_AT_KEY)||'';
+  box.innerHTML=`
+    <strong>Status:</strong> ${configured?'nuvem configurada':'nuvem não configurada'}<br>
+    Última alteração local: ${escH(fmtCloudTime(localTime))}<br>
+    Último envio neste navegador: ${escH(fmtCloudTime(pushed))}<br>
+    Último carregamento neste navegador: ${escH(fmtCloudTime(loaded))}
+  `;
+}
+function salvarCloudUrl(){
+  const input=document.getElementById('cfgCloudUrl');
+  const url=(input?.value||'').trim();
+  if(!url){ limparCloudUrl(); return; }
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(url)){
+    showToast('Cole a URL publicada do Apps Script terminando em /exec.',true);
+    return;
+  }
+  localStorage.setItem(CLOUD_URL_KEY,url);
+  renderCloudStatus();
+  showToast('URL da nuvem salva.');
+}
+function limparCloudUrl(){
+  localStorage.removeItem(CLOUD_URL_KEY);
+  const input=document.getElementById('cfgCloudUrl');
+  if(input) input.value='';
+  renderCloudStatus();
+  showToast('URL da nuvem removida. Os dados continuam neste navegador.');
+}
+function queueCloudSave(){
+  if(!cloudConfigured()) return;
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer=setTimeout(()=>syncToCloud(false),1800);
+}
+async function syncToCloud(manual=false){
+  if(!cloudConfigured()){
+    if(manual) showToast('Configure a URL do Apps Script antes de enviar.',true);
+    return;
+  }
+  try{
+    if(manual) markCloudUpdated();
+    const payload=JSON.stringify(D);
+    await fetch(getCloudUrl(),{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:payload
+    });
+    localStorage.setItem(CLOUD_PUSHED_AT_KEY,new Date().toISOString());
+    renderCloudStatus();
+    if(manual) showToast('Biblioteca enviada para a nuvem.');
+  }catch(err){
+    if(manual) showToast('Não consegui enviar agora. A cópia local continua salva.',true);
+  }
+}
+async function syncFromCloud(manual=false){
+  if(!cloudConfigured()){
+    showToast('Configure a URL do Apps Script antes de carregar.',true);
+    return;
+  }
+  try{
+    const resp=await fetch(getCloudUrl()+'?t='+Date.now());
+    const text=await resp.text();
+    if(!text || text.trim()==='{}'){
+      showToast('A planilha ainda está vazia. Mantive os dados locais.');
+      return;
+    }
+    const incoming=coerceData(JSON.parse(text));
+    const cloudTime=updatedMs(incoming);
+    const localTime=updatedMs(D);
+    if(localTime && cloudTime && localTime>cloudTime){
+      const ok=confirm('Os dados deste navegador parecem mais recentes que os da planilha.\n\nDeseja substituir a cópia local pelos dados da nuvem mesmo assim?');
+      if(!ok) return;
+    } else if(localTime && cloudTime && localTime===cloudTime && manual) {
+      const ok=confirm('A nuvem parece estar igual à cópia local.\n\nDeseja recarregar mesmo assim?');
+      if(!ok) return;
+    }
+    D=incoming;
+    localStorage.setItem(SK,JSON.stringify(D));
+    localStorage.setItem(CLOUD_LOADED_AT_KEY,new Date().toISOString());
+    applyLogo();
+    document.getElementById('hTitle').textContent='Materiais — '+(D.nomeCurso||'');
+    document.title='Materiais — '+(D.nomeCurso||'');
+    renderAdminHome();
+    renderConfigTab();
+    if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); }
+    showToast(`${D.materiais.length} materiais carregados da nuvem.`);
+  }catch(err){
+    showToast('Não consegui carregar da nuvem. Verifique a URL e a publicação do Apps Script.',true);
+  }
 }
 
 async function gerarVersaoProfessor(){
