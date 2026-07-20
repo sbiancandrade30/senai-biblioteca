@@ -503,7 +503,10 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         </div>
         <hr style="border:none;border-top:1px solid var(--border)">
         <p style="font-size:12px;color:var(--text2)"><strong>Cadastro em lote:</strong> importe uma planilha <code>.xlsx</code>, <code>.xls</code> ou <code>.csv</code> com as colunas <code>Disciplina</code>, <code>Tema</code>, <code>Tipo</code>, <code>Título</code>, <code>Link</code>, <code>Origem</code> e <code>Descrição</code>.</p>
-        <button class="btn btn-outline" style="align-self:flex-start" onclick="bulkSheetInput.click()">Importar planilha de materiais</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline" onclick="baixarModeloPlanilhaMateriais()">Baixar modelo de planilha</button>
+          <button class="btn btn-outline" onclick="bulkSheetInput.click()">Importar planilha de materiais</button>
+        </div>
       </div>
     </div>
 
@@ -2644,6 +2647,48 @@ function montarLinksDaPlanilha(row, header){
     links.push({id:uid('lnk'),titulo,link,origem,ordem:links.length+1});
   }
   return links;
+}
+function baixarModeloPlanilhaMateriais(){
+  if(!window.XLSX){
+    showToast('Não consegui carregar o gerador de Excel. Verifique a conexão e tente novamente.',true);
+    return;
+  }
+  const headers=[
+    'Disciplina','Modalidade','Tema','Tipo','Título','Link','Origem','Título do link',
+    'Link 2','Origem 2','Título do link 2','Descrição','Fixado'
+  ];
+  const exemplos=[
+    [
+      'Ensaios','Presencial','Ensaio de tração','Slide','Aula 01 - Ensaio de tração',
+      'https://www.canva.com/design/exemplo','Canva','Abrir slides',
+      'https://drive.google.com/exemplo','Google Drive','Material de apoio',
+      'Slides principais da aula, com conceitos e roteiro de discussão.','sim'
+    ],
+    [
+      'Transformação Digital no Setor Industrial','EaD','Cultura digital','Atividade','Atividade avaliativa - Indústria 4.0',
+      'https://docs.google.com/forms/d/exemplo','Google Forms','Responder formulário',
+      '','','',
+      'Atividade para ser realizada no AVA ou enviada como link de apoio.','não'
+    ]
+  ];
+  const instrucoes=[
+    ['Como preencher'],
+    ['Use uma linha por material.'],
+    ['Colunas obrigatórias: Título e Link.'],
+    ['Se Disciplina, Tema ou Tipo não existirem, a Biblioteca cria automaticamente.'],
+    ['Para materiais com mais de um acesso, use Link 2, Origem 2 e Título do link 2.'],
+    ['Na coluna Fixado, use sim ou não.'],
+    ['Modalidade aceita Presencial ou EaD. Se ficar vazia, entra como Presencial.']
+  ];
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet([headers,...exemplos]);
+  ws['!cols']=headers.map(h=>({wch:Math.max(14,h.length+2)}));
+  const info=XLSX.utils.aoa_to_sheet(instrucoes);
+  info['!cols']=[{wch:90}];
+  XLSX.utils.book_append_sheet(wb,ws,'Materiais');
+  XLSX.utils.book_append_sheet(wb,info,'Instrucoes');
+  XLSX.writeFile(wb,'modelo_importacao_materiais_senai.xlsx');
+  showToast('Modelo de planilha baixado!');
 }
 function importarPlanilhaMateriais(input){
   const file=input.files[0]; if(!file) return;
