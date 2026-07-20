@@ -3155,12 +3155,27 @@ async function syncToCloud(manual=false){
   try{
     if(manual) markCloudUpdated();
     const payload=JSON.stringify(D);
+    const localUpdated=updatedMs(D);
     await fetch(cloudUrlWithToken(),{
       method:'POST',
       mode:'no-cors',
       headers:{'Content-Type':'text/plain;charset=utf-8'},
       body:payload
     });
+    const confirmUrl=cloudUrlWithToken()+(cloudUrlWithToken().includes('?')?'&':'?')+'t='+Date.now();
+    const confirmResp=await fetch(confirmUrl);
+    const confirmText=await confirmResp.text();
+    const confirmed=confirmText ? JSON.parse(confirmText) : {};
+    if(confirmed && confirmed.error){
+      setSyncBadge('error','Chave inválida');
+      if(manual) showToast('A chave da nuvem não confere com o Apps Script.',true);
+      return;
+    }
+    if(updatedMs(confirmed) < localUpdated){
+      setSyncBadge('error','Envio não confirmado');
+      if(manual) showToast('Envio não confirmado. Confira se a chave do Apps Script é igual à chave da Biblioteca e publique uma nova versão.',true);
+      return;
+    }
     localStorage.setItem(CLOUD_PUSHED_AT_KEY,new Date().toISOString());
     renderCloudStatus();
     setSyncBadge('ok');
