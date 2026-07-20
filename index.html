@@ -2008,6 +2008,10 @@ function abrirProfessorOnline(){
   const globalSearch=document.getElementById('profGlobalSearch');
   if(globalSearch) globalSearch.value='';
   renderProfessorHome();
+  if(!cloudConfigured()){
+    setSyncBadge('off','Nuvem não configurada');
+    showToast('Este navegador ainda não recebeu a configuração da nuvem. Abra pelo link do professor online copiado no Admin.', true);
+  }
   startCloudAutoSync();
   syncFromCloud(false);
 }
@@ -2986,6 +2990,7 @@ function applySharedCloudConfigFromUrl(){
   }
   if(token) localStorage.setItem(CLOUD_TOKEN_KEY,token);
   if(role==='professor') {
+    sessionStorage.setItem('mat_shared_professor_link','1');
     setTimeout(()=>setLoginRole('professor'),50);
   }
 }
