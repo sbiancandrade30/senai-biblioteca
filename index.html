@@ -659,6 +659,7 @@ const ADMIN_AUTH_KEY = 'mat_admin_auth_v1';
 const CLOUD_URL_KEY = 'mat_cloud_apps_script_url_v1';
 const CLOUD_PUSHED_AT_KEY = 'mat_cloud_last_push_at_v1';
 const CLOUD_LOADED_AT_KEY = 'mat_cloud_last_load_at_v1';
+const CLOUD_AUTO_INTERVAL_MS = 120000;
 const ADMIN_DEFAULT_AUTH = {
   salt: 'UmtJxnDlltuSFgA5R3eM7A==',
   hash: 'OOQY12LolKu41Ml5laho6HvwHtqBXmnj8KEOTAQ7Zf4=',
@@ -1876,6 +1877,7 @@ function abrirApp(){
 
   renderAdminHome();
   renderConfigTab();
+  startCloudAutoSync();
 }
 
 function visualizarComoProfessor(){
@@ -2555,6 +2557,8 @@ function importarDados(input){
 }
 
 let cloudSaveTimer=null;
+let cloudAutoTimer=null;
+let cloudSyncBusy=false;
 function getCloudUrl(){ return (localStorage.getItem(CLOUD_URL_KEY)||'').trim(); }
 function cloudConfigured(){ return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(getCloudUrl()); }
 function getDeviceId(){
@@ -2607,9 +2611,11 @@ function salvarCloudUrl(){
   localStorage.setItem(CLOUD_URL_KEY,url);
   renderCloudStatus();
   showToast('URL da nuvem salva.');
+  startCloudAutoSync();
 }
 function limparCloudUrl(){
   localStorage.removeItem(CLOUD_URL_KEY);
+  stopCloudAutoSync();
   const input=document.getElementById('cfgCloudUrl');
   if(input) input.value='';
   renderCloudStatus();
@@ -2619,6 +2625,17 @@ function queueCloudSave(){
   if(!cloudConfigured()) return;
   clearTimeout(cloudSaveTimer);
   cloudSaveTimer=setTimeout(()=>syncToCloud(false),1800);
+}
+function startCloudAutoSync(){
+  if(cloudAutoTimer) return;
+  if(!cloudConfigured()) return;
+  setTimeout(()=>syncFromCloud(false),900);
+  cloudAutoTimer=setInterval(()=>syncFromCloud(false),CLOUD_AUTO_INTERVAL_MS);
+}
+function stopCloudAutoSync(){
+  if(!cloudAutoTimer) return;
+  clearInterval(cloudAutoTimer);
+  cloudAutoTimer=null;
 }
 async function syncToCloud(manual=false){
   if(!cloudConfigured()){
@@ -2643,25 +2660,33 @@ async function syncToCloud(manual=false){
 }
 async function syncFromCloud(manual=false){
   if(!cloudConfigured()){
-    showToast('Configure a URL do Apps Script antes de carregar.',true);
+    if(manual) showToast('Configure a URL do Apps Script antes de carregar.',true);
     return;
   }
+  if(cloudSyncBusy) return;
+  cloudSyncBusy=true;
   try{
     const resp=await fetch(getCloudUrl()+'?t='+Date.now());
     const text=await resp.text();
     if(!text || text.trim()==='{}'){
-      showToast('A planilha ainda está vazia. Mantive os dados locais.');
+      if(manual) showToast('A planilha ainda está vazia. Mantive os dados locais.');
       return;
     }
     const incoming=coerceData(JSON.parse(text));
     const cloudTime=updatedMs(incoming);
     const localTime=updatedMs(D);
     if(localTime && cloudTime && localTime>cloudTime){
+      if(!manual){
+        await syncToCloud(false);
+        return;
+      }
       const ok=confirm('Os dados deste navegador parecem mais recentes que os da planilha.\n\nDeseja substituir a cópia local pelos dados da nuvem mesmo assim?');
       if(!ok) return;
     } else if(localTime && cloudTime && localTime===cloudTime && manual) {
       const ok=confirm('A nuvem parece estar igual à cópia local.\n\nDeseja recarregar mesmo assim?');
       if(!ok) return;
+    } else if(!manual && localTime && cloudTime && cloudTime<=localTime) {
+      return;
     }
     D=incoming;
     localStorage.setItem(SK,JSON.stringify(D));
@@ -2672,9 +2697,12 @@ async function syncFromCloud(manual=false){
     renderAdminHome();
     renderConfigTab();
     if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); }
-    showToast(`${D.materiais.length} materiais carregados da nuvem.`);
+    if(manual) showToast(`${D.materiais.length} materiais carregados da nuvem.`);
+    else showToast('Biblioteca atualizada pela nuvem.');
   }catch(err){
-    showToast('Não consegui carregar da nuvem. Verifique a URL e a publicação do Apps Script.',true);
+    if(manual) showToast('Não consegui carregar da nuvem. Verifique a URL e a publicação do Apps Script.',true);
+  } finally {
+    cloudSyncBusy=false;
   }
 }
 
