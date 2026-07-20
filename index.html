@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Materiais de Aula — SENAI</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root {
   --bg:#f5f4f0; --surface:#fff; --surface2:#f0efe9;
@@ -295,6 +296,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 </div>
 <input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
 <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importarDados(this)">
+<input type="file" id="bulkSheetInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarPlanilhaMateriais(this)">
 
 <!-- HEADER -->
 <header class="app-header" id="appHeader" style="display:none">
@@ -499,6 +501,9 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           <button class="btn btn-outline" onclick="exportarDados()">↓ Exportar backup (.json)</button>
           <button class="btn btn-outline" onclick="importFileInput.click()">↑ Importar backup (.json)</button>
         </div>
+        <hr style="border:none;border-top:1px solid var(--border)">
+        <p style="font-size:12px;color:var(--text2)"><strong>Cadastro em lote:</strong> importe uma planilha <code>.xlsx</code>, <code>.xls</code> ou <code>.csv</code> com as colunas <code>Disciplina</code>, <code>Tema</code>, <code>Tipo</code>, <code>Título</code>, <code>Link</code>, <code>Origem</code> e <code>Descrição</code>.</p>
+        <button class="btn btn-outline" style="align-self:flex-start" onclick="bulkSheetInput.click()">Importar planilha de materiais</button>
       </div>
     </div>
 
@@ -2575,6 +2580,150 @@ function importarDados(input){
     }catch(err){ showToast('Erro ao ler o arquivo.',true); }
   };
   reader.readAsText(file); input.value='';
+}
+
+function normalizarCabecalho(v){
+  return String(v||'')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+}
+function valorLinha(row, header, names){
+  for(const name of names){
+    const idx=header[name];
+    if(idx!=null){
+      const value=String(row[idx]??'').trim();
+      if(value) return value;
+    }
+  }
+  return '';
+}
+function boolPlanilha(v){
+  const s=normalizar(String(v||''));
+  return ['sim','s','yes','y','1','true','verdadeiro','fixado'].includes(s);
+}
+function findOrCreateDiscByName(nome, modalidade){
+  const clean=String(nome||'').trim();
+  if(!clean || normalizar(clean)==='geral' || normalizar(clean)===normalizar(D.nomeGeral||'Materiais gerais')) return GERAL_ID;
+  let disc=D.disciplinas.find(d=>normalizar(d.nome)===normalizar(clean));
+  if(disc) return disc.id;
+  const max=Math.max(0,...D.disciplinas.map(d=>Number(d.ordem)||0));
+  disc={id:uid('disc'),nome:clean,ordem:max+1,modalidade:normalizar(modalidade)==='ead'?'ead':'presencial'};
+  D.disciplinas.push(disc);
+  return disc.id;
+}
+function findOrCreateTipoByName(nome){
+  const clean=String(nome||'').trim();
+  if(!clean) return tiposOrdenados()[0]?.id || 'tipo_outro';
+  let tipo=D.tipos.find(t=>normalizar(t.nome)===normalizar(clean));
+  if(tipo) return tipo.id;
+  const max=Math.max(0,...D.tipos.map(t=>Number(t.ordem)||0));
+  tipo={id:uid('tipo'),nome:clean,icone:'📎',cor:'#888888',ordem:max+1};
+  D.tipos.push(tipo);
+  return tipo.id;
+}
+function findOrCreateTemaByName(nome, disciplinaId){
+  const clean=String(nome||'').trim();
+  if(!clean) return '';
+  let tema=D.temas.find(t=>t.disciplinaId===disciplinaId && normalizar(t.nome)===normalizar(clean));
+  if(tema) return tema.id;
+  const max=Math.max(0,...temasDaDisc(disciplinaId).map(t=>Number(t.ordem)||0));
+  tema={id:uid('tema'),disciplinaId,nome:clean,ordem:max+1};
+  D.temas.push(tema);
+  return tema.id;
+}
+function montarLinksDaPlanilha(row, header){
+  const links=[];
+  for(let i=1;i<=5;i++){
+    const suffix=i===1?'':String(i);
+    const link=valorLinha(row, header, [
+      `link${suffix}`,`url${suffix}`,`endereco${suffix}`,`link_${suffix}`,`url_${suffix}`
+    ]);
+    if(!link) continue;
+    const origem=valorLinha(row, header, [`origem${suffix}`,`plataforma${suffix}`,`fonte${suffix}`,`origem_${suffix}`,`plataforma_${suffix}`]) || detectarOrigem(link);
+    const titulo=valorLinha(row, header, [`titulo_link${suffix}`,`nome_link${suffix}`,`botao${suffix}`,`titulo_do_link${suffix}`]);
+    links.push({id:uid('lnk'),titulo,link,origem,ordem:links.length+1});
+  }
+  return links;
+}
+function importarPlanilhaMateriais(input){
+  const file=input.files[0]; if(!file) return;
+  if(!window.XLSX){
+    showToast('Não consegui carregar o leitor de Excel. Verifique a conexão e tente novamente.',true);
+    input.value='';
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    let snapshot='';
+    try{
+      snapshot=JSON.stringify(D);
+      const wb=XLSX.read(e.target.result,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''}).filter(r=>r.some(c=>String(c||'').trim()));
+      if(rows.length<2){ showToast('A planilha precisa ter cabeçalho e ao menos uma linha de material.',true); return; }
+
+      let headerRowIndex=0;
+      for(let i=0;i<Math.min(rows.length,10);i++){
+        const keys=rows[i].map(normalizarCabecalho);
+        if(keys.some(k=>['titulo','material','nome'].includes(k)) && keys.some(k=>['link','url','endereco'].includes(k))){
+          headerRowIndex=i; break;
+        }
+      }
+      const header={};
+      rows[headerRowIndex].forEach((h,i)=>{ const key=normalizarCabecalho(h); if(key) header[key]=i; });
+      const dataRows=rows.slice(headerRowIndex+1);
+      const before={discs:D.disciplinas.length,temas:D.temas.length,tipos:D.tipos.length,materiais:D.materiais.length};
+      const novos=[];
+
+      dataRows.forEach(row=>{
+        const titulo=valorLinha(row, header, ['titulo','titulo_do_material','material','nome']);
+        const links=montarLinksDaPlanilha(row, header);
+        if(!titulo || !links.length) return;
+        const disciplina=valorLinha(row, header, ['disciplina','materia','unidade_curricular','uc']);
+        const modalidade=valorLinha(row, header, ['modalidade','tipo_de_aula']);
+        const disciplinaId=findOrCreateDiscByName(disciplina, modalidade);
+        const tema=valorLinha(row, header, ['tema','assunto','topico','conteudo']);
+        const temaId=findOrCreateTemaByName(tema, disciplinaId);
+        const tipo=valorLinha(row, header, ['tipo','tipo_de_material','categoria']);
+        const tipoId=findOrCreateTipoByName(tipo);
+        const descricao=valorLinha(row, header, ['descricao','descrição','observacao','observacoes','obs']);
+        const fixado=boolPlanilha(valorLinha(row, header, ['fixado','destaque','principal']));
+        const principal=links[0];
+        novos.push({
+          id:uid('mat'),titulo,link:principal.link,origem:principal.origem||'',links,
+          disciplinaId,temaId,tipoId,descricao,fixado,
+          ordem:nextOrderFor(disciplinaId,temaId,tipoId)+novos.filter(m=>m.disciplinaId===disciplinaId && (m.temaId||'')===(temaId||'') && m.tipoId===tipoId).length
+        });
+      });
+
+      if(!novos.length){
+        D=coerceData(JSON.parse(snapshot));
+        showToast('Não encontrei linhas com Título e Link para importar.',true);
+        return;
+      }
+      const createdDiscs=D.disciplinas.length-before.discs;
+      const createdTemas=D.temas.length-before.temas;
+      const createdTipos=D.tipos.length-before.tipos;
+      const msg=`Importar ${novos.length} material${novos.length!==1?'is':''}?\n\nTambém serão criados: ${createdDiscs} disciplina${createdDiscs!==1?'s':''}, ${createdTemas} tema${createdTemas!==1?'s':''} e ${createdTipos} tipo${createdTipos!==1?'s':''}.`;
+      if(!confirm(msg)) {
+        D=coerceData(JSON.parse(snapshot));
+        return;
+      }
+      D.materiais.push(...novos);
+      salvar();
+      renderAdminHome();
+      renderConfigTab();
+      if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); }
+      showToast(`${novos.length} material${novos.length!==1?'is':''} importado${novos.length!==1?'s':''}!`);
+    }catch(err){
+      if(snapshot) D=coerceData(JSON.parse(snapshot));
+      console.error(err);
+      showToast('Não consegui ler a planilha. Confira as colunas e tente novamente.',true);
+    }finally{
+      input.value='';
+    }
+  };
+  reader.readAsArrayBuffer(file);
 }
 
 let cloudSaveTimer=null;
