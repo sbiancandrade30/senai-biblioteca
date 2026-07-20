@@ -146,6 +146,20 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .modal-body{padding:20px 24px}
 .modal-foot{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:var(--surface)}
 .form-group{margin-bottom:14px}
+.import-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.import-stat{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+.import-stat strong{display:block;font-size:18px;color:var(--text)}
+.import-stat span{font-size:11px;color:var(--text2)}
+.import-alerts{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.import-alert{border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;font-size:12px;color:var(--text2);background:var(--surface2)}
+.import-alert.warn{background:var(--amber-bg);border-color:rgba(154,98,0,.25);color:var(--amber)}
+.import-alert.danger{background:var(--red-bg);border-color:rgba(185,50,50,.25);color:var(--red)}
+.import-table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:auto;max-height:360px}
+.import-table{width:100%;border-collapse:collapse;font-size:12px;min-width:860px}
+.import-table th{position:sticky;top:0;background:var(--surface2);text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);padding:8px;border-bottom:1px solid var(--border)}
+.import-table td{padding:8px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text)}
+.import-table tr.duplicate td{background:var(--amber-bg)}
+.import-muted{color:var(--text3);font-size:11px}
 
 /* ── TIPO SELECTOR ─────────────────────── */
 .tipo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
@@ -672,6 +686,21 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div class="modal-foot">
       <button class="btn btn-outline" onclick="closeDiscModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="salvarDisciplina()">Salvar disciplina</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PREVIA IMPORTACAO -->
+<div class="modal-overlay" id="importPreviewModalOverlay">
+  <div class="modal" style="width:min(1040px,94vw)">
+    <div class="modal-head">
+      <h2>Prévia da importação</h2>
+      <button class="close-btn" onclick="cancelarImportacaoPlanilha()">✕</button>
+    </div>
+    <div class="modal-body" id="importPreviewBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="cancelarImportacaoPlanilha()">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarImportacaoPlanilha()">Importar materiais</button>
     </div>
   </div>
 </div>
@@ -2650,6 +2679,7 @@ function montarLinksDaPlanilha(row, header){
   }
   return links;
 }
+let pendingSheetImport=null;
 function baixarModeloPlanilhaMateriais(disciplinaId=''){
   if(!window.XLSX){
     showToast('Não consegui carregar o gerador de Excel. Verifique a conexão e tente novamente.',true);
@@ -2756,11 +2786,15 @@ function importarPlanilhaMateriais(input){
       const dataRows=rows.slice(headerRowIndex+1);
       const before={discs:D.disciplinas.length,temas:D.temas.length,tipos:D.tipos.length,materiais:D.materiais.length};
       const novos=[];
+      const ignoradas=[];
 
-      dataRows.forEach(row=>{
+      dataRows.forEach((row,rowIdx)=>{
         const titulo=valorLinha(row, header, ['titulo','titulo_do_material','material','nome']);
         const links=montarLinksDaPlanilha(row, header);
-        if(!titulo || !links.length) return;
+        if(!titulo || !links.length) {
+          ignoradas.push({linha:headerRowIndex+rowIdx+2,motivo:!titulo?'sem título':'sem link'});
+          return;
+        }
         const disciplina=valorLinha(row, header, ['disciplina','materia','unidade_curricular','uc']);
         const modalidade=valorLinha(row, header, ['modalidade','tipo_de_aula']);
         const disciplinaId=disciplina ? findOrCreateDiscByName(disciplina, modalidade) : (currentAdminDiscId || GERAL_ID);
@@ -2771,9 +2805,12 @@ function importarPlanilhaMateriais(input){
         const descricao=valorLinha(row, header, ['descricao','descrição','observacao','observacoes','obs']);
         const fixado=boolPlanilha(valorLinha(row, header, ['fixado','destaque','principal']));
         const principal=links[0];
+        const duplicate=D.materiais.some(m=>normalizar(m.titulo)===normalizar(titulo) || materialLinks(m).some(l=>links.some(n=>String(n.link||'').trim()===String(l.link||'').trim())));
         novos.push({
           id:uid('mat'),titulo,link:principal.link,origem:principal.origem||'',links,
           disciplinaId,temaId,tipoId,descricao,fixado,
+          _importRow:headerRowIndex+rowIdx+2,
+          _duplicate:duplicate,
           ordem:nextOrderFor(disciplinaId,temaId,tipoId)+novos.filter(m=>m.disciplinaId===disciplinaId && (m.temaId||'')===(temaId||'') && m.tipoId===tipoId).length
         });
       });
@@ -2786,17 +2823,8 @@ function importarPlanilhaMateriais(input){
       const createdDiscs=D.disciplinas.length-before.discs;
       const createdTemas=D.temas.length-before.temas;
       const createdTipos=D.tipos.length-before.tipos;
-      const msg=`Importar ${novos.length} material${novos.length!==1?'is':''}?\n\nTambém serão criados: ${createdDiscs} disciplina${createdDiscs!==1?'s':''}, ${createdTemas} tema${createdTemas!==1?'s':''} e ${createdTipos} tipo${createdTipos!==1?'s':''}.`;
-      if(!confirm(msg)) {
-        D=coerceData(JSON.parse(snapshot));
-        return;
-      }
-      D.materiais.push(...novos);
-      salvar();
-      renderAdminHome();
-      renderConfigTab();
-      if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); }
-      showToast(`${novos.length} material${novos.length!==1?'is':''} importado${novos.length!==1?'s':''}!`);
+      pendingSheetImport={snapshot,novos,ignoradas,createdDiscs,createdTemas,createdTipos};
+      renderImportPreview();
     }catch(err){
       if(snapshot) D=coerceData(JSON.parse(snapshot));
       console.error(err);
@@ -2806,6 +2834,62 @@ function importarPlanilhaMateriais(input){
     }
   };
   reader.readAsArrayBuffer(file);
+}
+function renderImportPreview(){
+  if(!pendingSheetImport) return;
+  const {novos,ignoradas,createdDiscs,createdTemas,createdTipos}=pendingSheetImport;
+  const duplicates=novos.filter(m=>m._duplicate).length;
+  const body=document.getElementById('importPreviewBody');
+  const alerts=[];
+  if(duplicates) alerts.push(`<div class="import-alert warn">${duplicates} material${duplicates!==1?'is':''} parece${duplicates===1?'':'m'} duplicado${duplicates!==1?'s':''} por título ou link. Eles ficam destacados em amarelo.</div>`);
+  if(ignoradas.length) alerts.push(`<div class="import-alert danger">${ignoradas.length} linha${ignoradas.length!==1?'s':''} ignorada${ignoradas.length!==1?'s':''}: ${ignoradas.slice(0,6).map(i=>`linha ${i.linha} (${i.motivo})`).join(', ')}${ignoradas.length>6?'...':''}</div>`);
+  if(!alerts.length) alerts.push('<div class="import-alert">Tudo certo para importar. Confira a tabela abaixo antes de confirmar.</div>');
+  body.innerHTML=`
+    <div class="import-summary">
+      <div class="import-stat"><strong>${novos.length}</strong><span>materiais</span></div>
+      <div class="import-stat"><strong>${createdDiscs}</strong><span>disciplinas novas</span></div>
+      <div class="import-stat"><strong>${createdTemas}</strong><span>temas novos</span></div>
+      <div class="import-stat"><strong>${createdTipos}</strong><span>tipos novos</span></div>
+    </div>
+    <div class="import-alerts">${alerts.join('')}</div>
+    <div class="import-table-wrap">
+      <table class="import-table">
+        <thead><tr><th>Linha</th><th>Disciplina</th><th>Tema</th><th>Tipo</th><th>Título</th><th>Links</th><th>Observação</th></tr></thead>
+        <tbody>
+          ${novos.slice(0,80).map(m=>`
+            <tr class="${m._duplicate?'duplicate':''}">
+              <td>${m._importRow||''}</td>
+              <td>${escH(labelDisc(m.disciplinaId))}</td>
+              <td>${escH(labelTema(m.temaId))}</td>
+              <td>${escH(labelTipo(m.tipoId))}</td>
+              <td>${escH(m.titulo)}</td>
+              <td>${m.links.length} link${m.links.length!==1?'s':''}</td>
+              <td>${m._duplicate?'Possível duplicado':'Novo material'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    ${novos.length>80?`<div class="import-muted" style="margin-top:8px">Mostrando os primeiros 80 itens de ${novos.length}.</div>`:''}
+  `;
+  document.getElementById('importPreviewModalOverlay').classList.add('open');
+}
+function cancelarImportacaoPlanilha(){
+  if(pendingSheetImport?.snapshot) D=coerceData(JSON.parse(pendingSheetImport.snapshot));
+  pendingSheetImport=null;
+  document.getElementById('importPreviewModalOverlay').classList.remove('open');
+}
+function confirmarImportacaoPlanilha(){
+  if(!pendingSheetImport) return;
+  const {novos}=pendingSheetImport;
+  novos.forEach(m=>{ delete m._importRow; delete m._duplicate; });
+  D.materiais.push(...novos);
+  pendingSheetImport=null;
+  document.getElementById('importPreviewModalOverlay').classList.remove('open');
+  salvar();
+  renderAdminHome();
+  renderConfigTab();
+  if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); }
+  showToast(`${novos.length} material${novos.length!==1?'is':''} importado${novos.length!==1?'s':''}!`);
 }
 
 let cloudSaveTimer=null;
