@@ -616,6 +616,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
     <div class="modal-foot">
       <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-outline" onclick="salvarMaterial({keepOpen:true})">Salvar e adicionar outro</button>
       <button class="btn btn-primary" onclick="salvarMaterial()">Salvar material</button>
     </div>
   </div>
@@ -2346,6 +2347,7 @@ function adminCardHtml(m){
 // MATERIAIS
 // ════════════════════════════════════════════════════════
 let editingMaterialId=null;
+let lastMaterialDefaults={disciplinaId:'',temaId:'',tipoId:''};
 function materialLinkRowHtml(l={}){
   return `<div class="material-link-row" data-link-row>
     <div class="material-link-grid">
@@ -2355,7 +2357,7 @@ function materialLinkRowHtml(l={}){
       </div>
       <div class="form-group">
         <label class="form-label">Link *</label>
-        <input type="url" class="form-input link-url-input" placeholder="https://..." value="${escH(l.link||'')}">
+        <input type="url" class="form-input link-url-input" placeholder="https://..." value="${escH(l.link||'')}" oninput="autoDetectLinkOrigin(this)" onpaste="handleMaterialLinksPaste(event,this)">
       </div>
       <div class="form-group">
         <label class="form-label">Plataforma</label>
@@ -2365,7 +2367,36 @@ function materialLinkRowHtml(l={}){
     </div>
   </div>`;
 }
-function addMaterialLinkRow(l={}){ document.getElementById('mLinksList').insertAdjacentHTML('beforeend', materialLinkRowHtml(l)); }
+function addMaterialLinkRow(l={}){
+  document.getElementById('mLinksList').insertAdjacentHTML('beforeend', materialLinkRowHtml(l));
+  const row=document.querySelector('#mLinksList [data-link-row]:last-child');
+  const urlInput=row?.querySelector('.link-url-input');
+  if(urlInput && urlInput.value) autoDetectLinkOrigin(urlInput);
+}
+function autoDetectLinkOrigin(input){
+  const row=input.closest('[data-link-row]');
+  const origin=row?.querySelector('.link-origin-input');
+  if(!origin || origin.value.trim()) return;
+  const detected=detectarOrigem(input.value);
+  if(input.value.trim() && detected) origin.value=detected;
+}
+function extractLinksFromText(text){
+  return String(text||'').split(/\s+/).map(s=>s.trim()).filter(s=>/^https?:\/\//i.test(s));
+}
+function handleMaterialLinksPaste(event,input){
+  const text=event.clipboardData?.getData('text') || '';
+  const links=extractLinksFromText(text);
+  if(links.length<=1) return;
+  event.preventDefault();
+  const row=input.closest('[data-link-row]');
+  const title=row?.querySelector('.link-title-input')?.value || '';
+  const origin=row?.querySelector('.link-origin-input')?.value || '';
+  input.value=links[0];
+  const originInput=row?.querySelector('.link-origin-input');
+  if(originInput && !originInput.value) originInput.value=detectarOrigem(links[0]);
+  links.slice(1).forEach(link=>addMaterialLinkRow({titulo,link,origem:detectarOrigem(link)}));
+  showToast(`${links.length} links adicionados.`);
+}
 function removeMaterialLinkRow(btn){
   const rows=[...document.querySelectorAll('#mLinksList [data-link-row]')];
   if(rows.length<=1){
@@ -2382,7 +2413,7 @@ function collectModalLinks(){
       id:uid('lnk'),
       titulo:row.querySelector('.link-title-input')?.value.trim()||'',
       link:row.querySelector('.link-url-input')?.value.trim()||'',
-      origem:row.querySelector('.link-origin-input')?.value.trim()||'',
+      origem:row.querySelector('.link-origin-input')?.value.trim()||detectarOrigem(row.querySelector('.link-url-input')?.value.trim()||''),
       ordem:idx+1
     }))
     .filter(l=>l.link);
@@ -2400,13 +2431,13 @@ function openModal(id=null, preferredDiscId=null){
   const links=materialLinks(m);
   (links.length?links:[{}]).forEach(l=>addMaterialLinkRow(l));
 
-  const selectedDisc=m?.disciplinaId || preferredDiscId || currentAdminDiscId || GERAL_ID;
+  const selectedDisc=m?.disciplinaId || preferredDiscId || currentAdminDiscId || lastMaterialDefaults.disciplinaId || GERAL_ID;
   const sel=document.getElementById('mDisc');
   sel.innerHTML=`<option value="${GERAL_ID}">${escH(D.nomeGeral||'Materiais gerais')}</option>`+discsOrdenadas().map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`).join('');
   sel.value=selectedDisc;
-  renderThemeSelectForMaterial(m?.temaId||'');
+  renderThemeSelectForMaterial(m?.temaId||(!m && selectedDisc===lastMaterialDefaults.disciplinaId ? lastMaterialDefaults.temaId : ''));
 
-  const tipoSel=m?.tipoId||tiposOrdenados()[0]?.id||'';
+  const tipoSel=m?.tipoId||(!m ? lastMaterialDefaults.tipoId : '')||tiposOrdenados()[0]?.id||'';
   document.getElementById('tipoGrid').innerHTML=tiposOrdenados().map(t=>`
     <div class="tipo-opt${t.id===tipoSel?' sel':''}" onclick="selecionarTipo(this)" data-tipo="${escH(t.id)}">
       <div class="tipo-opt-icon">${escH(t.icone||'📎')}</div><span>${escH(t.nome)}</span>
@@ -2424,7 +2455,7 @@ function renderThemeSelectForMaterial(preselect=''){
 }
 function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); editingMaterialId=null; }
 function selecionarTipo(el){ document.querySelectorAll('.tipo-opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); }
-function salvarMaterial(){
+function salvarMaterial(options={}){
   const titulo=document.getElementById('mTitulo').value.trim();
   const links=collectModalLinks();
   const disciplinaId=document.getElementById('mDisc').value||GERAL_ID;
@@ -2439,13 +2470,23 @@ function salvarMaterial(){
   if(!Number.isFinite(ordem)||ordem<=0) ordem=nextOrderFor(disciplinaId,temaId,tipoId);
   const principal=links[0]||{link:'',origem:''};
   const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,ordem,fixado};
+  const wasEditing=Boolean(editingMaterialId);
   if(editingMaterialId){
     const idx=D.materiais.findIndex(x=>x.id===editingMaterialId);
     if(idx>=0) D.materiais[idx]=mat; else D.materiais.push(mat);
   } else D.materiais.push(mat);
-  salvar(); closeModal();
+  lastMaterialDefaults={disciplinaId,temaId,tipoId};
+  salvar();
   if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); } else renderAdminHome();
-  showToast(editingMaterialId?'Material atualizado!':'Material adicionado!');
+  showToast(wasEditing?'Material atualizado!':'Material adicionado!');
+  if(options.keepOpen && !wasEditing){
+    openModal(null,disciplinaId);
+    document.getElementById('mTema').value=temaId;
+    document.querySelectorAll('.tipo-opt').forEach(o=>o.classList.toggle('sel',o.dataset.tipo===tipoId));
+    document.getElementById('mTitulo').focus();
+  } else {
+    closeModal();
+  }
 }
 function excluirMaterial(id){
   const m=D.materiais.find(x=>x.id===id); if(!m) return;
