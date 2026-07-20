@@ -700,7 +700,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div class="modal-body" id="importPreviewBody"></div>
     <div class="modal-foot">
       <button class="btn btn-outline" onclick="cancelarImportacaoPlanilha()">Cancelar</button>
-      <button class="btn btn-primary" onclick="confirmarImportacaoPlanilha()">Importar materiais</button>
+      <button class="btn btn-outline" id="importOnlyNewBtn" onclick="confirmarImportacaoPlanilha({skipDuplicates:true})">Importar só novos</button>
+      <button class="btn btn-primary" onclick="confirmarImportacaoPlanilha({skipDuplicates:false})">Importar tudo</button>
     </div>
   </div>
 </div>
@@ -2805,12 +2806,21 @@ function importarPlanilhaMateriais(input){
         const descricao=valorLinha(row, header, ['descricao','descrição','observacao','observacoes','obs']);
         const fixado=boolPlanilha(valorLinha(row, header, ['fixado','destaque','principal']));
         const principal=links[0];
-        const duplicate=D.materiais.some(m=>normalizar(m.titulo)===normalizar(titulo) || materialLinks(m).some(l=>links.some(n=>String(n.link||'').trim()===String(l.link||'').trim())));
+        let duplicateReason='';
+        const linkDup=D.materiais.some(m=>materialLinks(m).some(l=>links.some(n=>String(n.link||'').trim()===String(l.link||'').trim())));
+        const titleDup=D.materiais.some(m=>
+          m.disciplinaId===disciplinaId &&
+          (m.temaId||'')===(temaId||'') &&
+          normalizar(m.titulo)===normalizar(titulo)
+        );
+        if(linkDup) duplicateReason='Mesmo link já cadastrado';
+        else if(titleDup) duplicateReason='Mesmo título na mesma disciplina/tema';
         novos.push({
           id:uid('mat'),titulo,link:principal.link,origem:principal.origem||'',links,
           disciplinaId,temaId,tipoId,descricao,fixado,
           _importRow:headerRowIndex+rowIdx+2,
-          _duplicate:duplicate,
+          _duplicate:Boolean(duplicateReason),
+          _duplicateReason:duplicateReason,
           ordem:nextOrderFor(disciplinaId,temaId,tipoId)+novos.filter(m=>m.disciplinaId===disciplinaId && (m.temaId||'')===(temaId||'') && m.tipoId===tipoId).length
         });
       });
@@ -2839,9 +2849,10 @@ function renderImportPreview(){
   if(!pendingSheetImport) return;
   const {novos,ignoradas,createdDiscs,createdTemas,createdTipos}=pendingSheetImport;
   const duplicates=novos.filter(m=>m._duplicate).length;
+  const onlyNew=novos.length-duplicates;
   const body=document.getElementById('importPreviewBody');
   const alerts=[];
-  if(duplicates) alerts.push(`<div class="import-alert warn">${duplicates} material${duplicates!==1?'is':''} parece${duplicates===1?'':'m'} duplicado${duplicates!==1?'s':''} por título ou link. Eles ficam destacados em amarelo.</div>`);
+  if(duplicates) alerts.push(`<div class="import-alert warn">${duplicates} material${duplicates!==1?'is':''} parece${duplicates===1?'':'m'} duplicado${duplicates!==1?'s':''}. Use "Importar só novos" para importar apenas ${onlyNew} item${onlyNew!==1?'s':''} sem duplicidade.</div>`);
   if(ignoradas.length) alerts.push(`<div class="import-alert danger">${ignoradas.length} linha${ignoradas.length!==1?'s':''} ignorada${ignoradas.length!==1?'s':''}: ${ignoradas.slice(0,6).map(i=>`linha ${i.linha} (${i.motivo})`).join(', ')}${ignoradas.length>6?'...':''}</div>`);
   if(!alerts.length) alerts.push('<div class="import-alert">Tudo certo para importar. Confira a tabela abaixo antes de confirmar.</div>');
   body.innerHTML=`
@@ -2864,13 +2875,15 @@ function renderImportPreview(){
               <td>${escH(labelTipo(m.tipoId))}</td>
               <td>${escH(m.titulo)}</td>
               <td>${m.links.length} link${m.links.length!==1?'s':''}</td>
-              <td>${m._duplicate?'Possível duplicado':'Novo material'}</td>
+              <td>${m._duplicate?escH(m._duplicateReason||'Possível duplicado'):'Novo material'}</td>
             </tr>`).join('')}
         </tbody>
       </table>
     </div>
     ${novos.length>80?`<div class="import-muted" style="margin-top:8px">Mostrando os primeiros 80 itens de ${novos.length}.</div>`:''}
   `;
+  const onlyNewBtn=document.getElementById('importOnlyNewBtn');
+  if(onlyNewBtn) onlyNewBtn.style.display=duplicates?'':'none';
   document.getElementById('importPreviewModalOverlay').classList.add('open');
 }
 function cancelarImportacaoPlanilha(){
@@ -2878,18 +2891,23 @@ function cancelarImportacaoPlanilha(){
   pendingSheetImport=null;
   document.getElementById('importPreviewModalOverlay').classList.remove('open');
 }
-function confirmarImportacaoPlanilha(){
+function confirmarImportacaoPlanilha(options={}){
   if(!pendingSheetImport) return;
   const {novos}=pendingSheetImport;
-  novos.forEach(m=>{ delete m._importRow; delete m._duplicate; });
-  D.materiais.push(...novos);
+  const selected=options.skipDuplicates ? novos.filter(m=>!m._duplicate) : novos;
+  if(!selected.length){
+    showToast('Não há materiais novos para importar.',true);
+    return;
+  }
+  selected.forEach(m=>{ delete m._importRow; delete m._duplicate; delete m._duplicateReason; });
+  D.materiais.push(...selected);
   pendingSheetImport=null;
   document.getElementById('importPreviewModalOverlay').classList.remove('open');
   salvar();
   renderAdminHome();
   renderConfigTab();
   if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); }
-  showToast(`${novos.length} material${novos.length!==1?'is':''} importado${novos.length!==1?'s':''}!`);
+  showToast(`${selected.length} material${selected.length!==1?'is':''} importado${selected.length!==1?'s':''}!`);
 }
 
 let cloudSaveTimer=null;
