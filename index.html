@@ -518,6 +518,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           Cria um único arquivo HTML em modo consulta. Os materiais são protegidos no próprio arquivo e só ficam legíveis após digitar a senha do professor — sem painel administrativo, sem importação e sem configuração.
         </div>
         <button class="btn btn-primary" style="background:var(--green);border-color:var(--green);align-self:flex-start" onclick="gerarVersaoProfessor()">📦 Gerar versão para professor</button>
+        <button class="btn btn-outline" style="align-self:flex-start" onclick="copiarLinkProfessorOnline()">Copiar link do professor online</button>
         <hr style="border:none;border-top:1px solid var(--border)">
         <p style="font-size:12px;color:var(--text2)"><strong>Backup / transferência entre computadores:</strong> exporte um <code>.json</code> e importe em outro computador.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -2973,6 +2974,39 @@ function cloudUrlWithToken(){
   if(!token) return url;
   return url+(url.includes('?')?'&':'?')+'token='+encodeURIComponent(token);
 }
+function applySharedCloudConfigFromUrl(){
+  const raw=window.location.hash && window.location.hash.startsWith('#') ? window.location.hash.slice(1) : '';
+  if(!raw) return;
+  const params=new URLSearchParams(raw);
+  const cloud=params.get('cloud') || '';
+  const token=params.get('token') || '';
+  const role=params.get('role') || '';
+  if(cloud && /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(cloud)) {
+    localStorage.setItem(CLOUD_URL_KEY,cloud);
+  }
+  if(token) localStorage.setItem(CLOUD_TOKEN_KEY,token);
+  if(role==='professor') {
+    setTimeout(()=>setLoginRole('professor'),50);
+  }
+}
+function professorShareUrl(){
+  const cloud=getCloudUrl();
+  const token=getCloudToken();
+  if(!cloud || !token) return '';
+  const base=location.href.split('#')[0];
+  const params=new URLSearchParams({role:'professor',cloud,token});
+  return base+'#'+params.toString();
+}
+function copiarLinkProfessorOnline(){
+  const url=professorShareUrl();
+  if(!url){
+    showToast('Salve a URL e a chave da nuvem antes de copiar o link do professor.',true);
+    return;
+  }
+  navigator.clipboard.writeText(url)
+    .then(()=>showToast('Link do professor copiado!'))
+    .catch(()=>showToast('Não consegui copiar o link automaticamente.',true));
+}
 function getDeviceId(){
   let id=localStorage.getItem('mat_cloud_device_id_v1');
   if(!id){
@@ -3612,6 +3646,7 @@ function showToast(msg, err){
 // INIT
 // ════════════════════════════════════════════════════════
 carregar();
+applySharedCloudConfigFromUrl();
 applyLogo();
 checkLogin();
 </script>
