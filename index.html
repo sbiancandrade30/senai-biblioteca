@@ -2008,6 +2008,7 @@ function abrirProfessorOnline(){
   if(globalSearch) globalSearch.value='';
   renderProfessorHome();
   startCloudAutoSync();
+  syncFromCloud(false);
 }
 
 function voltarDaPreviaProfessor(){
@@ -3111,6 +3112,7 @@ function stopCloudAutoSync(){
   cloudAutoTimer=null;
 }
 async function syncToCloud(manual=false){
+  if(sessionStorage.getItem('mat_mode')==='professor') return;
   if(!cloudConfigured()){
     if(manual) showToast('Configure a URL do Apps Script antes de enviar.',true);
     return;
@@ -3180,6 +3182,16 @@ async function syncFromCloud(manual=false){
     const incoming=coerceData(parsed);
     const cloudTime=updatedMs(incoming);
     const localTime=updatedMs(D);
+    const readOnlyProfessor=sessionStorage.getItem('mat_mode')==='professor';
+    if(readOnlyProfessor){
+      D=incoming;
+      localStorage.setItem(SK,JSON.stringify(D));
+      localStorage.setItem(CLOUD_LOADED_AT_KEY,new Date().toISOString());
+      renderAfterCloudLoad();
+      setSyncBadge('ok');
+      if(manual) showToast(`${D.materiais.length} materiais carregados da nuvem.`);
+      return;
+    }
     if(localTime && cloudTime && localTime>cloudTime){
       if(!manual){
         await syncToCloud(false);
