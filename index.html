@@ -248,6 +248,14 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .check-line{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-top:4px}
 .check-line input{accent-color:var(--accent)}
 .form-row.three{grid-template-columns:1fr 1fr 1fr}
+.pedagogy-box{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface2);margin:4px 0 14px;overflow:hidden}
+.pedagogy-box[open]{background:var(--surface)}
+.pedagogy-summary{cursor:pointer;padding:11px 13px;font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;user-select:none}
+.pedagogy-box[open] .pedagogy-summary{border-bottom:1px solid var(--border)}
+.pedagogy-content{padding:14px 14px 0}
+.pedagogy-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.pedagogy-pill{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:600;line-height:1.4}
+.pedagogy-line{font-size:11px;color:var(--text3);line-height:1.45;margin-top:6px}
 .search-result-head{font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 14px}
 .prof-home-note{background:var(--accent-bg);border:1px solid rgba(45,91,227,.15);border-radius:var(--radius-lg);padding:12px 14px;font-size:12px;color:var(--accent);line-height:1.55;margin-bottom:18px}
 .general-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);background:var(--purple-bg);border-radius:20px;padding:2px 8px}
@@ -526,7 +534,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           <button class="btn btn-outline" onclick="importFileInput.click()">↑ Importar backup (.json)</button>
         </div>
         <hr style="border:none;border-top:1px solid var(--border)">
-        <p style="font-size:12px;color:var(--text2)"><strong>Cadastro em lote:</strong> importe uma planilha <code>.xlsx</code>, <code>.xls</code> ou <code>.csv</code> com as colunas <code>Disciplina</code>, <code>Tema</code>, <code>Tipo</code>, <code>Título</code>, <code>Link</code>, <code>Origem</code> e <code>Descrição</code>.</p>
+        <p style="font-size:12px;color:var(--text2)"><strong>Cadastro em lote:</strong> importe uma planilha <code>.xlsx</code>, <code>.xls</code> ou <code>.csv</code> com materiais, links e campos pedagógicos opcionais, como curso/turma, unidade curricular, aula/módulo, capacidade, conhecimento e status.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-outline" onclick="baixarModeloPlanilhaMateriais()">Baixar modelo de planilha</button>
           <button class="btn btn-outline" onclick="bulkSheetInput.click()">Importar planilha de materiais</button>
@@ -600,6 +608,56 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <label class="form-label">Tipo *</label>
         <div class="tipo-grid" id="tipoGrid"></div>
       </div>
+      <details class="pedagogy-box">
+        <summary class="pedagogy-summary">Informações pedagógicas opcionais</summary>
+        <div class="pedagogy-content">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Curso / turma</label>
+              <input type="text" class="form-input" id="mCursoTurma" placeholder="ex: Moldador de Plástico - Turma 2026">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unidade curricular</label>
+              <input type="text" class="form-input" id="mUnidadeCurricular" placeholder="ex: Ensaios">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Aula / módulo</label>
+              <input type="text" class="form-input" id="mAulaModulo" placeholder="ex: Aula 03 / Módulo 2">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Modalidade do material</label>
+              <select class="form-input" id="mModalidadeMaterial">
+                <option value="">Usar a modalidade da disciplina</option>
+                <option value="presencial">Presencial</option>
+                <option value="ead">EaD</option>
+                <option value="ambos">Presencial e EaD</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Capacidade / competência</label>
+            <textarea class="form-input" id="mCapacidade" placeholder="ex: Interpretar resultados de ensaios mecânicos..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Conhecimento relacionado</label>
+              <input type="text" class="form-input" id="mConhecimento" placeholder="ex: Ensaio de tração, propriedades mecânicas">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status do material</label>
+              <select class="form-input" id="mStatusMaterial">
+                <option value="">Sem status</option>
+                <option value="pronto">Pronto para usar</option>
+                <option value="revisar">Revisar</option>
+                <option value="substituir">Substituir depois</option>
+                <option value="producao">Em produção</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </details>
       <div class="form-row three">
         <div class="form-group">
           <label class="form-label">Ordem</label>
@@ -1741,6 +1799,13 @@ function coerceData(raw) {
       temaId:m.temaId||'',
       tipoId,
       descricao:m.descricao||'',
+      cursoTurma:String(m.cursoTurma||m.curso||m.turma||'').trim(),
+      unidadeCurricular:String(m.unidadeCurricular||m.uc||'').trim(),
+      aulaModulo:String(m.aulaModulo||m.modulo||m.aula||'').trim(),
+      capacidadeCompetencia:String(m.capacidadeCompetencia||m.capacidade||m.competencia||'').trim(),
+      conhecimento:String(m.conhecimento||m.conteudoRelacionado||'').trim(),
+      modalidadeMaterial:normalizeModalidadeMaterial(m.modalidadeMaterial||m.modalidadeDoMaterial||''),
+      statusMaterial:normalizeStatusMaterial(m.statusMaterial||m.status||''),
       ordem:Number.isFinite(Number(m.ordem)) ? Number(m.ordem) : i+1,
       fixado:!!m.fixado
     };
@@ -1814,6 +1879,51 @@ function origensMaterial(m){ return [...new Set(materialLinks(m).map(origemLink)
 function tituloLink(l, idx=0){ return String(l?.titulo||'').trim() || origemLink(l) || `Link ${idx+1}`; }
 function sourceBadgesHtml(m){ return origensMaterial(m).map(o=>`<span class="mat-source-badge">${escH(o)}</span>`).join(''); }
 function materialLinksSearchText(m){ return materialLinks(m).map((l,idx)=>[tituloLink(l,idx),origemLink(l),l.link].join(' ')).join(' '); }
+function modalidadeMaterialLabel(v){
+  return ({presencial:'Presencial',ead:'EaD',ambos:'Presencial e EaD'})[String(v||'').toLowerCase()] || '';
+}
+function statusMaterialLabel(v){
+  return ({pronto:'Pronto',revisar:'Revisar',substituir:'Substituir',producao:'Em produção'})[String(v||'').toLowerCase()] || '';
+}
+function normalizeModalidadeMaterial(v){
+  const n=normalizar(v);
+  if(!n) return '';
+  if(['presencial','presenca','presenca_l'].includes(n) || n.includes('presencial')) return 'presencial';
+  if(n==='ead' || n.includes('distancia') || n.includes('online')) return 'ead';
+  if(n.includes('ambos') || n.includes('presencial_e_ead') || n.includes('presencial_ead')) return 'ambos';
+  return '';
+}
+function normalizeStatusMaterial(v){
+  const n=normalizar(v);
+  if(!n) return '';
+  if(n.includes('pronto') || n.includes('usar')) return 'pronto';
+  if(n.includes('revis')) return 'revisar';
+  if(n.includes('substit')) return 'substituir';
+  if(n.includes('produc') || n.includes('andamento')) return 'producao';
+  return '';
+}
+function pedagogicalSearchText(m){
+  return [
+    m.cursoTurma,m.unidadeCurricular,m.aulaModulo,m.capacidadeCompetencia,m.conhecimento,
+    modalidadeMaterialLabel(m.modalidadeMaterial),statusMaterialLabel(m.statusMaterial)
+  ].join(' ');
+}
+function pedagogyMetaHtml(m){
+  const chips=[];
+  if(m.cursoTurma) chips.push(`Curso/turma: ${m.cursoTurma}`);
+  if(m.unidadeCurricular) chips.push(`UC: ${m.unidadeCurricular}`);
+  if(m.aulaModulo) chips.push(`Aula: ${m.aulaModulo}`);
+  const mod=modalidadeMaterialLabel(m.modalidadeMaterial);
+  if(mod) chips.push(mod);
+  const status=statusMaterialLabel(m.statusMaterial);
+  if(status) chips.push(`Status: ${status}`);
+  const chipHtml=chips.map(c=>`<span class="pedagogy-pill">${escH(c)}</span>`).join('');
+  const lines=[];
+  if(m.capacidadeCompetencia) lines.push(`<div class="pedagogy-line"><strong>Capacidade:</strong> ${escH(m.capacidadeCompetencia)}</div>`);
+  if(m.conhecimento) lines.push(`<div class="pedagogy-line"><strong>Conhecimento:</strong> ${escH(m.conhecimento)}</div>`);
+  if(!chipHtml && !lines.length) return '';
+  return `<div class="pedagogy-meta">${chipHtml}</div>${lines.join('')}`;
+}
 function matsDaDisc(discId){ return D.materiais.filter(m=>m.disciplinaId===discId); }
 function countTema(discId){ return D.temas.filter(t=>t.disciplinaId===discId).length; }
 function countFixados(discId){ return D.materiais.filter(m=>m.disciplinaId===discId && m.fixado).length; }
@@ -1835,7 +1945,7 @@ function totalByType(discId){
 }
 function searchable(m){
   return normalizar([
-    m.titulo,m.descricao,materialLinksSearchText(m),labelDisc(m.disciplinaId),labelTema(m.temaId),labelTipo(m.tipoId)
+    m.titulo,m.descricao,materialLinksSearchText(m),labelDisc(m.disciplinaId),labelTema(m.temaId),labelTipo(m.tipoId),pedagogicalSearchText(m)
   ].join(' '));
 }
 function filterMats(list, {search='', tipoId='', temaId=''}={}){
@@ -2206,6 +2316,7 @@ function profCardHtml(m, showContext=false){
         <div class="mat-title">${m.fixado?'<span class="mat-pin">📌</span> ':''}${escH(m.titulo)}</div>
         ${showContext?`<div class="mat-desc">${escH(labelDisc(m.disciplinaId))}${m.temaId?' · '+escH(labelTema(m.temaId)):''}</div>`:''}
         ${m.descricao?`<div class="mat-desc">${escH(m.descricao)}</div>`:''}
+        ${pedagogyMetaHtml(m)}
       </div>
     </div>
     <div class="mat-footer">
@@ -2332,6 +2443,7 @@ function adminCardHtml(m){
       </div>
       <div class="admin-link-list">${linkPills || '<span class="mat-source-badge">Sem link</span>'}</div>
       ${m.descricao?`<div class="admin-desc">${escH(m.descricao)}</div>`:''}
+      ${pedagogyMetaHtml(m)}
     </div>
     <div class="admin-actions wrap">
       <button class="a-btn small-action" onclick="moverMaterial('${escJsStr(m.id)}',-1)" title="Subir">↑</button>
@@ -2426,6 +2538,13 @@ function openModal(id=null, preferredDiscId=null){
   document.getElementById('mDesc').value=m?.descricao||'';
   document.getElementById('mOrdem').value=m?.ordem||'';
   document.getElementById('mFixado').checked=!!m?.fixado;
+  document.getElementById('mCursoTurma').value=m?.cursoTurma||'';
+  document.getElementById('mUnidadeCurricular').value=m?.unidadeCurricular||'';
+  document.getElementById('mAulaModulo').value=m?.aulaModulo||'';
+  document.getElementById('mCapacidade').value=m?.capacidadeCompetencia||'';
+  document.getElementById('mConhecimento').value=m?.conhecimento||'';
+  document.getElementById('mModalidadeMaterial').value=m?.modalidadeMaterial||'';
+  document.getElementById('mStatusMaterial').value=m?.statusMaterial||'';
   const linksWrap=document.getElementById('mLinksList');
   linksWrap.innerHTML='';
   const links=materialLinks(m);
@@ -2462,6 +2581,13 @@ function salvarMaterial(options={}){
   const temaId=document.getElementById('mTema').value||'';
   const tipoId=document.querySelector('.tipo-opt.sel')?.dataset.tipo||'';
   const descricao=document.getElementById('mDesc').value.trim();
+  const cursoTurma=document.getElementById('mCursoTurma').value.trim();
+  const unidadeCurricular=document.getElementById('mUnidadeCurricular').value.trim();
+  const aulaModulo=document.getElementById('mAulaModulo').value.trim();
+  const capacidadeCompetencia=document.getElementById('mCapacidade').value.trim();
+  const conhecimento=document.getElementById('mConhecimento').value.trim();
+  const modalidadeMaterial=document.getElementById('mModalidadeMaterial').value;
+  const statusMaterial=document.getElementById('mStatusMaterial').value;
   const fixado=document.getElementById('mFixado').checked;
   let ordem=Number(document.getElementById('mOrdem').value);
   if(!titulo){ showToast('Preencha o título.',true); return document.getElementById('mTitulo').focus(); }
@@ -2469,7 +2595,7 @@ function salvarMaterial(options={}){
   if(!tipoId){ showToast('Selecione o tipo.',true); return; }
   if(!Number.isFinite(ordem)||ordem<=0) ordem=nextOrderFor(disciplinaId,temaId,tipoId);
   const principal=links[0]||{link:'',origem:''};
-  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,ordem,fixado};
+  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,ordem,fixado};
   const wasEditing=Boolean(editingMaterialId);
   if(editingMaterialId){
     const idx=D.materiais.findIndex(x=>x.id===editingMaterialId);
@@ -2787,18 +2913,23 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
   const nomeDisc=disc && disciplinaId ? disc.nome : 'Ensaios';
   const modalidade=disc && disciplinaId ? modalidadeLabel(modalidadeDisciplina(disc)) : 'Presencial';
   const headers=[
-    'Disciplina','Modalidade','Tema','Tipo','Título','Link','Origem','Título do link',
+    'Disciplina','Modalidade','Tema','Tipo','Título','Curso/Turma','Unidade curricular','Aula/Módulo',
+    'Capacidade/competência','Conhecimento','Modalidade do material','Status','Link','Origem','Título do link',
     'Link 2','Origem 2','Título do link 2','Descrição','Fixado'
   ];
   const exemplos=[
     [
       nomeDisc,modalidade,'Ensaio de tração','Slide','Aula 01 - Ensaio de tração',
+      'Moldador de Plástico - Turma 2026','Ensaios','Aula 01 / Módulo 1',
+      'Interpretar resultados de ensaios mecânicos.','Propriedades mecânicas e ensaio de tração','Presencial','Pronto',
       'https://www.canva.com/design/exemplo','Canva','Abrir slides',
       'https://drive.google.com/exemplo','Google Drive','Material de apoio',
       'Slides principais da aula, com conceitos e roteiro de discussão.','sim'
     ],
     [
       'Transformação Digital no Setor Industrial','EaD','Cultura digital','Atividade','Atividade avaliativa - Indústria 4.0',
+      'Moldador de Plástico - Turma 2026','Transformação Digital','Semana 02',
+      'Reconhecer tecnologias digitais aplicadas à indústria.','Indústria 4.0, dados e automação','EaD','Revisar',
       'https://docs.google.com/forms/d/exemplo','Google Forms','Responder formulário',
       '','','',
       'Atividade para ser realizada no AVA ou enviada como link de apoio.','não'
@@ -2809,18 +2940,21 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
     ['Use uma linha por material.'],
     ['Colunas obrigatórias: Título e Link.'],
     ['Se Disciplina, Tema ou Tipo não existirem, a Biblioteca cria automaticamente.'],
+    ['Os campos pedagógicos são opcionais e ajudam quando você tiver mais de uma turma, curso ou substituir outro professor.'],
     ['Para materiais com mais de um acesso, use Link 2, Origem 2 e Título do link 2.'],
     ['Na coluna Fixado, use sim ou não.'],
-    ['Modalidade aceita Presencial ou EaD. Se ficar vazia, entra como Presencial.']
+    ['Modalidade aceita Presencial ou EaD. Se ficar vazia, entra como Presencial.'],
+    ['Status aceita Pronto, Revisar, Substituir depois ou Em produção.']
   ];
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet([headers,...exemplos]);
   ws['!cols']=[
-    {wch:26},{wch:13},{wch:24},{wch:14},{wch:34},{wch:44},{wch:18},
-    {wch:22},{wch:44},{wch:18},{wch:22},{wch:58},{wch:12}
+    {wch:26},{wch:13},{wch:24},{wch:14},{wch:34},{wch:30},{wch:26},{wch:18},
+    {wch:38},{wch:34},{wch:22},{wch:18},{wch:44},{wch:18},{wch:22},
+    {wch:44},{wch:18},{wch:22},{wch:58},{wch:12}
   ];
   ws['!rows']=[{hpt:22},{hpt:34},{hpt:34}];
-  ws['!autofilter']={ref:'A1:M1'};
+  ws['!autofilter']={ref:'A1:T1'};
   ws['!freeze']={xSplit:0,ySplit:1,topLeftCell:'A2',activePane:'bottomLeft',state:'frozen'};
   const headerStyle={
     fill:{fgColor:{rgb:'164194'}},
@@ -2901,6 +3035,13 @@ function importarPlanilhaMateriais(input){
         const tipo=valorLinha(row, header, ['tipo','tipo_de_material','categoria']);
         const tipoId=findOrCreateTipoByName(tipo);
         const descricao=valorLinha(row, header, ['descricao','descrição','observacao','observacoes','obs']);
+        const cursoTurma=valorLinha(row, header, ['curso_turma','curso','turma','curso_ou_turma']);
+        const unidadeCurricular=valorLinha(row, header, ['unidade_curricular','uc','componente_curricular']);
+        const aulaModulo=valorLinha(row, header, ['aula_modulo','aula','modulo','aula_ou_modulo']);
+        const capacidadeCompetencia=valorLinha(row, header, ['capacidade_competencia','capacidade','competencia','competência']);
+        const conhecimento=valorLinha(row, header, ['conhecimento','conteudo_relacionado','conteúdo_relacionado']);
+        const modalidadeMaterial=normalizeModalidadeMaterial(valorLinha(row, header, ['modalidade_do_material','modalidade_material','uso']));
+        const statusMaterial=normalizeStatusMaterial(valorLinha(row, header, ['status','status_do_material','situacao','situação']));
         const fixado=boolPlanilha(valorLinha(row, header, ['fixado','destaque','principal']));
         const principal=links[0];
         let duplicateReason='';
@@ -2914,7 +3055,7 @@ function importarPlanilhaMateriais(input){
         else if(titleDup) duplicateReason='Mesmo título na mesma disciplina/tema';
         novos.push({
           id:uid('mat'),titulo,link:principal.link,origem:principal.origem||'',links,
-          disciplinaId,temaId,tipoId,descricao,fixado,
+          disciplinaId,temaId,tipoId,descricao,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,fixado,
           _importRow:headerRowIndex+rowIdx+2,
           _duplicate:Boolean(duplicateReason),
           _duplicateReason:duplicateReason,
@@ -2962,7 +3103,7 @@ function renderImportPreview(){
     <div class="import-alerts">${alerts.join('')}</div>
     <div class="import-table-wrap">
       <table class="import-table">
-        <thead><tr><th>Linha</th><th>Disciplina</th><th>Tema</th><th>Tipo</th><th>Título</th><th>Links</th><th>Observação</th></tr></thead>
+        <thead><tr><th>Linha</th><th>Disciplina</th><th>Tema</th><th>Tipo</th><th>Título</th><th>Pedagógico</th><th>Links</th><th>Observação</th></tr></thead>
         <tbody>
           ${novos.slice(0,80).map(m=>`
             <tr class="${m._duplicate?'duplicate':''}">
@@ -2971,6 +3112,7 @@ function renderImportPreview(){
               <td>${escH(labelTema(m.temaId))}</td>
               <td>${escH(labelTipo(m.tipoId))}</td>
               <td>${escH(m.titulo)}</td>
+              <td>${escH([m.cursoTurma,m.aulaModulo,statusMaterialLabel(m.statusMaterial)].filter(Boolean).join(' · ') || '-')}</td>
               <td>${m.links.length} link${m.links.length!==1?'s':''}</td>
               <td>${m._duplicate?escH(m._duplicateReason||'Possível duplicado'):'Novo material'}</td>
             </tr>`).join('')}
@@ -3523,7 +3665,11 @@ function origemLink(l){return String(l.origem||'').trim()||detectarOrigem(l.link
 function tituloLink(l,idx=0){return String(l.titulo||'').trim()||origemLink(l)||('Link '+(idx+1))}
 function origens(m){return [...new Set(links(m).map(origemLink).filter(Boolean))]}
 function sourceBadges(m){return origens(m).map(o=>'<span class="mat-source-badge">'+escH(o)+'</span>').join('')}
-function searchable(m){return norm([m.titulo,m.descricao,links(m).map((l,i)=>tituloLink(l,i)+' '+origemLink(l)+' '+l.link).join(' '),disc(m.disciplinaId)?.nome,tema(m.temaId)?.nome,tipo(m.tipoId)?.nome].join(' '))}
+function modalidadeMaterialLabel(v){return ({presencial:'Presencial',ead:'EaD',ambos:'Presencial e EaD'})[String(v||'').toLowerCase()]||''}
+function statusMaterialLabel(v){return ({pronto:'Pronto',revisar:'Revisar',substituir:'Substituir',producao:'Em produção'})[String(v||'').toLowerCase()]||''}
+function pedagogyText(m){return [m.cursoTurma,m.unidadeCurricular,m.aulaModulo,m.capacidadeCompetencia,m.conhecimento,modalidadeMaterialLabel(m.modalidadeMaterial),statusMaterialLabel(m.statusMaterial)].join(' ')}
+function pedagogyMeta(m){const chips=[];if(m.cursoTurma)chips.push('Curso/turma: '+m.cursoTurma);if(m.unidadeCurricular)chips.push('UC: '+m.unidadeCurricular);if(m.aulaModulo)chips.push('Aula: '+m.aulaModulo);const mod=modalidadeMaterialLabel(m.modalidadeMaterial);if(mod)chips.push(mod);const st=statusMaterialLabel(m.statusMaterial);if(st)chips.push('Status: '+st);const chipHtml=chips.map(c=>'<span class="pedagogy-pill">'+escH(c)+'</span>').join('');const lines=[];if(m.capacidadeCompetencia)lines.push('<div class="pedagogy-line"><strong>Capacidade:</strong> '+escH(m.capacidadeCompetencia)+'</div>');if(m.conhecimento)lines.push('<div class="pedagogy-line"><strong>Conhecimento:</strong> '+escH(m.conhecimento)+'</div>');return chipHtml||lines.length?'<div class="pedagogy-meta">'+chipHtml+'</div>'+lines.join(''):''}
+function searchable(m){return norm([m.titulo,m.descricao,links(m).map((l,i)=>tituloLink(l,i)+' '+origemLink(l)+' '+l.link).join(' '),disc(m.disciplinaId)?.nome,tema(m.temaId)?.nome,tipo(m.tipoId)?.nome,pedagogyText(m)].join(' '))}
 function filtered(list,{search='',tipoId='',temaId=''}={}){const s=norm(search);return sortM(list.filter(m=>{if(tipoId&&m.tipoId!==tipoId)return false;if(temaId&&(m.temaId||'')!==temaId)return false;if(s&&!searchable(m).includes(s))return false;return true}))}
 function bg(id){return colorAlpha(tipo(id).cor,.12)}
 function cor(id){return tipo(id).cor||'#888888'}
@@ -3684,7 +3830,7 @@ function grouped(list){
 function cardMat(m){
   const t=tipo(m.tipoId), th=tema(m.temaId), dl=links(m);
   const linksHtml=dl.map((l,i)=>'<a class="mat-open-btn" href="'+escH(l.link)+'" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>'+escH(tituloLink(l,i))+'</a>').join('');
-  return '<article class="mat-card"><div class="mat-card-top"><div class="mat-icon" style="background:'+bg(m.tipoId)+'">'+escH(t.icone||'📎')+'</div><div><div class="mat-title">'+escH(m.titulo)+'</div>'+((m.descricao)?'<div class="mat-desc">'+escH(m.descricao)+'</div>':'')+'</div></div><div class="mat-footer"><span class="mat-tipo-badge" style="background:'+bg(m.tipoId)+';color:'+cor(m.tipoId)+'">'+escH(t.nome)+'</span>'+sourceBadges(m)+(m.fixado?'<span class="pin-pill">📌 Fixado</span>':'')+'</div>'+((th?.nome)?'<div class="mat-context">'+escH(th.nome)+'</div>':'')+(linksHtml?'<div class="mat-links">'+linksHtml+'</div>':'')+'</article>';
+  return '<article class="mat-card"><div class="mat-card-top"><div class="mat-icon" style="background:'+bg(m.tipoId)+'">'+escH(t.icone||'📎')+'</div><div><div class="mat-title">'+escH(m.titulo)+'</div>'+((m.descricao)?'<div class="mat-desc">'+escH(m.descricao)+'</div>':'')+pedagogyMeta(m)+'</div></div><div class="mat-footer"><span class="mat-tipo-badge" style="background:'+bg(m.tipoId)+';color:'+cor(m.tipoId)+'">'+escH(t.nome)+'</span>'+sourceBadges(m)+(m.fixado?'<span class="pin-pill">📌 Fixado</span>':'')+'</div>'+((th?.nome)?'<div class="mat-context">'+escH(th.nome)+'</div>':'')+(linksHtml?'<div class="mat-links">'+linksHtml+'</div>':'')+'</article>';
 }
 function showToast(msg,err){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;right:24px;background:'+(err?'var(--red)':'var(--text)')+';color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)}
 applyLogoProfessorOnly();
