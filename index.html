@@ -256,6 +256,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .pedagogy-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
 .pedagogy-pill{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:600;line-height:1.4}
 .pedagogy-line{font-size:11px;color:var(--text3);line-height:1.45;margin-top:6px}
+.review-pill{background:var(--amber-bg)!important;color:var(--amber)!important;border-color:rgba(154,98,0,.22)!important}
+.review-pill.danger{background:var(--red-bg)!important;color:var(--red)!important;border-color:rgba(185,50,50,.25)!important}
 .search-result-head{font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 14px}
 .prof-home-note{background:var(--accent-bg);border:1px solid rgba(45,91,227,.15);border-radius:var(--radius-lg);padding:12px 14px;font-size:12px;color:var(--accent);line-height:1.55;margin-bottom:18px}
 .general-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);background:var(--purple-bg);border-radius:20px;padding:2px 8px}
@@ -379,6 +381,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       <input class="search-input" type="text" id="profDiscSearch" placeholder="Buscar dentro desta disciplina..." oninput="renderProfessorDisc()">
       <select class="filter-sel" id="profDiscTipo" onchange="renderProfessorDisc()"><option value="">Todos os tipos</option></select>
       <select class="filter-sel" id="profDiscTema" onchange="renderProfessorDisc()"><option value="">Todos os temas</option></select>
+      <select class="filter-sel" id="profDiscRevisao" onchange="renderProfessorDisc()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="stale">Desatualizados</option><option value="ready">Prontos</option></select>
     </div>
     <div id="professorDiscContent"></div>
   </div>
@@ -434,6 +437,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <input class="search-input" type="text" id="adminMatSearch" placeholder="Buscar material dentro desta disciplina..." oninput="renderAdminDisc()">
         <select class="filter-sel" id="adminMatTipo" onchange="renderAdminDisc()"><option value="">Todos os tipos</option></select>
         <select class="filter-sel" id="adminMatTema" onchange="renderAdminDisc()"><option value="">Todos os temas</option></select>
+        <select class="filter-sel" id="adminMatRevisao" onchange="renderAdminDisc()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="stale">Desatualizados</option><option value="ready">Prontos</option></select>
       </div>
       <div id="adminDiscContent"></div>
     </div>
@@ -1914,6 +1918,22 @@ function formatDateTime(v){
   if(!iso) return '';
   return new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
 }
+const REVIEW_STALE_DAYS=180;
+function daysSinceDate(v){
+  const iso=normalizeDateValue(v);
+  if(!iso) return null;
+  const diff=Date.now()-new Date(iso).getTime();
+  return diff<0 ? 0 : Math.floor(diff/86400000);
+}
+function isMaterialStale(m){ const days=daysSinceDate(m.updatedAt || m.createdAt); return days!=null && days>=REVIEW_STALE_DAYS; }
+function needsMaterialReview(m){ return ['revisar','substituir'].includes(String(m.statusMaterial||'')) || isMaterialStale(m); }
+function reviewBadgeHtml(m){
+  if(m.statusMaterial==='substituir') return '<span class="pedagogy-pill review-pill danger">Substituir</span>';
+  if(m.statusMaterial==='revisar') return '<span class="pedagogy-pill review-pill">Revisar</span>';
+  if(isMaterialStale(m)) return `<span class="pedagogy-pill review-pill">Mais de ${REVIEW_STALE_DAYS} dias sem atualização</span>`;
+  if(m.statusMaterial==='pronto') return '<span class="pedagogy-pill">Pronto</span>';
+  return '';
+}
 function modalidadeMaterialLabel(v){
   return ({presencial:'Presencial',ead:'EaD',ambos:'Presencial e EaD'})[String(v||'').toLowerCase()] || '';
 }
@@ -1953,13 +1973,14 @@ function pedagogyMetaHtml(m){
   const mod=modalidadeMaterialLabel(m.modalidadeMaterial);
   if(mod) chips.push(mod);
   const status=statusMaterialLabel(m.statusMaterial);
-  if(status) chips.push(`Status: ${status}`);
+  const reviewBadge=reviewBadgeHtml(m);
+  if(status && !reviewBadge) chips.push(`Status: ${status}`);
   const chipHtml=chips.map(c=>`<span class="pedagogy-pill">${escH(c)}</span>`).join('');
   const lines=[];
   if(m.capacidadeCompetencia) lines.push(`<div class="pedagogy-line"><strong>Capacidade:</strong> ${escH(m.capacidadeCompetencia)}</div>`);
   if(m.conhecimento) lines.push(`<div class="pedagogy-line"><strong>Conhecimento:</strong> ${escH(m.conhecimento)}</div>`);
-  if(!chipHtml && !lines.length) return '';
-  return `<div class="pedagogy-meta">${chipHtml}</div>${lines.join('')}`;
+  if(!chipHtml && !reviewBadge && !lines.length) return '';
+  return `<div class="pedagogy-meta">${reviewBadge}${chipHtml}</div>${lines.join('')}`;
 }
 function matsDaDisc(discId){ return D.materiais.filter(m=>m.disciplinaId===discId); }
 function countTema(discId){ return D.temas.filter(t=>t.disciplinaId===discId).length; }
@@ -1985,11 +2006,14 @@ function searchable(m){
     m.titulo,m.descricao,materialLinksSearchText(m),labelDisc(m.disciplinaId),labelTema(m.temaId),labelTipo(m.tipoId),pedagogicalSearchText(m)
   ].join(' '));
 }
-function filterMats(list, {search='', tipoId='', temaId=''}={}){
+function filterMats(list, {search='', tipoId='', temaId='', revisao=''}={}){
   const s = normalizar(search);
   return sortMats(list.filter(m=>{
     if (tipoId && m.tipoId!==tipoId) return false;
     if (temaId && (m.temaId||'')!==temaId) return false;
+    if (revisao==='review' && !needsMaterialReview(m)) return false;
+    if (revisao==='stale' && !isMaterialStale(m)) return false;
+    if (revisao==='ready' && needsMaterialReview(m)) return false;
     if (s && !searchable(m).includes(s)) return false;
     return true;
   }));
@@ -2264,6 +2288,7 @@ function discCardHtml(d, professor=false){
   const mats=matsDaDisc(d.id);
   const temas=countTema(d.id);
   const fix=countFixados(d.id);
+  const review=mats.filter(needsMaterialReview).length;
   const tipos = totalByType(d.id).slice(0,3).map(x=>`${escH(labelTipo(x.tipoId))}: ${x.total}`).join(' · ');
   const sub = d.id===GERAL_ID ? 'Documentos e referências que não precisam ficar ligados a uma disciplina.' : (tipos || 'Nenhum material cadastrado ainda.');
   const action = professor ? `onclick="abrirProfessorDisc('${escJsStr(d.id)}')"` : `onclick="abrirAdminDisc('${escJsStr(d.id)}')"`;
@@ -2277,6 +2302,7 @@ function discCardHtml(d, professor=false){
       <span class="mini-pill">${mats.length} material${mats.length!==1?'is':''}</span>
       <span class="mini-pill">${temas} tema${temas!==1?'s':''}</span>
       ${fix?`<span class="mini-pill pin">📌 ${fix} fixado${fix!==1?'s':''}</span>`:''}
+      ${review?`<span class="mini-pill pin">${review} a revisar</span>`:''}
     </div>
   </button>`;
 }
@@ -2291,6 +2317,7 @@ function abrirProfessorDisc(discId){
   document.getElementById('profDiscSearch').value='';
   document.getElementById('profDiscTipo').value='';
   document.getElementById('profDiscTema').value='';
+  document.getElementById('profDiscRevisao').value='';
   renderProfessorDiscSelectors();
   renderProfessorDisc();
 }
@@ -2310,7 +2337,8 @@ function renderProfessorDisc(){
   const search=document.getElementById('profDiscSearch').value;
   const tipoId=document.getElementById('profDiscTipo').value;
   let temaId=document.getElementById('profDiscTema').value;
-  const list=filterMats(matsDaDisc(disc.id),{search,tipoId,temaId:temaId==='__semtema__'?'':temaId});
+  const revisao=document.getElementById('profDiscRevisao').value;
+  const list=filterMats(matsDaDisc(disc.id),{search,tipoId,temaId:temaId==='__semtema__'?'':temaId,revisao});
   document.getElementById('professorDiscContent').innerHTML=renderProfessorGrouped(list, disc.id);
 }
 function renderProfessorGrouped(list, discId){
@@ -2380,12 +2408,13 @@ function renderAdminHome(){
   currentAdminDiscId=null;
   document.getElementById('adminHome').style.display='';
   document.getElementById('adminDiscView').style.display='none';
-  const totalM=D.materiais.length, totalD=D.disciplinas.length, totalT=D.temas.length, totalF=D.materiais.filter(m=>m.fixado).length;
+  const totalM=D.materiais.length, totalD=D.disciplinas.length, totalT=D.temas.length, totalF=D.materiais.filter(m=>m.fixado).length, totalR=D.materiais.filter(needsMaterialReview).length;
   document.getElementById('adminSummary').innerHTML = [
     [totalD,'disciplinas'],
     [totalT,'temas'],
     [totalM,'materiais'],
-    [totalF,'fixados']
+    [totalF,'fixados'],
+    [totalR,'a revisar']
   ].map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
   const q=normalizar(document.getElementById('adminDiscSearch')?.value||'');
   const geralDisc=getDisc(GERAL_ID);
@@ -2409,6 +2438,7 @@ function abrirAdminDisc(discId){
   document.getElementById('adminMatSearch').value='';
   document.getElementById('adminMatTipo').value='';
   document.getElementById('adminMatTema').value='';
+  document.getElementById('adminMatRevisao').value='';
   renderAdminDiscSelectors();
   renderAdminDisc();
 }
@@ -2428,7 +2458,8 @@ function renderAdminDisc(){
   const search=document.getElementById('adminMatSearch').value;
   const tipoId=document.getElementById('adminMatTipo').value;
   let temaId=document.getElementById('adminMatTema').value;
-  const list=filterMats(matsDaDisc(disc.id),{search,tipoId,temaId:temaId==='__semtema__'?'':temaId});
+  const revisao=document.getElementById('adminMatRevisao').value;
+  const list=filterMats(matsDaDisc(disc.id),{search,tipoId,temaId:temaId==='__semtema__'?'':temaId,revisao});
   document.getElementById('adminDiscContent').innerHTML=renderAdminGrouped(list,disc.id);
 }
 function renderAdminGrouped(list,discId){
@@ -3653,6 +3684,7 @@ ${css}
       <input class="search-input" type="text" id="profDiscSearch" placeholder="Buscar dentro desta disciplina..." oninput="renderDiscProfessorOnly()">
       <select class="filter-sel" id="profDiscTipo" onchange="renderDiscProfessorOnly()"><option value="">Todos os tipos</option></select>
       <select class="filter-sel" id="profDiscTema" onchange="renderDiscProfessorOnly()"><option value="">Todos os temas</option></select>
+      <select class="filter-sel" id="profDiscRevisao" onchange="renderDiscProfessorOnly()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="stale">Desatualizados</option><option value="ready">Prontos</option></select>
     </div>
     <div id="professorDiscContent"></div>
   </div>
@@ -3717,10 +3749,15 @@ function sourceBadges(m){return origens(m).map(o=>'<span class="mat-source-badge
 function modalidadeMaterialLabel(v){return ({presencial:'Presencial',ead:'EaD',ambos:'Presencial e EaD'})[String(v||'').toLowerCase()]||''}
 function statusMaterialLabel(v){return ({pronto:'Pronto',revisar:'Revisar',substituir:'Substituir',producao:'Em produção'})[String(v||'').toLowerCase()]||''}
 function formatDateTime(v){if(!v)return '';const d=new Date(v);return Number.isNaN(d.getTime())?'':d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}
+const REVIEW_STALE_DAYS=180;
+function daysSinceDate(v){if(!v)return null;const d=new Date(v);if(Number.isNaN(d.getTime()))return null;const diff=Date.now()-d.getTime();return diff<0?0:Math.floor(diff/86400000)}
+function isMaterialStale(m){const days=daysSinceDate(m.updatedAt||m.createdAt);return days!=null&&days>=REVIEW_STALE_DAYS}
+function needsMaterialReview(m){return ['revisar','substituir'].includes(String(m.statusMaterial||''))||isMaterialStale(m)}
+function reviewBadge(m){if(m.statusMaterial==='substituir')return '<span class="pedagogy-pill review-pill danger">Substituir</span>';if(m.statusMaterial==='revisar')return '<span class="pedagogy-pill review-pill">Revisar</span>';if(isMaterialStale(m))return '<span class="pedagogy-pill review-pill">Mais de '+REVIEW_STALE_DAYS+' dias sem atualização</span>';if(m.statusMaterial==='pronto')return '<span class="pedagogy-pill">Pronto</span>';return ''}
 function pedagogyText(m){return [m.cursoTurma,m.unidadeCurricular,m.aulaModulo,m.capacidadeCompetencia,m.conhecimento,modalidadeMaterialLabel(m.modalidadeMaterial),statusMaterialLabel(m.statusMaterial),formatDateTime(m.createdAt),formatDateTime(m.updatedAt)].join(' ')}
-function pedagogyMeta(m){const chips=[];if(m.createdAt)chips.push('Criado: '+formatDateTime(m.createdAt));if(m.updatedAt)chips.push('Atualizado: '+formatDateTime(m.updatedAt));if(m.cursoTurma)chips.push('Curso/turma: '+m.cursoTurma);if(m.unidadeCurricular)chips.push('UC: '+m.unidadeCurricular);if(m.aulaModulo)chips.push('Aula: '+m.aulaModulo);const mod=modalidadeMaterialLabel(m.modalidadeMaterial);if(mod)chips.push(mod);const st=statusMaterialLabel(m.statusMaterial);if(st)chips.push('Status: '+st);const chipHtml=chips.map(c=>'<span class="pedagogy-pill">'+escH(c)+'</span>').join('');const lines=[];if(m.capacidadeCompetencia)lines.push('<div class="pedagogy-line"><strong>Capacidade:</strong> '+escH(m.capacidadeCompetencia)+'</div>');if(m.conhecimento)lines.push('<div class="pedagogy-line"><strong>Conhecimento:</strong> '+escH(m.conhecimento)+'</div>');return chipHtml||lines.length?'<div class="pedagogy-meta">'+chipHtml+'</div>'+lines.join(''):''}
+function pedagogyMeta(m){const chips=[];if(m.createdAt)chips.push('Criado: '+formatDateTime(m.createdAt));if(m.updatedAt)chips.push('Atualizado: '+formatDateTime(m.updatedAt));if(m.cursoTurma)chips.push('Curso/turma: '+m.cursoTurma);if(m.unidadeCurricular)chips.push('UC: '+m.unidadeCurricular);if(m.aulaModulo)chips.push('Aula: '+m.aulaModulo);const mod=modalidadeMaterialLabel(m.modalidadeMaterial);if(mod)chips.push(mod);const rb=reviewBadge(m);const st=statusMaterialLabel(m.statusMaterial);if(st&&!rb)chips.push('Status: '+st);const chipHtml=chips.map(c=>'<span class="pedagogy-pill">'+escH(c)+'</span>').join('');const lines=[];if(m.capacidadeCompetencia)lines.push('<div class="pedagogy-line"><strong>Capacidade:</strong> '+escH(m.capacidadeCompetencia)+'</div>');if(m.conhecimento)lines.push('<div class="pedagogy-line"><strong>Conhecimento:</strong> '+escH(m.conhecimento)+'</div>');return chipHtml||rb||lines.length?'<div class="pedagogy-meta">'+rb+chipHtml+'</div>'+lines.join(''):''}
 function searchable(m){return norm([m.titulo,m.descricao,links(m).map((l,i)=>tituloLink(l,i)+' '+origemLink(l)+' '+l.link).join(' '),disc(m.disciplinaId)?.nome,tema(m.temaId)?.nome,tipo(m.tipoId)?.nome,pedagogyText(m)].join(' '))}
-function filtered(list,{search='',tipoId='',temaId=''}={}){const s=norm(search);return sortM(list.filter(m=>{if(tipoId&&m.tipoId!==tipoId)return false;if(temaId&&(m.temaId||'')!==temaId)return false;if(s&&!searchable(m).includes(s))return false;return true}))}
+function filtered(list,{search='',tipoId='',temaId='',revisao=''}={}){const s=norm(search);return sortM(list.filter(m=>{if(tipoId&&m.tipoId!==tipoId)return false;if(temaId&&(m.temaId||'')!==temaId)return false;if(revisao==='review'&&!needsMaterialReview(m))return false;if(revisao==='stale'&&!isMaterialStale(m))return false;if(revisao==='ready'&&needsMaterialReview(m))return false;if(s&&!searchable(m).includes(s))return false;return true}))}
 function bg(id){return colorAlpha(tipo(id).cor,.12)}
 function cor(id){return tipo(id).cor||'#888888'}
 const collapsedProfessorOnlyThemes=new Set();
@@ -3829,6 +3866,7 @@ function cardDisc(id){
   const list=mats(id);
   const temas=themes(id).length;
   const fix=list.filter(m=>m.fixado).length;
+  const review=list.filter(needsMaterialReview).length;
   const tipos=totalByTypeProfessorOnly(id).slice(0,3).map(x=>escH(x.nome)+': '+x.total).join(' · ');
   const sub=id===GERAL_ID
     ? 'Documentos e referências que não precisam ficar ligados a uma disciplina.'
@@ -3843,6 +3881,7 @@ function cardDisc(id){
       +'<span class="mini-pill">'+list.length+' material'+(list.length!==1?'is':'')+'</span>'
       +'<span class="mini-pill">'+temas+' tema'+(temas!==1?'s':'')+'</span>'
       +(fix?'<span class="mini-pill pin">📌 '+fix+' fixado'+(fix!==1?'s':'')+'</span>':'')
+      +(review?'<span class="mini-pill pin">'+review+' a revisar</span>':'')
     +'</div>'
   +'</button>';
 }
@@ -3864,12 +3903,12 @@ function renderSelectorsProfessorOnly(){
   if(oldT)st.value=oldT;if(oldM)sm.value=oldM;
 }
 function renderDiscProfessorOnly(){
-  const search=document.getElementById('profDiscSearch').value;const tipoId=document.getElementById('profDiscTipo').value;const temaSel=document.getElementById('profDiscTema').value;
-  const base=mats(currentDisc);const list=filtered(base,{search,tipoId,temaId:temaSel==='__semtema__'?'':temaSel});
+  const search=document.getElementById('profDiscSearch').value;const tipoId=document.getElementById('profDiscTipo').value;const temaSel=document.getElementById('profDiscTema').value;const revisao=document.getElementById('profDiscRevisao').value;
+  const base=mats(currentDisc);const list=filtered(base,{search,tipoId,temaId:temaSel==='__semtema__'?'':temaSel,revisao});
   document.getElementById('profDiscSubtitle').textContent=list.length+' material'+(list.length!==1?'is':'')+' exibido'+(list.length!==1?'s':'');
   const el=document.getElementById('professorDiscContent');
   if(!list.length){el.innerHTML='<div class="empty"><h3>Nenhum material encontrado.</h3><p>Ajuste os filtros ou escolha outra disciplina.</p></div>';return}
-  if(search||tipoId||temaSel){el.innerHTML='<div class="prof-card-grid">'+list.map(cardMat).join('')+'</div>';return}
+  if(search||tipoId||temaSel||revisao){el.innerHTML='<div class="prof-card-grid">'+list.map(cardMat).join('')+'</div>';return}
   el.innerHTML=grouped(list);
 }
 function grouped(list){
