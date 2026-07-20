@@ -48,6 +48,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .h-divider{width:1px;height:22px;background:rgba(255,255,255,.24);flex-shrink:0}
 .h-title{font-size:14px;font-weight:500;opacity:.9;min-width:0;max-width:none;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.35}
 .h-badge{background:rgba(255,255,255,.18);color:rgba(255,255,255,.9);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0}
+.sync-badge{display:none;align-items:center;gap:6px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.92);font-size:11px;font-weight:600;padding:4px 10px;border:1px solid rgba(255,255,255,.18);border-radius:20px;white-space:nowrap;flex-shrink:0}
+.sync-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.5)}
+.sync-badge.ok::before{background:#6ee7a8}
+.sync-badge.syncing::before{background:#ffd166}
+.sync-badge.error::before{background:#ff8a8a}
+.sync-badge.off::before{background:rgba(255,255,255,.45)}
 .h-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .h-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:var(--radius);padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
 .h-btn:hover{background:rgba(255,255,255,.22)}
@@ -298,6 +304,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div class="h-divider" id="hDivider"></div>
     <span class="h-title" id="hTitle">Materiais de Aula</span>
     <span class="h-badge" id="hBadge" style="display:none">Admin</span>
+    <span class="sync-badge off" id="hSyncBadge">Nuvem off</span>
   </div>
   <div class="h-right">
     <button class="h-btn" id="hBtnVoltarAdmin" onclick="voltarDaPreviaProfessor()" style="display:none">← Voltar ao administrador</button>
@@ -507,6 +514,15 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
             <button class="btn btn-outline" onclick="limparCloudUrl()">Limpar</button>
           </div>
         </div>
+        <div>
+          <label class="form-label">Chave de sincronização</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input type="password" class="form-input" id="cfgCloudToken" placeholder="Mesma chave configurada no Apps Script" style="flex:1;min-width:260px">
+            <button class="btn btn-outline" onclick="gerarCloudToken()">Gerar chave</button>
+            <button class="btn btn-primary" onclick="salvarCloudToken()">Salvar chave</button>
+          </div>
+          <div style="font-size:11px;color:var(--text3);line-height:1.5;margin-top:4px">Use a mesma chave no Apps Script e nos dois notebooks. Ela protege a planilha contra alterações de quem não tiver a chave.</div>
+        </div>
         <div style="font-size:12px;color:var(--text2);line-height:1.6" id="cloudStatusBox"></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-outline" onclick="syncToCloud(true)">↑ Enviar para nuvem</button>
@@ -657,6 +673,7 @@ const LEGACY_SK = 'mat_v3';
 const LEGACY_ADMIN_PW_KEY = 'app_password';
 const ADMIN_AUTH_KEY = 'mat_admin_auth_v1';
 const CLOUD_URL_KEY = 'mat_cloud_apps_script_url_v1';
+const CLOUD_TOKEN_KEY = 'mat_cloud_sync_token_v1';
 const CLOUD_PUSHED_AT_KEY = 'mat_cloud_last_push_at_v1';
 const CLOUD_LOADED_AT_KEY = 'mat_cloud_last_load_at_v1';
 const CLOUD_AUTO_INTERVAL_MS = 120000;
@@ -2396,6 +2413,8 @@ function renderConfigTab(){
   document.getElementById('cfgNomeGeral').value=D.nomeGeral||'Materiais gerais';
   const cloudUrlInput=document.getElementById('cfgCloudUrl');
   if(cloudUrlInput) cloudUrlInput.value=getCloudUrl();
+  const cloudTokenInput=document.getElementById('cfgCloudToken');
+  if(cloudTokenInput) cloudTokenInput.value=getCloudToken();
   renderCloudStatus();
 
   const lp=document.getElementById('logoPreview');
@@ -2560,7 +2579,14 @@ let cloudSaveTimer=null;
 let cloudAutoTimer=null;
 let cloudSyncBusy=false;
 function getCloudUrl(){ return (localStorage.getItem(CLOUD_URL_KEY)||'').trim(); }
+function getCloudToken(){ return (localStorage.getItem(CLOUD_TOKEN_KEY)||'').trim(); }
 function cloudConfigured(){ return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(getCloudUrl()); }
+function cloudUrlWithToken(){
+  const token=getCloudToken();
+  const url=getCloudUrl();
+  if(!token) return url;
+  return url+(url.includes('?')?'&':'?')+'token='+encodeURIComponent(token);
+}
 function getDeviceId(){
   let id=localStorage.getItem('mat_cloud_device_id_v1');
   if(!id){
@@ -2590,15 +2616,25 @@ function renderCloudStatus(){
   const box=document.getElementById('cloudStatusBox');
   if(!box) return;
   const configured=cloudConfigured();
+  const tokenOk=Boolean(getCloudToken());
   const localTime=D?._syncMeta?.updatedAt||'';
   const pushed=localStorage.getItem(CLOUD_PUSHED_AT_KEY)||'';
   const loaded=localStorage.getItem(CLOUD_LOADED_AT_KEY)||'';
   box.innerHTML=`
-    <strong>Status:</strong> ${configured?'nuvem configurada':'nuvem não configurada'}<br>
+    <strong>Status:</strong> ${configured?'nuvem configurada':'nuvem não configurada'} · ${tokenOk?'chave salva':'sem chave'}<br>
     Última alteração local: ${escH(fmtCloudTime(localTime))}<br>
     Último envio neste navegador: ${escH(fmtCloudTime(pushed))}<br>
     Último carregamento neste navegador: ${escH(fmtCloudTime(loaded))}
   `;
+  setSyncBadge(configured ? 'ok' : 'off');
+}
+function setSyncBadge(status, label){
+  const el=document.getElementById('hSyncBadge');
+  if(!el) return;
+  el.style.display='inline-flex';
+  el.className='sync-badge '+(status||'off');
+  const labels={ok:'Sincronizado',syncing:'Sincronizando',error:'Erro na nuvem',off:'Nuvem off'};
+  el.textContent=label || labels[status] || labels.off;
 }
 function salvarCloudUrl(){
   const input=document.getElementById('cfgCloudUrl');
@@ -2613,13 +2649,37 @@ function salvarCloudUrl(){
   showToast('URL da nuvem salva.');
   startCloudAutoSync();
 }
+function gerarCloudToken(){
+  const input=document.getElementById('cfgCloudToken');
+  const bytes=new Uint8Array(18);
+  crypto.getRandomValues(bytes);
+  const token=Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join('');
+  if(input) input.value=token;
+  showToast('Chave gerada. Salve e copie a mesma chave para o Apps Script.');
+}
+function salvarCloudToken(){
+  const input=document.getElementById('cfgCloudToken');
+  const token=(input?.value||'').trim();
+  if(!token || token.length<12){
+    showToast('Use uma chave com pelo menos 12 caracteres.',true);
+    return;
+  }
+  localStorage.setItem(CLOUD_TOKEN_KEY,token);
+  renderCloudStatus();
+  showToast('Chave da nuvem salva.');
+  startCloudAutoSync();
+}
 function limparCloudUrl(){
   localStorage.removeItem(CLOUD_URL_KEY);
+  localStorage.removeItem(CLOUD_TOKEN_KEY);
   stopCloudAutoSync();
   const input=document.getElementById('cfgCloudUrl');
   if(input) input.value='';
+  const tokenInput=document.getElementById('cfgCloudToken');
+  if(tokenInput) tokenInput.value='';
   renderCloudStatus();
-  showToast('URL da nuvem removida. Os dados continuam neste navegador.');
+  setSyncBadge('off');
+  showToast('URL e chave da nuvem removidas. Os dados continuam neste navegador.');
 }
 function queueCloudSave(){
   if(!cloudConfigured()) return;
@@ -2642,10 +2702,11 @@ async function syncToCloud(manual=false){
     if(manual) showToast('Configure a URL do Apps Script antes de enviar.',true);
     return;
   }
+  setSyncBadge('syncing');
   try{
     if(manual) markCloudUpdated();
     const payload=JSON.stringify(D);
-    await fetch(getCloudUrl(),{
+    await fetch(cloudUrlWithToken(),{
       method:'POST',
       mode:'no-cors',
       headers:{'Content-Type':'text/plain;charset=utf-8'},
@@ -2653,8 +2714,10 @@ async function syncToCloud(manual=false){
     });
     localStorage.setItem(CLOUD_PUSHED_AT_KEY,new Date().toISOString());
     renderCloudStatus();
+    setSyncBadge('ok');
     if(manual) showToast('Biblioteca enviada para a nuvem.');
   }catch(err){
+    setSyncBadge('error');
     if(manual) showToast('Não consegui enviar agora. A cópia local continua salva.',true);
   }
 }
@@ -2665,14 +2728,23 @@ async function syncFromCloud(manual=false){
   }
   if(cloudSyncBusy) return;
   cloudSyncBusy=true;
+  setSyncBadge('syncing');
   try{
-    const resp=await fetch(getCloudUrl()+'?t='+Date.now());
+    const url=cloudUrlWithToken()+(cloudUrlWithToken().includes('?')?'&':'?')+'t='+Date.now();
+    const resp=await fetch(url);
     const text=await resp.text();
     if(!text || text.trim()==='{}'){
       if(manual) showToast('A planilha ainda está vazia. Mantive os dados locais.');
+      setSyncBadge('ok');
       return;
     }
-    const incoming=coerceData(JSON.parse(text));
+    const parsed=JSON.parse(text);
+    if(parsed && parsed.error){
+      setSyncBadge('error','Chave inválida');
+      if(manual) showToast('A chave da nuvem não confere com o Apps Script.',true);
+      return;
+    }
+    const incoming=coerceData(parsed);
     const cloudTime=updatedMs(incoming);
     const localTime=updatedMs(D);
     if(localTime && cloudTime && localTime>cloudTime){
@@ -2686,6 +2758,7 @@ async function syncFromCloud(manual=false){
       const ok=confirm('A nuvem parece estar igual à cópia local.\n\nDeseja recarregar mesmo assim?');
       if(!ok) return;
     } else if(!manual && localTime && cloudTime && cloudTime<=localTime) {
+      setSyncBadge('ok');
       return;
     }
     D=incoming;
@@ -2697,9 +2770,11 @@ async function syncFromCloud(manual=false){
     renderAdminHome();
     renderConfigTab();
     if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); }
+    setSyncBadge('ok');
     if(manual) showToast(`${D.materiais.length} materiais carregados da nuvem.`);
     else showToast('Biblioteca atualizada pela nuvem.');
   }catch(err){
+    setSyncBadge('error');
     if(manual) showToast('Não consegui carregar da nuvem. Verifique a URL e a publicação do Apps Script.',true);
   } finally {
     cloudSyncBusy=false;
