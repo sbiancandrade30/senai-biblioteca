@@ -221,6 +221,10 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .inner-actions{display:flex;gap:8px;flex-wrap:wrap}
 .inner-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
 .inner-filters .search-input{min-width:260px}
+.course-filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.course-chip{border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:999px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s}
+.course-chip:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.course-chip.active{border-color:var(--accent);background:var(--accent);color:#fff}
 .theme-admin-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .theme-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px}
 .theme-head{background:var(--surface2);border-bottom:1px solid var(--border);padding:13px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -362,6 +366,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div class="disc-search">
       <input class="search-input" type="text" id="profGlobalSearch" placeholder="Buscar em toda a biblioteca por título, descrição, disciplina ou tema..." oninput="renderProfessorHome()">
     </div>
+    <div id="profCourseFilterBar" class="course-filter-bar"></div>
     <div id="professorHomeContent"></div>
   </div>
 
@@ -413,6 +418,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       <div class="disc-search">
         <input class="search-input" type="text" id="adminDiscSearch" placeholder="Buscar disciplina..." oninput="renderAdminHome()">
       </div>
+      <div id="adminCourseFilterBar" class="course-filter-bar"></div>
       <div id="adminHomeContent"></div>
     </div>
 
@@ -2006,6 +2012,24 @@ function pedagogyMetaHtml(m){
   return `<div class="pedagogy-meta">${reviewBadge}${chipHtml}</div>${lines.join('')}`;
 }
 function matsDaDisc(discId){ return D.materiais.filter(m=>m.disciplinaId===discId); }
+let selectedAdminCourse='';
+let selectedProfessorCourse='';
+function materialCourse(m){ return String(m?.cursoTurma||'').trim(); }
+function courseMatches(m, course){ return !course || materialCourse(m)===course; }
+function cursosOrdenados(){
+  return [...new Set(D.materiais.map(materialCourse).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b,'pt-BR'));
+}
+function matsDaDiscCurso(discId, course=''){ return D.materiais.filter(m=>m.disciplinaId===discId && courseMatches(m,course)); }
+function courseFilterBarHtml(scope, selected){
+  const cursos=cursosOrdenados();
+  if(!cursos.length) return '';
+  const fn=scope==='admin'?'setAdminCourseFilter':'setProfessorCourseFilter';
+  return [
+    `<button class="course-chip${!selected?' active':''}" onclick="${fn}('')">Todas as turmas</button>`,
+    ...cursos.map(c=>`<button class="course-chip${selected===c?' active':''}" onclick="${fn}('${escJsStr(c)}')">${escH(c)}</button>`)
+  ].join('');
+}
 function countTema(discId){ return D.temas.filter(t=>t.disciplinaId===discId).length; }
 function countFixados(discId){ return D.materiais.filter(m=>m.disciplinaId===discId && m.fixado).length; }
 function sortMats(lista){
@@ -2022,6 +2046,11 @@ function nextOrderFor(disciplinaId, temaId, tipoId){
 function totalByType(discId){
   const map = new Map();
   matsDaDisc(discId).forEach(m=>map.set(m.tipoId,(map.get(m.tipoId)||0)+1));
+  return [...map.entries()].map(([tipoId,total])=>({tipoId,total}));
+}
+function totalByTypeList(list){
+  const map = new Map();
+  list.forEach(m=>map.set(m.tipoId,(map.get(m.tipoId)||0)+1));
   return [...map.entries()].map(([tipoId,total])=>({tipoId,total}));
 }
 function searchable(m){
@@ -2281,16 +2310,19 @@ function renderProfessorHome(){
   document.getElementById('professorDiscView').style.display='none';
   const s = normalizar(document.getElementById('profGlobalSearch')?.value || '');
   const el = document.getElementById('professorHomeContent');
+  const course=selectedProfessorCourse;
+  document.getElementById('profCourseFilterBar').innerHTML=courseFilterBarHtml('professor',course);
 
   if(s){
-    const mats = filterMats(D.materiais,{search:s});
+    const mats = filterMats(D.materiais.filter(m=>courseMatches(m,course)),{search:s});
     el.innerHTML = `<div class="search-result-head">${mats.length} resultado${mats.length!==1?'s':''} encontrado${mats.length!==1?'s':''}</div>` + renderProfessorSearchResults(mats);
     return;
   }
 
-  const geral=discCardHtml(getDisc(GERAL_ID),true);
-  const presList=discsPorModalidade('presencial');
-  const eadList=discsPorModalidade('ead');
+  const geral=(!course || matsDaDiscCurso(GERAL_ID,course).length) ? discCardHtml(getDisc(GERAL_ID),true) : '';
+  const passaCourse=d=>!course || matsDaDiscCurso(d.id,course).length>0;
+  const presList=discsPorModalidade('presencial').filter(passaCourse);
+  const eadList=discsPorModalidade('ead').filter(passaCourse);
   const pres=presList.map(d=>discCardHtml(d,true)).join('');
   const ead=eadList.map(d=>discCardHtml(d,true)).join('');
   el.innerHTML = [
@@ -2309,13 +2341,22 @@ function renderDiscGroupHtml(titulo,cardsHtml,total,mostrarContador=true){
     ${cardsHtml?`<div class="disc-grid">${cardsHtml}</div>`:'<div class="disc-group-empty">Nenhuma disciplina nesta seção.</div>'}
   </section>`;
 }
+function setProfessorCourseFilter(course){
+  selectedProfessorCourse=course||'';
+  renderProfessorHome();
+}
+function setAdminCourseFilter(course){
+  selectedAdminCourse=course||'';
+  renderAdminHome();
+}
 
 function discCardHtml(d, professor=false){
-  const mats=matsDaDisc(d.id);
+  const course=professor ? selectedProfessorCourse : selectedAdminCourse;
+  const mats=matsDaDiscCurso(d.id,course);
   const temas=countTema(d.id);
-  const fix=countFixados(d.id);
+  const fix=mats.filter(m=>m.fixado).length;
   const review=mats.filter(needsMaterialReview).length;
-  const tipos = totalByType(d.id).slice(0,3).map(x=>`${escH(labelTipo(x.tipoId))}: ${x.total}`).join(' · ');
+  const tipos = totalByTypeList(mats).slice(0,3).map(x=>`${escH(labelTipo(x.tipoId))}: ${x.total}`).join(' · ');
   const sub = d.id===GERAL_ID ? 'Documentos e referências que não precisam ficar ligados a uma disciplina.' : (tipos || 'Nenhum material cadastrado ainda.');
   const action = professor ? `onclick="abrirProfessorDisc('${escJsStr(d.id)}')"` : `onclick="abrirAdminDisc('${escJsStr(d.id)}')"`;
   return `<button class="disc-card${d.id===GERAL_ID?' general':''}" ${action}>
@@ -2349,7 +2390,8 @@ function abrirProfessorDisc(discId){
 }
 function voltarProfessorHome(){ renderProfessorHome(); }
 function renderProfessorDiscSelectors(){
-  const tipos = tiposOrdenados().filter(t=>matsDaDisc(currentProfessorDiscId).some(m=>m.tipoId===t.id));
+  const base=matsDaDiscCurso(currentProfessorDiscId,selectedProfessorCourse);
+  const tipos = tiposOrdenados().filter(t=>base.some(m=>m.tipoId===t.id));
   const temas = temasDaDisc(currentProfessorDiscId);
   document.getElementById('profDiscTipo').innerHTML='<option value="">Todos os tipos</option>'+tipos.map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
   document.getElementById('profDiscTema').innerHTML='<option value="">Todos os temas</option>'+temas.map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('')+'<option value="__semtema__">Sem tema</option>';
@@ -2358,13 +2400,16 @@ function renderProfessorDisc(){
   const disc=getDisc(currentProfessorDiscId); if(!disc) return voltarProfessorHome();
   document.getElementById('profBreadcrumbDisc').textContent=disc.nome;
   document.getElementById('profDiscTitle').textContent=disc.nome;
-  const total=matsDaDisc(disc.id).length, temas=countTema(disc.id);
+  const base=matsDaDiscCurso(disc.id,selectedProfessorCourse);
+  const total=base.length, temas=countTema(disc.id);
+  const courseSuffix=selectedProfessorCourse ? ' · '+selectedProfessorCourse : '';
   document.getElementById('profDiscSubtitle').textContent=`${total} material${total!==1?'is':''} · ${temas} tema${temas!==1?'s':''}`;
   const search=document.getElementById('profDiscSearch').value;
   const tipoId=document.getElementById('profDiscTipo').value;
   let temaId=document.getElementById('profDiscTema').value;
   const revisao=document.getElementById('profDiscRevisao').value;
-  const list=filterMats(matsDaDisc(disc.id),{search,tipoId,temaId:temaId==='__semtema__'?'':temaId,revisao});
+  document.getElementById('profDiscSubtitle').textContent += courseSuffix;
+  const list=filterMats(base,{search,tipoId,temaId:temaId==='__semtema__'?'':temaId,revisao});
   document.getElementById('professorDiscContent').innerHTML=renderProfessorGrouped(list, disc.id);
 }
 function renderProfessorGrouped(list, discId){
@@ -2434,7 +2479,10 @@ function renderAdminHome(){
   currentAdminDiscId=null;
   document.getElementById('adminHome').style.display='';
   document.getElementById('adminDiscView').style.display='none';
-  const totalM=D.materiais.length, totalD=D.disciplinas.length, totalT=D.temas.length, totalF=D.materiais.filter(m=>m.fixado).length, totalR=D.materiais.filter(needsMaterialReview).length;
+  const course=selectedAdminCourse;
+  document.getElementById('adminCourseFilterBar').innerHTML=courseFilterBarHtml('admin',course);
+  const scopedMaterials=D.materiais.filter(m=>courseMatches(m,course));
+  const totalM=scopedMaterials.length, totalD=D.disciplinas.length, totalT=D.temas.length, totalF=scopedMaterials.filter(m=>m.fixado).length, totalR=scopedMaterials.filter(needsMaterialReview).length;
   document.getElementById('adminSummary').innerHTML = [
     [totalD,'disciplinas'],
     [totalT,'temas'],
@@ -2444,8 +2492,8 @@ function renderAdminHome(){
   ].map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
   const q=normalizar(document.getElementById('adminDiscSearch')?.value||'');
   const geralDisc=getDisc(GERAL_ID);
-  const geral=!q||normalizar(geralDisc.nome).includes(q)?discCardHtml(geralDisc,false):'';
-  const passa=d=>!q||normalizar(d.nome+' '+modalidadeLabel(modalidadeDisciplina(d))).includes(q);
+  const geral=(!course || matsDaDiscCurso(GERAL_ID,course).length) && (!q||normalizar(geralDisc.nome).includes(q)) ? discCardHtml(geralDisc,false) : '';
+  const passa=d=>(!q||normalizar(d.nome+' '+modalidadeLabel(modalidadeDisciplina(d))).includes(q)) && (!course || matsDaDiscCurso(d.id,course).length>0);
   const presList=discsPorModalidade('presencial').filter(passa);
   const eadList=discsPorModalidade('ead').filter(passa);
   const pres=presList.map(d=>discCardHtml(d,false)).join('');
@@ -2470,7 +2518,8 @@ function abrirAdminDisc(discId){
 }
 function voltarAdminHome(){ renderAdminHome(); }
 function renderAdminDiscSelectors(){
-  const tipos=tiposOrdenados();
+  const base=matsDaDiscCurso(currentAdminDiscId,selectedAdminCourse);
+  const tipos=tiposOrdenados().filter(t=>base.some(m=>m.tipoId===t.id));
   const temas=temasDaDisc(currentAdminDiscId);
   document.getElementById('adminMatTipo').innerHTML='<option value="">Todos os tipos</option>'+tipos.map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
   document.getElementById('adminMatTema').innerHTML='<option value="">Todos os temas</option>'+temas.map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('')+'<option value="__semtema__">Sem tema</option>';
@@ -2479,13 +2528,16 @@ function renderAdminDisc(){
   const disc=getDisc(currentAdminDiscId); if(!disc) return voltarAdminHome();
   document.getElementById('adminBreadcrumbDisc').textContent=disc.nome;
   document.getElementById('adminDiscTitle').textContent=disc.nome;
-  const total=matsDaDisc(disc.id).length, temas=countTema(disc.id), fix=countFixados(disc.id);
+  const base=matsDaDiscCurso(disc.id,selectedAdminCourse);
+  const total=base.length, temas=countTema(disc.id), fix=base.filter(m=>m.fixado).length;
+  const courseSuffix=selectedAdminCourse ? ' · '+selectedAdminCourse : '';
   document.getElementById('adminDiscSubtitle').textContent=`${total} material${total!==1?'is':''} · ${temas} tema${temas!==1?'s':''}${fix?` · ${fix} fixado${fix!==1?'s':''}`:''}`;
   const search=document.getElementById('adminMatSearch').value;
   const tipoId=document.getElementById('adminMatTipo').value;
   let temaId=document.getElementById('adminMatTema').value;
   const revisao=document.getElementById('adminMatRevisao').value;
-  const list=filterMats(matsDaDisc(disc.id),{search,tipoId,temaId:temaId==='__semtema__'?'':temaId,revisao});
+  document.getElementById('adminDiscSubtitle').textContent += courseSuffix;
+  const list=filterMats(base,{search,tipoId,temaId:temaId==='__semtema__'?'':temaId,revisao});
   document.getElementById('adminDiscContent').innerHTML=renderAdminGrouped(list,disc.id);
 }
 function renderAdminGrouped(list,discId){
@@ -2722,7 +2774,7 @@ function openModal(id=null, preferredDiscId=null){
   document.getElementById('mDesc').value=m?.descricao||'';
   document.getElementById('mOrdem').value=m?.ordem||'';
   document.getElementById('mFixado').checked=!!m?.fixado;
-  document.getElementById('mCursoTurma').value=m?.cursoTurma||'';
+  document.getElementById('mCursoTurma').value=m?.cursoTurma||(!m?selectedAdminCourse:'')||'';
   document.getElementById('mUnidadeCurricular').value=m?.unidadeCurricular||'';
   document.getElementById('mAulaModulo').value=m?.aulaModulo||'';
   document.getElementById('mCapacidade').value=m?.capacidadeCompetencia||'';
@@ -3791,6 +3843,7 @@ ${css}
     <div class="library-top"><div><h2>Biblioteca de materiais</h2><p>Escolha uma disciplina para consultar os arquivos organizados por tema e tipo. A busca também encontra materiais em toda a biblioteca.</p></div></div>
     <div class="prof-home-note">Os links podem abrir apresentações, arquivos, vídeos, formulários ou páginas externas compartilhadas pela professora.</div>
     <div class="disc-search"><input class="search-input" type="text" id="profGlobalSearch" placeholder="Buscar em toda a biblioteca..." oninput="renderHomeProfessorOnly()"></div>
+    <div id="profCourseFilterBar" class="course-filter-bar"></div>
     <div id="professorHomeContent"></div>
   </div>
   <div id="professorDiscView" style="display:none">
@@ -3812,6 +3865,7 @@ const PUBLIC_META=${safeMeta};
 const GERAL_ID='geral';
 let DATA=null;
 let currentDisc=null;
+let selectedProfessorCourse='';
 ${professorOnlyJs()}
 <\/script>
 </body></html>`;
@@ -3856,6 +3910,12 @@ function tipo(id){return DATA.tipos.find(t=>t.id===id)||{nome:'Outro',icone:'�
 function tema(id){return DATA.temas.find(t=>t.id===id)}
 function themes(id){return DATA.temas.filter(t=>t.disciplinaId===id).sort((a,b)=>(a.ordem||0)-(b.ordem||0)||a.nome.localeCompare(b.nome,'pt-BR'))}
 function mats(id){return DATA.materiais.filter(m=>m.disciplinaId===id)}
+function matCourse(m){return String(m?.cursoTurma||'').trim()}
+function courseMatches(m,c){return !c||matCourse(m)===c}
+function cursos(){return [...new Set(DATA.materiais.map(matCourse).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'))}
+function matsCourse(id,c){return DATA.materiais.filter(m=>m.disciplinaId===id&&courseMatches(m,c))}
+function courseBar(){const cs=cursos();if(!cs.length)return '';return ['<button class="course-chip'+(!selectedProfessorCourse?' active':'')+'" onclick="setCourseProfessorOnly(\\'\\')">Todas as turmas</button>'].concat(cs.map(c=>'<button class="course-chip'+(selectedProfessorCourse===c?' active':'')+'" onclick="setCourseProfessorOnly(\\''+escH(c).replace(/'/g,'&#39;')+'\\')">'+escH(c)+'</button>')).join('')}
+function setCourseProfessorOnly(c){selectedProfessorCourse=c||'';renderHomeProfessorOnly()}
 function sortM(list){return [...list].sort((a,b)=>Number(!!b.fixado)-Number(!!a.fixado)||(Number(a.ordem)||999999)-(Number(b.ordem)||999999)||(a.titulo||'').localeCompare(b.titulo||'','pt-BR'))}
 function detectarOrigem(link){const l=String(link||'').toLowerCase();if(l.includes('canva.com'))return 'Canva';if(l.includes('youtube.com')||l.includes('youtu.be'))return 'YouTube';if(l.includes('docs.google.com/forms'))return 'Google Forms';if(l.includes('docs.google.com/presentation')||l.includes('slides.google.com'))return 'Google Slides';if(l.includes('docs.google.com/document'))return 'Google Docs';if(l.includes('docs.google.com/spreadsheets')||l.includes('sheets.google.com'))return 'Google Planilhas';if(l.includes('drive.google.com'))return 'Google Drive';if(l.includes('forms.office.com'))return 'Microsoft Forms';if(l.includes('onedrive.live.com')||l.includes('1drv.ms'))return 'OneDrive';return 'Link externo'}
 function links(m){if(Array.isArray(m.links)&&m.links.length)return m.links.filter(l=>l&&String(l.link||'').trim());if(String(m.link||'').trim())return[{titulo:'',link:m.link,origem:m.origem||'',ordem:1}];return[]}
@@ -3955,10 +4015,12 @@ function openProfessorOnly(){
 }
 function renderHomeProfessorOnly(){
   const s=norm(document.getElementById('profGlobalSearch')?.value||'');
+  document.getElementById('profCourseFilterBar').innerHTML=courseBar();
   if(s){searchCards(s);return}
-  const geral=cardDisc(GERAL_ID);
-  const presList=discsPorModalidade('presencial');
-  const eadList=discsPorModalidade('ead');
+  const geral=(!selectedProfessorCourse||matsCourse(GERAL_ID,selectedProfessorCourse).length)?cardDisc(GERAL_ID):'';
+  const passa=d=>!selectedProfessorCourse||matsCourse(d.id,selectedProfessorCourse).length>0;
+  const presList=discsPorModalidade('presencial').filter(passa);
+  const eadList=discsPorModalidade('ead').filter(passa);
   const pres=presList.map(d=>cardDisc(d.id)).filter(Boolean).join('');
   const ead=eadList.map(d=>cardDisc(d.id)).filter(Boolean).join('');
   const blocks=[
@@ -3980,7 +4042,7 @@ function totalByTypeProfessorOnly(id){
 }
 function cardDisc(id){
   const d=disc(id);if(!d)return '';
-  const list=mats(id);
+  const list=matsCourse(id,selectedProfessorCourse);
   const temas=themes(id).length;
   const fix=list.filter(m=>m.fixado).length;
   const review=list.filter(needsMaterialReview).length;
@@ -4003,7 +4065,7 @@ function cardDisc(id){
   +'</button>';
 }
 function searchCards(s){
-  const list=sortM(DATA.materiais.filter(m=>searchable(m).includes(s)));
+  const list=sortM(DATA.materiais.filter(m=>courseMatches(m,selectedProfessorCourse)&&searchable(m).includes(s)));
   const el=document.getElementById('professorHomeContent');
   if(!list.length){el.innerHTML='<div class="empty"><h3>Nenhum material encontrado.</h3><p>Tente outra palavra.</p></div>';return}
   el.innerHTML='<div class="search-results-title">Resultados da busca</div><div class="prof-card-grid">'+list.map(cardMat).join('')+'</div>';
@@ -4015,14 +4077,15 @@ function openDiscProfessorOnly(id){
 function voltarHomeProfessorOnly(){currentDisc=null;document.getElementById('professorDiscView').style.display='none';document.getElementById('professorHome').style.display='';renderHomeProfessorOnly()}
 function renderSelectorsProfessorOnly(){
   const st=document.getElementById('profDiscTipo'), sm=document.getElementById('profDiscTema');const oldT=st.value,oldM=sm.value;
-  st.innerHTML='<option value="">Todos os tipos</option>'+tipos().map(t=>'<option value="'+escH(t.id)+'">'+escH(t.nome)+'</option>').join('');
+  const base=matsCourse(currentDisc,selectedProfessorCourse);
+  st.innerHTML='<option value="">Todos os tipos</option>'+tipos().filter(t=>base.some(m=>m.tipoId===t.id)).map(t=>'<option value="'+escH(t.id)+'">'+escH(t.nome)+'</option>').join('');
   sm.innerHTML='<option value="">Todos os temas</option>'+themes(currentDisc).map(t=>'<option value="'+escH(t.id)+'">'+escH(t.nome)+'</option>').join('')+'<option value="__semtema__">Sem tema</option>';
   if(oldT)st.value=oldT;if(oldM)sm.value=oldM;
 }
 function renderDiscProfessorOnly(){
   const search=document.getElementById('profDiscSearch').value;const tipoId=document.getElementById('profDiscTipo').value;const temaSel=document.getElementById('profDiscTema').value;const revisao=document.getElementById('profDiscRevisao').value;
-  const base=mats(currentDisc);const list=filtered(base,{search,tipoId,temaId:temaSel==='__semtema__'?'':temaSel,revisao});
-  document.getElementById('profDiscSubtitle').textContent=list.length+' material'+(list.length!==1?'is':'')+' exibido'+(list.length!==1?'s':'');
+  const base=matsCourse(currentDisc,selectedProfessorCourse);const list=filtered(base,{search,tipoId,temaId:temaSel==='__semtema__'?'':temaSel,revisao});
+  document.getElementById('profDiscSubtitle').textContent=list.length+' material'+(list.length!==1?'is':'')+' exibido'+(list.length!==1?'s':'')+(selectedProfessorCourse?' · '+selectedProfessorCourse:'');
   const el=document.getElementById('professorDiscContent');
   if(!list.length){el.innerHTML='<div class="empty"><h3>Nenhum material encontrado.</h3><p>Ajuste os filtros ou escolha outra disciplina.</p></div>';return}
   if(search||tipoId||temaSel||revisao){el.innerHTML='<div class="prof-card-grid">'+list.map(cardMat).join('')+'</div>';return}
