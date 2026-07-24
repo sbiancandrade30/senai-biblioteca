@@ -251,6 +251,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .cfg-addline{display:flex;gap:8px;flex-wrap:wrap}
 .check-line{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);margin-top:4px}
 .check-line input{accent-color:var(--accent)}
+.help-tip{position:relative;display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;margin-left:5px;border:1px solid var(--border2);border-radius:50%;background:var(--surface2);color:var(--text3);font-size:11px;font-weight:700;line-height:1;cursor:help;vertical-align:middle}
+.help-tip::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 9px);transform:translateX(-50%) translateY(4px);width:max-content;max-width:260px;padding:9px 10px;border:1px solid var(--border);border-radius:var(--radius);background:#252525;color:#fff;font-size:12px;font-weight:500;line-height:1.35;text-transform:none;letter-spacing:0;box-shadow:var(--shadow);opacity:0;visibility:hidden;pointer-events:none;z-index:30;white-space:normal}
+.help-tip::before{content:'';position:absolute;left:50%;bottom:calc(100% + 3px);transform:translateX(-50%) translateY(4px);border:6px solid transparent;border-top-color:#252525;opacity:0;visibility:hidden;pointer-events:none;z-index:31}
+.help-tip:hover,.help-tip:focus{border-color:var(--accent);color:var(--accent);background:var(--accent-bg);outline:none}
+.help-tip:hover::after,.help-tip:hover::before,.help-tip:focus::after,.help-tip:focus::before{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
 .form-row.three{grid-template-columns:1fr 1fr 1fr}
 .pedagogy-box{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface2);margin:4px 0 14px;overflow:hidden}
 .pedagogy-box[open]{background:var(--surface)}
@@ -655,27 +660,27 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label class="form-label">Título *</label>
+        <label class="form-label">Título * <span class="help-tip" tabindex="0" data-tip="Use um nome que você consiga reconhecer depois. Exemplo: Aula 01 - Ensaio de tração.">?</span></label>
         <input type="text" class="form-input" id="mTitulo" placeholder="ex: Aula 3 — Contato de Selo">
       </div>
       <div class="form-group">
-        <label class="form-label">Links de acesso *</label>
+        <label class="form-label">Links de acesso * <span class="help-tip" tabindex="0" data-tip="Cole o link principal do material. Você pode adicionar Canva, Drive, YouTube, Forms ou outros links no mesmo cadastro.">?</span></label>
         <div id="mLinksList" class="link-editor"></div>
         <button type="button" class="btn btn-outline add-link-btn" onclick="addMaterialLinkRow()">+ Adicionar outro link</button>
         <div style="font-size:11px;color:var(--text3);margin-top:7px">Um mesmo material pode reunir vários acessos, como slide no Canva, PDF no Drive e vídeo no YouTube. A plataforma é detectada automaticamente se você não preencher.</div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Disciplina / Área *</label>
+          <label class="form-label">Disciplina / Área * <span class="help-tip" tabindex="0" data-tip="Escolha a área de conhecimento onde o material deve ficar guardado no acervo. Não precisa ser uma turma.">?</span></label>
           <select class="form-input" id="mDisc" onchange="renderThemeSelectForMaterial()"></select>
         </div>
         <div class="form-group">
-          <label class="form-label">Tema <span style="font-weight:400;color:var(--text3)">(opcional)</span></label>
+          <label class="form-label">Tema <span style="font-weight:400;color:var(--text3)">(opcional)</span> <span class="help-tip" tabindex="0" data-tip="Use para separar assuntos dentro da disciplina, como segurança, ensaios, extrusão ou cultura digital.">?</span></label>
           <select class="form-input" id="mTema"></select>
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Tipo *</label>
+        <label class="form-label">Tipo * <span class="help-tip" tabindex="0" data-tip="Marque o formato do material: slide, atividade, prova, vídeo, gabarito ou outro.">?</span></label>
         <div class="tipo-grid" id="tipoGrid"></div>
       </div>
       <details class="pedagogy-box" id="advancedPedagogyDetails">
@@ -691,22 +696,22 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Aplicável em</label>
+              <label class="form-label">Aplicável em <span class="help-tip" tabindex="0" data-tip="Indique em quais cursos, modalidades ou contextos este material pode servir. Exemplo: Moldador de Plástico, laboratório, EaD.">?</span></label>
               <input type="text" class="form-input" id="mCursoTurma" list="contextosUsoList" placeholder="ex: Moldador de Plástico, cursos técnicos, EaD, laboratório">
               <datalist id="contextosUsoList"></datalist>
             </div>
             <div class="form-group">
-              <label class="form-label">Unidade curricular</label>
+              <label class="form-label">Unidade curricular <span class="help-tip" tabindex="0" data-tip="Preencha se quiser aproximar o material de um plano de curso. Pode deixar vazio no cadastro rápido.">?</span></label>
               <input type="text" class="form-input" id="mUnidadeCurricular" placeholder="ex: Ensaios">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Aula / módulo</label>
+              <label class="form-label">Aula / módulo <span class="help-tip" tabindex="0" data-tip="Use apenas quando o material já estiver ligado a uma sequência sugerida. A Biblioteca não depende disso.">?</span></label>
               <input type="text" class="form-input" id="mAulaModulo" placeholder="ex: Aula 03 / Módulo 2">
             </div>
             <div class="form-group">
-              <label class="form-label">Modalidade do material</label>
+              <label class="form-label">Modalidade do material <span class="help-tip" tabindex="0" data-tip="Escolha se o material foi pensado para presencial, EaD ou ambos. Se deixar vazio, vale a modalidade da disciplina.">?</span></label>
               <select class="form-input" id="mModalidadeMaterial">
                 <option value="">Usar a modalidade da disciplina</option>
                 <option value="presencial">Presencial</option>
@@ -726,16 +731,16 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Capacidade / competência</label>
+            <label class="form-label">Capacidade / competência <span class="help-tip" tabindex="0" data-tip="Campo para copiar ou resumir a capacidade do plano de curso relacionada ao material.">?</span></label>
             <textarea class="form-input" id="mCapacidade" placeholder="ex: Interpretar resultados de ensaios mecânicos..."></textarea>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Conhecimento relacionado</label>
+              <label class="form-label">Conhecimento relacionado <span class="help-tip" tabindex="0" data-tip="Liste palavras-chave do conteúdo. Isso ajuda a encontrar materiais mesmo quando você não lembra o título.">?</span></label>
               <input type="text" class="form-input" id="mConhecimento" placeholder="ex: Ensaio de tração, propriedades mecânicas">
             </div>
             <div class="form-group">
-              <label class="form-label">Status do material</label>
+              <label class="form-label">Status do material <span class="help-tip" tabindex="0" data-tip="Use para controlar revisão: pronto, revisar, substituir depois ou em produção.">?</span></label>
               <select class="form-input" id="mStatusMaterial">
                 <option value="">Sem status</option>
                 <option value="pronto">Pronto para usar</option>
@@ -746,7 +751,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Checklist pedagógico</label>
+            <label class="form-label">Checklist pedagógico <span class="help-tip" tabindex="0" data-tip="Marque só quando quiser conferir se o material já tem objetivo, atividade, avaliação, gabarito e revisão por modalidade.">?</span></label>
             <div class="check-grid">
               <label class="check-line"><input type="checkbox" id="mChkObjetivo"> Tem objetivo de aprendizagem</label>
               <label class="check-line"><input type="checkbox" id="mChkAtividade"> Tem atividade prática/avaliativa</label>
@@ -760,15 +765,15 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       </details>
       <div class="form-row three">
         <div class="form-group">
-          <label class="form-label">Ordem</label>
+          <label class="form-label">Ordem <span class="help-tip" tabindex="0" data-tip="Número usado para ordenar os materiais dentro do tema. Pode deixar vazio para a Biblioteca preencher automaticamente.">?</span></label>
           <input type="number" class="form-input" id="mOrdem" min="1" placeholder="ex: 1">
         </div>
         <div class="form-group" style="display:flex;align-items:flex-end">
-          <label class="check-line"><input type="checkbox" id="mFixado"> Fixar no topo</label>
+          <label class="check-line"><input type="checkbox" id="mFixado"> Fixar no topo <span class="help-tip" tabindex="0" data-tip="Use para materiais que você consulta sempre, como plano base, slide principal ou atividade essencial.">?</span></label>
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Descrição <span style="font-weight:400;color:var(--text3)">(opcional)</span></label>
+        <label class="form-label">Descrição <span style="font-weight:400;color:var(--text3)">(opcional)</span> <span class="help-tip" tabindex="0" data-tip="Escreva uma observação curta sobre como usar o material, para que serve ou o que precisa revisar.">?</span></label>
         <textarea class="form-input" id="mDesc" placeholder="ex: Slides com exercícios de fixação sobre auto-retenção..."></textarea>
       </div>
     </div>
@@ -2864,15 +2869,15 @@ function materialLinkRowHtml(l={}){
   return `<div class="material-link-row" data-link-row>
     <div class="material-link-grid">
       <div class="form-group">
-        <label class="form-label">Nome do link</label>
+        <label class="form-label">Nome do link <span class="help-tip" tabindex="0" data-tip="Nome curto do botão que aparecerá no material. Exemplo: Abrir slides, Responder formulário, Baixar PDF.">?</span></label>
         <input type="text" class="form-input link-title-input" placeholder="ex: Slides, PDF, Vídeo" value="${escH(l.titulo||'')}">
       </div>
       <div class="form-group">
-        <label class="form-label">Link *</label>
+        <label class="form-label">Link * <span class="help-tip" tabindex="0" data-tip="Cole aqui o endereço do material. Se colar vários links de uma vez, a Biblioteca tenta separar automaticamente.">?</span></label>
         <input type="url" class="form-input link-url-input" placeholder="https://..." value="${escH(l.link||'')}" oninput="autoDetectLinkOrigin(this)" onpaste="handleMaterialLinksPaste(event,this)">
       </div>
       <div class="form-group">
-        <label class="form-label">Plataforma</label>
+        <label class="form-label">Plataforma <span class="help-tip" tabindex="0" data-tip="Normalmente é preenchido sozinho: Canva, Google Drive, YouTube, Forms e outros.">?</span></label>
         <input type="text" class="form-input link-origin-input" placeholder="Canva, Drive, YouTube..." value="${escH(l.origem||'')}">
       </div>
       <button type="button" class="link-remove-btn" onclick="removeMaterialLinkRow(this)" title="Remover link">×</button>
