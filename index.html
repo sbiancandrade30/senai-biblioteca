@@ -493,6 +493,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <option value="stale">Desatualizados</option>
         <option value="substituir">Substituir</option>
         <option value="revisar">Marcados como revisar</option>
+        <option value="incomplete">Cadastros incompletos</option>
+        <option value="semDescricao">Sem descrição</option>
+        <option value="semContexto">Sem contexto de uso</option>
+        <option value="semTema">Sem tema</option>
+        <option value="semChecklist">Checklist vazio</option>
         <option value="all">Todos os materiais</option>
       </select>
     </div>
@@ -2654,6 +2659,16 @@ function materialReviewReason(m){
   if(m.statusMaterial==='pronto') return 'Pronto';
   return 'Sem alerta';
 }
+function materialQualityIssues(m){
+  const issues=[];
+  if(!String(m.descricao||'').trim()) issues.push('sem descrição');
+  if(!materialCourse(m)) issues.push('sem contexto');
+  if((m.disciplinaId||GERAL_ID)!==GERAL_ID && !String(m.temaId||'').trim()) issues.push('sem tema');
+  if(!String(m.modalidadeMaterial||'').trim()) issues.push('sem modalidade');
+  if(!checklistLabels(m).length) issues.push('checklist vazio');
+  return issues;
+}
+function isMaterialIncomplete(m){ return materialQualityIssues(m).length>0; }
 function reviewList(){
   const q=normalizar(document.getElementById('reviewSearch')?.value||'');
   const f=document.getElementById('reviewFilter')?.value||'review';
@@ -2662,6 +2677,11 @@ function reviewList(){
     if(f==='stale' && !isMaterialStale(m)) return false;
     if(f==='substituir' && m.statusMaterial!=='substituir') return false;
     if(f==='revisar' && m.statusMaterial!=='revisar') return false;
+    if(f==='incomplete' && !isMaterialIncomplete(m)) return false;
+    if(f==='semDescricao' && String(m.descricao||'').trim()) return false;
+    if(f==='semContexto' && materialCourse(m)) return false;
+    if(f==='semTema' && ((m.disciplinaId||GERAL_ID)===GERAL_ID || String(m.temaId||'').trim())) return false;
+    if(f==='semChecklist' && checklistLabels(m).length) return false;
     if(q && !searchable(m).includes(q)) return false;
     return true;
   }));
@@ -2672,11 +2692,13 @@ function renderReviewTab(){
   const review=all.filter(needsMaterialReview).length;
   const substituir=all.filter(m=>m.statusMaterial==='substituir').length;
   const revisar=all.filter(m=>m.statusMaterial==='revisar').length;
+  const incomplete=all.filter(isMaterialIncomplete).length;
+  const semContexto=all.filter(m=>!materialCourse(m)).length;
   document.getElementById('reviewSummary').innerHTML=[
     [review,'a revisar'],
     [stale,'desatualizados'],
-    [revisar,'marcados revisar'],
-    [substituir,'substituir']
+    [incomplete,'cadastros incompletos'],
+    [semContexto,'sem contexto']
   ].map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
   const list=reviewList();
   const el=document.getElementById('reviewContent');
@@ -2699,6 +2721,7 @@ function reviewCardHtml(m){
   const reason=materialReviewReason(m);
   const days=daysSinceDate(m.updatedAt || m.createdAt);
   const context=[labelDisc(m.disciplinaId),m.temaId?labelTema(m.temaId):'',tipo.nome].filter(Boolean).join(' · ');
+  const issues=materialQualityIssues(m);
   return `<div class="admin-card${needsMaterialReview(m)?' pinned':''}">
     <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'📎')}</div>
     <div class="admin-body">
@@ -2708,6 +2731,7 @@ function reviewCardHtml(m){
         ${days!=null?`<span class="pedagogy-pill">${days} dia${days!==1?'s':''}</span>`:''}
       </div>
       <div class="admin-desc">${escH(context)}</div>
+      ${issues.length?`<div class="admin-meta">${issues.slice(0,5).map(i=>`<span class="pedagogy-pill">${escH(i)}</span>`).join('')}</div>`:''}
       ${pedagogyMetaHtml(m)}
     </div>
     <div class="admin-actions wrap">
