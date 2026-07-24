@@ -262,6 +262,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .pedagogy-line{font-size:11px;color:var(--text3);line-height:1.45;margin-top:6px}
 .review-pill{background:var(--amber-bg)!important;color:var(--amber)!important;border-color:rgba(154,98,0,.22)!important}
 .review-pill.danger{background:var(--red-bg)!important;color:var(--red)!important;border-color:rgba(185,50,50,.25)!important}
+.check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;margin-bottom:14px}
+.check-grid .check-line{margin-top:0;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px}
 .search-result-head{font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 14px}
 .prof-home-note{background:var(--accent-bg);border:1px solid rgba(45,91,227,.15);border-radius:var(--radius-lg);padding:12px 14px;font-size:12px;color:var(--accent);line-height:1.55;margin-bottom:18px}
 .general-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);background:var(--purple-bg);border-radius:20px;padding:2px 8px}
@@ -554,6 +556,18 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
 
     <div class="cfg-section">
+      <div class="cfg-head">Contextos de uso</div>
+      <div class="cfg-body">
+        <div style="font-size:12px;color:var(--text2)">Use contextos para indicar onde um material pode ser reaproveitado, sem prender o acervo a uma turma específica.</div>
+        <div class="cfg-list" id="contextosConfigList"></div>
+        <div class="cfg-addline">
+          <input type="text" class="form-input" id="novoContextoUso" placeholder="ex: Moldador de Plástico, cursos técnicos, laboratório" style="flex:1;min-width:260px">
+          <button class="btn btn-outline" onclick="adicionarContextoUso()">+ Adicionar contexto</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cfg-section">
       <div class="cfg-head">Tipos de material</div>
       <div class="cfg-body">
         <div style="font-size:12px;color:var(--text2)">Você pode criar, editar, reordenar e excluir tipos. Cada tipo tem nome, ícone e cor.</div>
@@ -584,6 +598,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <p style="font-size:12px;color:var(--text2)"><strong>Backup / transferência entre computadores:</strong> exporte um <code>.json</code> e importe em outro computador.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-outline" onclick="exportarDados()">↓ Exportar backup (.json)</button>
+          <button class="btn btn-outline" onclick="exportarAcervoPlanilha()">↓ Exportar acervo (.xlsx)</button>
           <button class="btn btn-outline" onclick="importFileInput.click()">↑ Importar backup (.json)</button>
         </div>
         <hr style="border:none;border-top:1px solid var(--border)">
@@ -622,7 +637,9 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-outline" onclick="syncToCloud(true)">↑ Enviar para nuvem</button>
           <button class="btn btn-outline" onclick="syncFromCloud(true)">↓ Carregar da nuvem</button>
+          <button class="btn btn-outline" onclick="loadCloudHistory()">Ver histórico da nuvem</button>
         </div>
+        <div id="cloudHistoryBox"></div>
       </div>
     </div>
 
@@ -667,7 +684,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Aplicável em</label>
-              <input type="text" class="form-input" id="mCursoTurma" placeholder="ex: Moldador de Plástico, cursos técnicos, EaD, laboratório">
+              <input type="text" class="form-input" id="mCursoTurma" list="contextosUsoList" placeholder="ex: Moldador de Plástico, cursos técnicos, EaD, laboratório">
+              <datalist id="contextosUsoList"></datalist>
             </div>
             <div class="form-group">
               <label class="form-label">Unidade curricular</label>
@@ -717,6 +735,17 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
                 <option value="substituir">Substituir depois</option>
                 <option value="producao">Em produção</option>
               </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Checklist pedagógico</label>
+            <div class="check-grid">
+              <label class="check-line"><input type="checkbox" id="mChkObjetivo"> Tem objetivo de aprendizagem</label>
+              <label class="check-line"><input type="checkbox" id="mChkAtividade"> Tem atividade prática/avaliativa</label>
+              <label class="check-line"><input type="checkbox" id="mChkAvaliacao"> Tem avaliação vinculada</label>
+              <label class="check-line"><input type="checkbox" id="mChkGabarito"> Tem gabarito/roteiro de correção</label>
+              <label class="check-line"><input type="checkbox" id="mChkPresencial"> Revisado para presencial</label>
+              <label class="check-line"><input type="checkbox" id="mChkEad"> Revisado para EaD</label>
             </div>
           </div>
         </div>
@@ -894,6 +923,7 @@ function defaults() {
     senhaProfessor: 'convidado2026',
     nomeCurso: 'Aprendizagem Industrial em Moldador de Plástico por Compressão',
     nomeGeral: 'Materiais gerais',
+    contextosUso: ['Moldador de Plástico','Cursos técnicos','EaD','Presencial','Laboratório'],
     logo: '',
     tipos: [
       {id:'tipo_aula', nome:'Aula', icone:'📖', cor:'#2d5be3', ordem:1},
@@ -1782,6 +1812,7 @@ function coerceData(raw) {
   out.nomeGeral = src.nomeGeral || base.nomeGeral;
   out.tipos = Array.isArray(src.tipos) ? src.tipos : base.tipos;
   out.disciplinas = Array.isArray(src.disciplinas) ? src.disciplinas : base.disciplinas;
+  out.contextosUso = Array.isArray(src.contextosUso) ? src.contextosUso : ['Moldador de Plástico','Cursos técnicos','EaD','Presencial','Laboratório'];
   out.temas = Array.isArray(src.temas) ? src.temas : [];
   out.materiais = Array.isArray(src.materiais) ? src.materiais : [];
   out._syncMeta = src._syncMeta && typeof src._syncMeta === 'object' ? {...src._syncMeta} : (out._syncMeta || {});
@@ -1871,6 +1902,14 @@ function coerceData(raw) {
       conhecimento:String(m.conhecimento||m.conteudoRelacionado||'').trim(),
       modalidadeMaterial:normalizeModalidadeMaterial(m.modalidadeMaterial||m.modalidadeDoMaterial||''),
       statusMaterial:normalizeStatusMaterial(m.statusMaterial||m.status||''),
+      checklist:{
+        objetivo:!!(m.checklist?.objetivo||m.temObjetivo),
+        atividade:!!(m.checklist?.atividade||m.temAtividade),
+        avaliacao:!!(m.checklist?.avaliacao||m.temAvaliacao),
+        gabarito:!!(m.checklist?.gabarito||m.temGabarito),
+        presencial:!!(m.checklist?.presencial||m.revisadoPresencial),
+        ead:!!(m.checklist?.ead||m.revisadoEad)
+      },
       ordem:Number.isFinite(Number(m.ordem)) ? Number(m.ordem) : i+1,
       fixado:!!m.fixado
     };
@@ -2009,8 +2048,19 @@ function normalizeStatusMaterial(v){
 function pedagogicalSearchText(m){
   return [
     m.cursoTurma,m.unidadeCurricular,m.aulaModulo,m.capacidadeCompetencia,m.conhecimento,
-    modalidadeMaterialLabel(m.modalidadeMaterial),statusMaterialLabel(m.statusMaterial),formatDateTime(m.createdAt),formatDateTime(m.updatedAt)
+    modalidadeMaterialLabel(m.modalidadeMaterial),statusMaterialLabel(m.statusMaterial),checklistLabels(m).join(' '),formatDateTime(m.createdAt),formatDateTime(m.updatedAt)
   ].join(' ');
+}
+function checklistLabels(m){
+  const c=m?.checklist||{};
+  return [
+    c.objetivo?'objetivo':'',
+    c.atividade?'atividade':'',
+    c.avaliacao?'avaliação':'',
+    c.gabarito?'gabarito':'',
+    c.presencial?'revisado presencial':'',
+    c.ead?'revisado EaD':''
+  ].filter(Boolean);
 }
 function pedagogyMetaHtml(m){
   const chips=[];
@@ -2028,6 +2078,8 @@ function pedagogyMetaHtml(m){
   const lines=[];
   if(m.capacidadeCompetencia) lines.push(`<div class="pedagogy-line"><strong>Capacidade:</strong> ${escH(m.capacidadeCompetencia)}</div>`);
   if(m.conhecimento) lines.push(`<div class="pedagogy-line"><strong>Conhecimento:</strong> ${escH(m.conhecimento)}</div>`);
+  const checklist=checklistLabels(m);
+  if(checklist.length) lines.push(`<div class="pedagogy-line"><strong>Checklist:</strong> ${escH(checklist.join(', '))}</div>`);
   if(!chipHtml && !reviewBadge && !lines.length) return '';
   return `<div class="pedagogy-meta">${reviewBadge}${chipHtml}</div>${lines.join('')}`;
 }
@@ -2874,6 +2926,7 @@ function openModal(id=null, preferredDiscId=null){
   editingMaterialId=id||null;
   const m=id?D.materiais.find(x=>x.id===id):null;
   document.getElementById('modalTitle').textContent=m?'Editar material':'Novo material';
+  renderContextosDatalist();
   document.getElementById('mTitulo').value=m?.titulo||'';
   document.getElementById('mDesc').value=m?.descricao||'';
   document.getElementById('mOrdem').value=m?.ordem||'';
@@ -2885,6 +2938,13 @@ function openModal(id=null, preferredDiscId=null){
   document.getElementById('mConhecimento').value=m?.conhecimento||'';
   document.getElementById('mModalidadeMaterial').value=m?.modalidadeMaterial||'';
   document.getElementById('mStatusMaterial').value=m?.statusMaterial||'';
+  const chk=m?.checklist||{};
+  document.getElementById('mChkObjetivo').checked=!!chk.objetivo;
+  document.getElementById('mChkAtividade').checked=!!chk.atividade;
+  document.getElementById('mChkAvaliacao').checked=!!chk.avaliacao;
+  document.getElementById('mChkGabarito').checked=!!chk.gabarito;
+  document.getElementById('mChkPresencial').checked=!!chk.presencial;
+  document.getElementById('mChkEad').checked=!!chk.ead;
   document.getElementById('mCreatedAtInfo').value=formatDateTime(m?.createdAt)||'Será definido ao salvar';
   document.getElementById('mUpdatedAtInfo').value=formatDateTime(m?.updatedAt)||'Será definido ao salvar';
   const linksWrap=document.getElementById('mLinksList');
@@ -2930,6 +2990,14 @@ function salvarMaterial(options={}){
   const conhecimento=document.getElementById('mConhecimento').value.trim();
   const modalidadeMaterial=document.getElementById('mModalidadeMaterial').value;
   const statusMaterial=document.getElementById('mStatusMaterial').value;
+  const checklist={
+    objetivo:document.getElementById('mChkObjetivo').checked,
+    atividade:document.getElementById('mChkAtividade').checked,
+    avaliacao:document.getElementById('mChkAvaliacao').checked,
+    gabarito:document.getElementById('mChkGabarito').checked,
+    presencial:document.getElementById('mChkPresencial').checked,
+    ead:document.getElementById('mChkEad').checked
+  };
   const fixado=document.getElementById('mFixado').checked;
   let ordem=Number(document.getElementById('mOrdem').value);
   if(!titulo){ showToast('Preencha o título.',true); return document.getElementById('mTitulo').focus(); }
@@ -2941,7 +3009,7 @@ function salvarMaterial(options={}){
   const now=isoNow();
   const createdAt=existing?.createdAt || now;
   const updatedAt=now;
-  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,ordem,fixado};
+  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,checklist,ordem,fixado};
   const wasEditing=Boolean(editingMaterialId);
   if(editingMaterialId){
     const idx=D.materiais.findIndex(x=>x.id===editingMaterialId);
@@ -3072,6 +3140,7 @@ function renderConfigTab(){
         <button class="a-btn danger" onclick="excluirDisc('${escJsStr(d.id)}')">Excluir</button>
       </div>
     </div>`).join('');
+  renderContextosConfig();
 }
 function salvarNome(){
   D.nomeCurso=document.getElementById('cfgNomeCurso').value.trim()||D.nomeCurso;
@@ -3081,6 +3150,48 @@ function salvarNomeGeral(){
   const v=document.getElementById('cfgNomeGeral').value.trim();
   if(!v){ showToast('Preencha o nome da área geral.',true); return; }
   D.nomeGeral=v; salvar(); renderConfigTab(); renderAdminHome(); showToast('Nome da área geral salvo!');
+}
+function contextosUsoOrdenados(){
+  const configured=Array.isArray(D.contextosUso)?D.contextosUso:[];
+  return [...new Set([...configured,...cursosOrdenados()].map(c=>String(c||'').trim()).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b,'pt-BR'));
+}
+function renderContextosDatalist(){
+  const list=document.getElementById('contextosUsoList');
+  if(!list) return;
+  list.innerHTML=contextosUsoOrdenados().map(c=>`<option value="${escH(c)}"></option>`).join('');
+}
+function renderContextosConfig(){
+  const wrap=document.getElementById('contextosConfigList');
+  if(!wrap) return;
+  const contextos=contextosUsoOrdenados();
+  wrap.innerHTML=contextos.length?contextos.map(c=>{
+    const used=D.materiais.filter(m=>materialCourse(m).split(',').map(x=>x.trim()).includes(c)).length;
+    return `<div class="cfg-row">
+      <div class="cfg-row-main">
+        <div>
+          <div class="cfg-row-name">${escH(c)}</div>
+          <div class="cfg-row-sub">${used} material${used!==1?'is':''} indicado${used!==1?'s':''}</div>
+        </div>
+      </div>
+      <div class="cfg-row-actions">
+        <button class="a-btn danger" onclick="removerContextoUso('${escJsStr(c)}')">Remover</button>
+      </div>
+    </div>`;
+  }).join(''):'<div class="cfg-row"><div class="cfg-row-sub">Nenhum contexto cadastrado.</div></div>';
+}
+function adicionarContextoUso(){
+  const input=document.getElementById('novoContextoUso');
+  const values=String(input?.value||'').split(',').map(v=>v.trim()).filter(Boolean);
+  if(!values.length){ showToast('Digite ao menos um contexto.',true); return; }
+  D.contextosUso=[...new Set([...(D.contextosUso||[]),...values])].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  if(input) input.value='';
+  salvar(); renderConfigTab(); showToast('Contexto adicionado.');
+}
+function removerContextoUso(nome){
+  if(!confirm(`Remover o contexto "${nome}" da lista?\n\nOs materiais que já usam esse texto não serão alterados.`)) return;
+  D.contextosUso=(D.contextosUso||[]).filter(c=>c!==nome);
+  salvar(); renderConfigTab(); showToast('Contexto removido da lista.');
 }
 function trocarSenha(){
   const nova=document.getElementById('cfgSenhaNova').value.trim();
@@ -3175,6 +3286,49 @@ function exportarDados(){
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='materiais_backup.json'; a.click();
   showToast('Backup exportado!');
 }
+function exportarAcervoPlanilha(){
+  const rows=D.materiais.map(m=>{
+    const links=materialLinks(m);
+    const chk=m.checklist||{};
+    return {
+      Disciplina:labelDisc(m.disciplinaId),
+      Tema:labelTema(m.temaId),
+      Tipo:labelTipo(m.tipoId),
+      Título:m.titulo,
+      'Aplicável em':m.cursoTurma||'',
+      'Unidade curricular':m.unidadeCurricular||'',
+      'Aula/Módulo':m.aulaModulo||'',
+      'Capacidade/competência':m.capacidadeCompetencia||'',
+      Conhecimento:m.conhecimento||'',
+      Modalidade:modalidadeMaterialLabel(m.modalidadeMaterial)||modalidadeLabel(modalidadeDisciplina(getDisc(m.disciplinaId)||{})),
+      Status:statusMaterialLabel(m.statusMaterial)||'',
+      Checklist:checklistLabels(m).join(', '),
+      'Tem objetivo':chk.objetivo?'sim':'não',
+      'Tem atividade':chk.atividade?'sim':'não',
+      'Tem avaliação':chk.avaliacao?'sim':'não',
+      'Tem gabarito':chk.gabarito?'sim':'não',
+      'Revisado presencial':chk.presencial?'sim':'não',
+      'Revisado EaD':chk.ead?'sim':'não',
+      'Criado em':formatDateTime(m.createdAt),
+      'Atualizado em':formatDateTime(m.updatedAt),
+      Links:links.map((l,i)=>`${tituloLink(l,i)}: ${l.link}`).join('\n'),
+      Descrição:m.descricao||''
+    };
+  });
+  if(window.XLSX){
+    const wb=XLSX.utils.book_new();
+    const ws=XLSX.utils.json_to_sheet(rows);
+    ws['!cols']=[22,22,16,34,28,24,18,34,30,18,16,34,12,12,12,12,18,16,18,18,60,50].map(wch=>({wch}));
+    XLSX.utils.book_append_sheet(wb,ws,'Acervo');
+    XLSX.writeFile(wb,'acervo_biblioteca_senai.xlsx');
+  } else {
+    const headers=Object.keys(rows[0]||{});
+    const csv=[headers.join(';'),...rows.map(r=>headers.map(h=>`"${String(r[h]||'').replace(/"/g,'""')}"`).join(';'))].join('\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='acervo_biblioteca_senai.csv'; a.click();
+  }
+  showToast('Acervo exportado!');
+}
 function importarDados(input){
   const file=input.files[0]; if(!file) return;
   const reader=new FileReader();
@@ -3264,22 +3418,25 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
   const headers=[
     'Disciplina','Modalidade','Tema','Tipo','Título','Aplicável em','Unidade curricular','Aula/Módulo',
     'Capacidade/competência','Conhecimento','Modalidade do material','Status','Data de criação','Último upload',
+    'Tem objetivo','Tem atividade','Tem avaliação','Tem gabarito','Revisado presencial','Revisado EaD',
     'Link','Origem','Título do link',
     'Link 2','Origem 2','Título do link 2','Descrição','Fixado'
   ];
   const exemplos=[
     [
       nomeDisc,modalidade,'Ensaio de tração','Slide','Aula 01 - Ensaio de tração',
-      'Moldador de Plástico - Turma 2026','Ensaios','Aula 01 / Módulo 1',
+      'Moldador de Plástico, laboratório','Ensaios','Aula 01 / Módulo 1',
       'Interpretar resultados de ensaios mecânicos.','Propriedades mecânicas e ensaio de tração','Presencial','Pronto','','',
+      'sim','sim','não','não','sim','não',
       'https://www.canva.com/design/exemplo','Canva','Abrir slides',
       'https://drive.google.com/exemplo','Google Drive','Material de apoio',
       'Slides principais da aula, com conceitos e roteiro de discussão.','sim'
     ],
     [
       'Transformação Digital no Setor Industrial','EaD','Cultura digital','Atividade','Atividade avaliativa - Indústria 4.0',
-      'Moldador de Plástico - Turma 2026','Transformação Digital','Semana 02',
+      'EaD, cursos técnicos','Transformação Digital','Semana 02',
       'Reconhecer tecnologias digitais aplicadas à indústria.','Indústria 4.0, dados e automação','EaD','Revisar','','',
+      'sim','sim','sim','não','não','sim',
       'https://docs.google.com/forms/d/exemplo','Google Forms','Responder formulário',
       '','','',
       'Atividade para ser realizada no AVA ou enviada como link de apoio.','não'
@@ -3290,22 +3447,23 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
     ['Use uma linha por material.'],
     ['Colunas obrigatórias: Título e Link.'],
     ['Se Disciplina, Tema ou Tipo não existirem, a Biblioteca cria automaticamente.'],
-    ['Os campos pedagógicos são opcionais e ajudam quando você tiver mais de uma turma, curso ou substituir outro professor.'],
+    ['Os campos pedagógicos são opcionais e ajudam a reaproveitar materiais em diferentes planos de curso.'],
     ['Para materiais com mais de um acesso, use Link 2, Origem 2 e Título do link 2.'],
     ['Na coluna Fixado, use sim ou não.'],
     ['Modalidade aceita Presencial ou EaD. Se ficar vazia, entra como Presencial.'],
     ['Status aceita Pronto, Revisar, Substituir depois ou Em produção.'],
-    ['Data de criação e Último upload são opcionais. Se ficarem vazias, a Biblioteca preenche automaticamente ao importar.']
+    ['Data de criação e Último upload são opcionais. Se ficarem vazias, a Biblioteca preenche automaticamente ao importar.'],
+    ['Nas colunas do checklist, use sim ou não.']
   ];
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet([headers,...exemplos]);
   ws['!cols']=[
     {wch:26},{wch:13},{wch:24},{wch:14},{wch:34},{wch:30},{wch:26},{wch:18},
-    {wch:38},{wch:34},{wch:22},{wch:18},{wch:18},{wch:18},{wch:44},{wch:18},{wch:22},
+    {wch:38},{wch:34},{wch:22},{wch:18},{wch:18},{wch:18},{wch:14},{wch:14},{wch:14},{wch:14},{wch:20},{wch:16},{wch:44},{wch:18},{wch:22},
     {wch:44},{wch:18},{wch:22},{wch:58},{wch:12}
   ];
   ws['!rows']=[{hpt:22},{hpt:34},{hpt:34}];
-  ws['!autofilter']={ref:'A1:V1'};
+  ws['!autofilter']={ref:'A1:AB1'};
   ws['!freeze']={xSplit:0,ySplit:1,topLeftCell:'A2',activePane:'bottomLeft',state:'frozen'};
   const headerStyle={
     fill:{fgColor:{rgb:'164194'}},
@@ -3397,6 +3555,14 @@ function importarPlanilhaMateriais(input){
         const createdAt=normalizeDateValue(valorLinha(row, header, ['data_de_criacao','data_criacao','criado_em','data_cadastro'])) || now;
         const updatedAt=normalizeDateValue(valorLinha(row, header, ['ultimo_upload','último_upload','data_upload','data_atualizacao','data_atualização'])) || createdAt;
         const fixado=boolPlanilha(valorLinha(row, header, ['fixado','destaque','principal']));
+        const checklist={
+          objetivo:boolPlanilha(valorLinha(row, header, ['tem_objetivo','objetivo','objetivo_de_aprendizagem'])),
+          atividade:boolPlanilha(valorLinha(row, header, ['tem_atividade','atividade','atividade_pratica','atividade_avaliativa'])),
+          avaliacao:boolPlanilha(valorLinha(row, header, ['tem_avaliacao','tem_avaliação','avaliacao','avaliação'])),
+          gabarito:boolPlanilha(valorLinha(row, header, ['tem_gabarito','gabarito','roteiro_correcao','roteiro_de_correcao'])),
+          presencial:boolPlanilha(valorLinha(row, header, ['revisado_presencial','presencial_revisado','revisado_para_presencial'])),
+          ead:boolPlanilha(valorLinha(row, header, ['revisado_ead','ead_revisado','revisado_para_ead']))
+        };
         const principal=links[0];
         let duplicateReason='';
         const linkDup=D.materiais.some(m=>materialLinks(m).some(l=>links.some(n=>String(n.link||'').trim()===String(l.link||'').trim())));
@@ -3409,7 +3575,7 @@ function importarPlanilhaMateriais(input){
         else if(titleDup) duplicateReason='Mesmo título na mesma disciplina/tema';
         novos.push({
           id:uid('mat'),titulo,link:principal.link,origem:principal.origem||'',links,
-          disciplinaId,temaId,tipoId,descricao,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,fixado,
+          disciplinaId,temaId,tipoId,descricao,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,checklist,fixado,
           _importRow:headerRowIndex+rowIdx+2,
           _duplicate:Boolean(duplicateReason),
           _duplicateReason:duplicateReason,
@@ -3466,7 +3632,7 @@ function renderImportPreview(){
               <td>${escH(labelTema(m.temaId))}</td>
               <td>${escH(labelTipo(m.tipoId))}</td>
               <td>${escH(m.titulo)}</td>
-              <td>${escH([m.cursoTurma,m.aulaModulo,statusMaterialLabel(m.statusMaterial)].filter(Boolean).join(' · ') || '-')}</td>
+              <td>${escH([m.cursoTurma,m.aulaModulo,statusMaterialLabel(m.statusMaterial),checklistLabels(m).length?`${checklistLabels(m).length} checks`:'' ].filter(Boolean).join(' · ') || '-')}</td>
               <td>${m.links.length} link${m.links.length!==1?'s':''}</td>
               <td>${m._duplicate?escH(m._duplicateReason||'Possível duplicado'):'Novo material'}</td>
             </tr>`).join('')}
@@ -3516,6 +3682,11 @@ function cloudUrlWithToken(){
   const url=getCloudUrl();
   if(!token) return url;
   return url+(url.includes('?')?'&':'?')+'token='+encodeURIComponent(token);
+}
+function cloudActionUrl(action, extra={}){
+  let url=cloudUrlWithToken();
+  const params=new URLSearchParams({action,...extra,t:String(Date.now())});
+  return url+(url.includes('?')?'&':'?')+params.toString();
 }
 function applySharedCloudConfigFromUrl(){
   const raw=window.location.hash && window.location.hash.startsWith('#') ? window.location.hash.slice(1) : '';
@@ -3813,6 +3984,52 @@ async function syncFromCloud(manual=false){
     cloudSyncBusy=false;
   }
 }
+async function loadCloudHistory(){
+  const box=document.getElementById('cloudHistoryBox');
+  if(!cloudConfigured()){
+    showToast('Configure a URL do Apps Script antes de abrir o histórico.',true);
+    return;
+  }
+  box.innerHTML='<div class="import-alert">Carregando histórico...</div>';
+  try{
+    const resp=await fetch(cloudActionUrl('history'));
+    const data=await resp.json();
+    if(data.error){ box.innerHTML='<div class="import-alert danger">Não consegui acessar o histórico. Confira a chave da nuvem.</div>'; return; }
+    const versions=Array.isArray(data.history)?data.history:[];
+    if(!versions.length){ box.innerHTML='<div class="import-alert">Ainda não há versões salvas no histórico.</div>'; return; }
+    box.innerHTML=`<div class="import-table-wrap" style="max-height:280px;margin-top:10px">
+      <table class="import-table">
+        <thead><tr><th>Versão</th><th>Data</th><th>Tamanho</th><th>Ação</th></tr></thead>
+        <tbody>
+          ${versions.map(v=>`<tr>
+            <td>${escH(v.index)}</td>
+            <td>${escH(v.date||'')}</td>
+            <td>${escH(v.size||'')}</td>
+            <td><button class="a-btn" onclick="restoreCloudHistory('${escJsStr(v.index)}')">Restaurar</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  }catch(err){
+    box.innerHTML='<div class="import-alert danger">Não consegui carregar o histórico. Publique a versão atualizada do Apps Script para usar esse recurso.</div>';
+  }
+}
+async function restoreCloudHistory(index){
+  if(!confirm('Restaurar esta versão do histórico?\n\nA Biblioteca atual será substituída e depois enviada para a nuvem como versão atual.')) return;
+  try{
+    const resp=await fetch(cloudActionUrl('version',{index}));
+    const data=await resp.json();
+    if(data.error || !data.payload){ showToast('Não consegui restaurar essa versão.',true); return; }
+    D=coerceData(data.payload);
+    salvar({sync:false});
+    renderAfterCloudLoad();
+    await syncToCloud(true);
+    showToast('Versão restaurada.');
+    loadCloudHistory();
+  }catch(err){
+    showToast('Erro ao restaurar a versão.',true);
+  }
+}
 
 async function gerarVersaoProfessor(){
   if(!window.crypto || !window.crypto.subtle){
@@ -4032,8 +4249,9 @@ function daysSinceDate(v){if(!v)return null;const d=new Date(v);if(Number.isNaN(
 function isMaterialStale(m){const days=daysSinceDate(m.updatedAt||m.createdAt);return days!=null&&days>=REVIEW_STALE_DAYS}
 function needsMaterialReview(m){return ['revisar','substituir'].includes(String(m.statusMaterial||''))||isMaterialStale(m)}
 function reviewBadge(m){if(m.statusMaterial==='substituir')return '<span class="pedagogy-pill review-pill danger">Substituir</span>';if(m.statusMaterial==='revisar')return '<span class="pedagogy-pill review-pill">Revisar</span>';if(isMaterialStale(m))return '<span class="pedagogy-pill review-pill">Mais de '+REVIEW_STALE_DAYS+' dias sem atualização</span>';if(m.statusMaterial==='pronto')return '<span class="pedagogy-pill">Pronto</span>';return ''}
-function pedagogyText(m){return [m.cursoTurma,m.unidadeCurricular,m.aulaModulo,m.capacidadeCompetencia,m.conhecimento,modalidadeMaterialLabel(m.modalidadeMaterial),statusMaterialLabel(m.statusMaterial),formatDateTime(m.createdAt),formatDateTime(m.updatedAt)].join(' ')}
-function pedagogyMeta(m){const chips=[];if(m.createdAt)chips.push('Criado: '+formatDateTime(m.createdAt));if(m.updatedAt)chips.push('Atualizado: '+formatDateTime(m.updatedAt));if(m.cursoTurma)chips.push('Aplicável em: '+m.cursoTurma);if(m.unidadeCurricular)chips.push('UC: '+m.unidadeCurricular);if(m.aulaModulo)chips.push('Aula: '+m.aulaModulo);const mod=modalidadeMaterialLabel(m.modalidadeMaterial);if(mod)chips.push(mod);const rb=reviewBadge(m);const st=statusMaterialLabel(m.statusMaterial);if(st&&!rb)chips.push('Status: '+st);const chipHtml=chips.map(c=>'<span class="pedagogy-pill">'+escH(c)+'</span>').join('');const lines=[];if(m.capacidadeCompetencia)lines.push('<div class="pedagogy-line"><strong>Capacidade:</strong> '+escH(m.capacidadeCompetencia)+'</div>');if(m.conhecimento)lines.push('<div class="pedagogy-line"><strong>Conhecimento:</strong> '+escH(m.conhecimento)+'</div>');return chipHtml||rb||lines.length?'<div class="pedagogy-meta">'+rb+chipHtml+'</div>'+lines.join(''):''}
+function checklistLabels(m){const c=m&&m.checklist||{};return [c.objetivo?'objetivo':'',c.atividade?'atividade':'',c.avaliacao?'avaliação':'',c.gabarito?'gabarito':'',c.presencial?'revisado presencial':'',c.ead?'revisado EaD':''].filter(Boolean)}
+function pedagogyText(m){return [m.cursoTurma,m.unidadeCurricular,m.aulaModulo,m.capacidadeCompetencia,m.conhecimento,modalidadeMaterialLabel(m.modalidadeMaterial),statusMaterialLabel(m.statusMaterial),checklistLabels(m).join(' '),formatDateTime(m.createdAt),formatDateTime(m.updatedAt)].join(' ')}
+function pedagogyMeta(m){const chips=[];if(m.createdAt)chips.push('Criado: '+formatDateTime(m.createdAt));if(m.updatedAt)chips.push('Atualizado: '+formatDateTime(m.updatedAt));if(m.cursoTurma)chips.push('Aplicável em: '+m.cursoTurma);if(m.unidadeCurricular)chips.push('UC: '+m.unidadeCurricular);if(m.aulaModulo)chips.push('Aula: '+m.aulaModulo);const mod=modalidadeMaterialLabel(m.modalidadeMaterial);if(mod)chips.push(mod);const rb=reviewBadge(m);const st=statusMaterialLabel(m.statusMaterial);if(st&&!rb)chips.push('Status: '+st);const chipHtml=chips.map(c=>'<span class="pedagogy-pill">'+escH(c)+'</span>').join('');const lines=[];if(m.capacidadeCompetencia)lines.push('<div class="pedagogy-line"><strong>Capacidade:</strong> '+escH(m.capacidadeCompetencia)+'</div>');if(m.conhecimento)lines.push('<div class="pedagogy-line"><strong>Conhecimento:</strong> '+escH(m.conhecimento)+'</div>');const checks=checklistLabels(m);if(checks.length)lines.push('<div class="pedagogy-line"><strong>Checklist:</strong> '+escH(checks.join(', '))+'</div>');return chipHtml||rb||lines.length?'<div class="pedagogy-meta">'+rb+chipHtml+'</div>'+lines.join(''):''}
 function searchable(m){return norm([m.titulo,m.descricao,links(m).map((l,i)=>tituloLink(l,i)+' '+origemLink(l)+' '+l.link).join(' '),disc(m.disciplinaId)?.nome,tema(m.temaId)?.nome,tipo(m.tipoId)?.nome,pedagogyText(m)].join(' '))}
 function filtered(list,{search='',tipoId='',temaId='',revisao=''}={}){const s=norm(search);return sortM(list.filter(m=>{if(tipoId&&m.tipoId!==tipoId)return false;if(temaId&&(m.temaId||'')!==temaId)return false;if(revisao==='review'&&!needsMaterialReview(m))return false;if(revisao==='stale'&&!isMaterialStale(m))return false;if(revisao==='ready'&&needsMaterialReview(m))return false;if(s&&!searchable(m).includes(s))return false;return true}))}
 function bg(id){return colorAlpha(tipo(id).cor,.12)}
