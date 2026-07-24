@@ -578,6 +578,20 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
 
     <div class="cfg-section">
+      <div class="cfg-head">Revisão do acervo</div>
+      <div class="cfg-body">
+        <div>
+          <label class="form-label">Considerar material desatualizado após quantos dias?</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <input type="number" class="form-input" id="cfgReviewStaleDays" min="30" step="30" placeholder="180" style="max-width:160px">
+            <button class="btn btn-primary" onclick="salvarPrazoRevisao()">Salvar prazo</button>
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin-top:6px">Sugestão: 180 dias para revisão semestral ou 365 dias para revisão anual.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cfg-section">
       <div class="cfg-head">Tipos de material</div>
       <div class="cfg-body">
         <div style="font-size:12px;color:var(--text2)">Você pode criar, editar, reordenar e excluir tipos. Cada tipo tem nome, ícone e cor.</div>
@@ -942,6 +956,7 @@ function defaults() {
     nomeCurso: 'Aprendizagem Industrial em Moldador de Plástico por Compressão',
     nomeGeral: 'Materiais gerais',
     contextosUso: ['Moldador de Plástico','Cursos técnicos','EaD','Presencial','Laboratório'],
+    reviewStaleDays: 180,
     logo: '',
     tipos: [
       {id:'tipo_aula', nome:'Aula', icone:'📖', cor:'#2d5be3', ordem:1},
@@ -1831,6 +1846,7 @@ function coerceData(raw) {
   out.tipos = Array.isArray(src.tipos) ? src.tipos : base.tipos;
   out.disciplinas = Array.isArray(src.disciplinas) ? src.disciplinas : base.disciplinas;
   out.contextosUso = Array.isArray(src.contextosUso) ? src.contextosUso : ['Moldador de Plástico','Cursos técnicos','EaD','Presencial','Laboratório'];
+  out.reviewStaleDays = Number.isFinite(Number(src.reviewStaleDays)) && Number(src.reviewStaleDays) > 0 ? Number(src.reviewStaleDays) : 180;
   out.temas = Array.isArray(src.temas) ? src.temas : [];
   out.materiais = Array.isArray(src.materiais) ? src.materiais : [];
   out._syncMeta = src._syncMeta && typeof src._syncMeta === 'object' ? {...src._syncMeta} : (out._syncMeta || {});
@@ -2024,19 +2040,19 @@ function formatDateTime(v){
   if(!iso) return '';
   return new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
 }
-const REVIEW_STALE_DAYS=180;
+function reviewStaleDays(){ return Number(D.reviewStaleDays)||180; }
 function daysSinceDate(v){
   const iso=normalizeDateValue(v);
   if(!iso) return null;
   const diff=Date.now()-new Date(iso).getTime();
   return diff<0 ? 0 : Math.floor(diff/86400000);
 }
-function isMaterialStale(m){ const days=daysSinceDate(m.updatedAt || m.createdAt); return days!=null && days>=REVIEW_STALE_DAYS; }
+function isMaterialStale(m){ const days=daysSinceDate(m.updatedAt || m.createdAt); return days!=null && days>=reviewStaleDays(); }
 function needsMaterialReview(m){ return ['revisar','substituir'].includes(String(m.statusMaterial||'')) || isMaterialStale(m); }
 function reviewBadgeHtml(m){
   if(m.statusMaterial==='substituir') return '<span class="pedagogy-pill review-pill danger">Substituir</span>';
   if(m.statusMaterial==='revisar') return '<span class="pedagogy-pill review-pill">Revisar</span>';
-  if(isMaterialStale(m)) return `<span class="pedagogy-pill review-pill">Mais de ${REVIEW_STALE_DAYS} dias sem atualização</span>`;
+  if(isMaterialStale(m)) return `<span class="pedagogy-pill review-pill">Mais de ${reviewStaleDays()} dias sem atualização</span>`;
   if(m.statusMaterial==='pronto') return '<span class="pedagogy-pill">Pronto</span>';
   return '';
 }
@@ -3160,6 +3176,8 @@ function renderConfigTab(){
   document.getElementById('cfgNomeCurso').value=D.nomeCurso||'';
   document.getElementById('cfgSenhaAtual').value=D.senhaProfessor||'';
   document.getElementById('cfgNomeGeral').value=D.nomeGeral||'Materiais gerais';
+  const reviewDaysInput=document.getElementById('cfgReviewStaleDays');
+  if(reviewDaysInput) reviewDaysInput.value=reviewStaleDays();
   const cloudUrlInput=document.getElementById('cfgCloudUrl');
   if(cloudUrlInput) cloudUrlInput.value=getCloudUrl();
   const cloudTokenInput=document.getElementById('cfgCloudToken');
@@ -3217,6 +3235,18 @@ function salvarNomeGeral(){
   const v=document.getElementById('cfgNomeGeral').value.trim();
   if(!v){ showToast('Preencha o nome da área geral.',true); return; }
   D.nomeGeral=v; salvar(); renderConfigTab(); renderAdminHome(); showToast('Nome da área geral salvo!');
+}
+function salvarPrazoRevisao(){
+  const days=Number(document.getElementById('cfgReviewStaleDays')?.value);
+  if(!Number.isFinite(days) || days<30){
+    showToast('Use um prazo de pelo menos 30 dias.',true);
+    return;
+  }
+  D.reviewStaleDays=Math.round(days);
+  salvar();
+  renderConfigTab();
+  if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
+  showToast('Prazo de revisão salvo!');
 }
 function contextosUsoOrdenados(){
   const configured=Array.isArray(D.contextosUso)?D.contextosUso:[];
@@ -4157,6 +4187,7 @@ async function gerarVersaoProfessor(){
 
     const publicMeta = {
       nomeCurso: D.nomeCurso || 'SENAI',
+      reviewStaleDays: reviewStaleDays(),
       logo: D.logo || ''
     };
 
@@ -4311,7 +4342,7 @@ function sourceBadges(m){return origens(m).map(o=>'<span class="mat-source-badge
 function modalidadeMaterialLabel(v){return ({presencial:'Presencial',ead:'EaD',ambos:'Presencial e EaD'})[String(v||'').toLowerCase()]||''}
 function statusMaterialLabel(v){return ({pronto:'Pronto',revisar:'Revisar',substituir:'Substituir',producao:'Em produção'})[String(v||'').toLowerCase()]||''}
 function formatDateTime(v){if(!v)return '';const d=new Date(v);return Number.isNaN(d.getTime())?'':d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}
-const REVIEW_STALE_DAYS=180;
+const REVIEW_STALE_DAYS=Number(META.reviewStaleDays)||180;
 function daysSinceDate(v){if(!v)return null;const d=new Date(v);if(Number.isNaN(d.getTime()))return null;const diff=Date.now()-d.getTime();return diff<0?0:Math.floor(diff/86400000)}
 function isMaterialStale(m){const days=daysSinceDate(m.updatedAt||m.createdAt);return days!=null&&days>=REVIEW_STALE_DAYS}
 function needsMaterialReview(m){return ['revisar','substituir'].includes(String(m.statusMaterial||''))||isMaterialStale(m)}
