@@ -678,9 +678,17 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <label class="form-label">Tipo *</label>
         <div class="tipo-grid" id="tipoGrid"></div>
       </div>
-      <details class="pedagogy-box">
-        <summary class="pedagogy-summary">Informações pedagógicas opcionais</summary>
+      <details class="pedagogy-box" id="advancedPedagogyDetails">
+        <summary class="pedagogy-summary">Organização pedagógica opcional</summary>
         <div class="pedagogy-content">
+          <div style="font-size:12px;color:var(--text3);line-height:1.45;margin-bottom:12px">
+            Para cadastrar rápido, você pode deixar esta parte em branco. Use estes campos quando quiser revisar o acervo, preparar a versão do professor ou localizar materiais por plano de curso.
+          </div>
+          <div class="quick-actions" style="margin-bottom:14px">
+            <button type="button" class="btn btn-outline" onclick="aplicarModeloPedagogico('pronto')">Marcar como pronto</button>
+            <button type="button" class="btn btn-outline" onclick="aplicarModeloPedagogico('revisar')">Marcar para revisar</button>
+            <button type="button" class="btn btn-outline" onclick="aplicarModeloPedagogico('limpar')">Limpar organização</button>
+          </div>
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Aplicável em</label>
@@ -2947,6 +2955,14 @@ function openModal(id=null, preferredDiscId=null){
   document.getElementById('mChkEad').checked=!!chk.ead;
   document.getElementById('mCreatedAtInfo').value=formatDateTime(m?.createdAt)||'Será definido ao salvar';
   document.getElementById('mUpdatedAtInfo').value=formatDateTime(m?.updatedAt)||'Será definido ao salvar';
+  const advanced=document.getElementById('advancedPedagogyDetails');
+  if(advanced){
+    const hasAdvanced=Boolean(m && (
+      m.cursoTurma || m.unidadeCurricular || m.aulaModulo || m.capacidadeCompetencia || m.conhecimento ||
+      m.modalidadeMaterial || m.statusMaterial || Object.values(chk).some(Boolean)
+    ));
+    advanced.open=hasAdvanced;
+  }
   const linksWrap=document.getElementById('mLinksList');
   linksWrap.innerHTML='';
   const links=materialLinks(m);
@@ -2966,6 +2982,28 @@ function openModal(id=null, preferredDiscId=null){
 
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('mTitulo').focus(),60);
+}
+function aplicarModeloPedagogico(modelo){
+  const ids=['mCursoTurma','mUnidadeCurricular','mAulaModulo','mCapacidade','mConhecimento'];
+  const checks=['mChkObjetivo','mChkAtividade','mChkAvaliacao','mChkGabarito','mChkPresencial','mChkEad'];
+  if(modelo==='limpar'){
+    ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    checks.forEach(id=>{ const el=document.getElementById(id); if(el) el.checked=false; });
+    document.getElementById('mModalidadeMaterial').value='';
+    document.getElementById('mStatusMaterial').value='';
+    showToast('Organização pedagógica limpa.');
+    return;
+  }
+  if(modelo==='pronto'){
+    document.getElementById('mStatusMaterial').value='pronto';
+    ['mChkObjetivo','mChkAtividade'].forEach(id=>{ const el=document.getElementById(id); if(el) el.checked=true; });
+    showToast('Material marcado como pronto.');
+    return;
+  }
+  if(modelo==='revisar'){
+    document.getElementById('mStatusMaterial').value='revisar';
+    showToast('Material marcado para revisão.');
+  }
 }
 function renderThemeSelectForMaterial(preselect=''){
   const discId=document.getElementById('mDisc').value||GERAL_ID;
