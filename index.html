@@ -811,6 +811,10 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <label class="form-label">Descrição <span style="font-weight:400;color:var(--text3)">(opcional)</span> <span class="help-tip" tabindex="0" data-tip="Escreva uma observação curta sobre como usar o material, para que serve ou o que precisa revisar.">?</span></label>
         <textarea class="form-input" id="mDesc" placeholder="ex: Slides com exercícios de fixação sobre auto-retenção..."></textarea>
       </div>
+      <div class="form-group">
+        <label class="form-label">Nota interna <span style="font-weight:400;color:var(--text3)">(somente admin)</span> <span class="help-tip" tabindex="0" data-tip="Use para lembretes seus, como ajustes a fazer, observações da turma ou restrições de uso. Não aparece para professor.">?</span></label>
+        <textarea class="form-input" id="mInternalNotes" placeholder="ex: Revisar exemplos antes de compartilhar com outra turma."></textarea>
+      </div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
@@ -1945,6 +1949,7 @@ function coerceData(raw) {
       temaId:m.temaId||'',
       tipoId,
       descricao:m.descricao||'',
+      internalNotes:String(m.internalNotes||m.notaInterna||m.observacaoInterna||'').trim(),
       createdAt:normalizeDateValue(m.createdAt||m.criadoEm||m.dataCriacao||m.dataCadastro||''),
       updatedAt:normalizeDateValue(m.updatedAt||m.uploadedAt||m.dataUpload||m.dataAtualizacao||m.ultimoUpload||''),
       cursoTurma:String(m.cursoTurma||m.curso||m.turma||'').trim(),
@@ -2190,12 +2195,12 @@ function aulaModuloSortValue(label){
   else if(s.includes('aula')) weight=30000;
   return weight + nums[0]*100 + (nums[1]||0);
 }
-function searchable(m){
+function searchable(m, includeInternal=false){
   return normalizar([
-    m.titulo,m.descricao,materialLinksSearchText(m),labelDisc(m.disciplinaId),labelTema(m.temaId),labelTipo(m.tipoId),pedagogicalSearchText(m)
+    m.titulo,m.descricao,includeInternal?m.internalNotes:'',materialLinksSearchText(m),labelDisc(m.disciplinaId),labelTema(m.temaId),labelTipo(m.tipoId),pedagogicalSearchText(m)
   ].join(' '));
 }
-function filterMats(list, {search='', tipoId='', temaId='', revisao=''}={}){
+function filterMats(list, {search='', tipoId='', temaId='', revisao='', includeInternal=false}={}){
   const s = normalizar(search);
   return sortMats(list.filter(m=>{
     if (tipoId && m.tipoId!==tipoId) return false;
@@ -2203,7 +2208,7 @@ function filterMats(list, {search='', tipoId='', temaId='', revisao=''}={}){
     if (revisao==='review' && !needsMaterialReview(m)) return false;
     if (revisao==='stale' && !isMaterialStale(m)) return false;
     if (revisao==='ready' && needsMaterialReview(m)) return false;
-    if (s && !searchable(m).includes(s)) return false;
+    if (s && !searchable(m,includeInternal).includes(s)) return false;
     return true;
   }));
 }
@@ -2658,7 +2663,7 @@ function renderAdminDisc(){
   const tipoId=document.getElementById('adminMatTipo').value;
   let temaId=document.getElementById('adminMatTema').value;
   const revisao=document.getElementById('adminMatRevisao').value;
-  const list=filterMats(base,{search,tipoId,temaId:temaId==='__semtema__'?'':temaId,revisao});
+  const list=filterMats(base,{search,tipoId,temaId:temaId==='__semtema__'?'':temaId,revisao,includeInternal:true});
   document.getElementById('adminDiscContent').innerHTML=renderAdminGrouped(list,disc.id);
 }
 function renderAdminGrouped(list,discId){
@@ -2755,7 +2760,7 @@ function reviewList(){
     if(f==='semTema' && ((m.disciplinaId||GERAL_ID)===GERAL_ID || String(m.temaId||'').trim())) return false;
     if(f==='semChecklist' && checklistLabels(m).length) return false;
     if(f.startsWith('tag:') && !materialReviewTags(m).includes(f.slice(4))) return false;
-    if(q && !searchable(m).includes(q)) return false;
+    if(q && !searchable(m,true).includes(q)) return false;
     return true;
   }));
 }
@@ -2808,6 +2813,7 @@ function reviewCardHtml(m){
         ${days!=null?`<span class="pedagogy-pill">${days} dia${days!==1?'s':''}</span>`:''}
       </div>
       <div class="admin-desc">${escH(context)}</div>
+      ${m.internalNotes?`<div class="admin-desc"><strong>Nota interna:</strong> ${escH(m.internalNotes)}</div>`:''}
       ${issues.length?`<div class="admin-meta">${issues.slice(0,5).map(i=>`<span class="pedagogy-pill">${escH(i)}</span>`).join('')}</div>`:''}
       ${tags.length?`<div class="admin-meta">${tags.map(t=>`<span class="pedagogy-pill review-pill">${escH(t)}</span>`).join('')}</div>`:''}
       ${pedagogyMetaHtml(m)}
@@ -2852,6 +2858,7 @@ function adminCardHtml(m){
       </div>
       <div class="admin-link-list">${linkPills || '<span class="mat-source-badge">Sem link</span>'}</div>
       ${m.descricao?`<div class="admin-desc">${escH(m.descricao)}</div>`:''}
+      ${m.internalNotes?`<div class="admin-desc"><strong>Nota interna:</strong> ${escH(m.internalNotes)}</div>`:''}
       ${pedagogyMetaHtml(m)}
     </div>
     <div class="admin-actions wrap">
@@ -2888,7 +2895,7 @@ function planFilteredMaterials(){
     if(course && !courseMatches(m,course)) return false;
     if(discId && m.disciplinaId!==discId) return false;
     return true;
-  }),{search,revisao:status});
+  }),{search,revisao:status,includeInternal:true});
 }
 function renderPlanTab(){
   renderPlanSelectors();
@@ -2953,6 +2960,7 @@ function planCardHtml(m){
         ${links.length?`<span class="mat-source-badge">${links.length} link${links.length!==1?'s':''}</span>`:''}
       </div>
       ${m.descricao?`<div class="admin-desc">${escH(m.descricao)}</div>`:''}
+      ${m.internalNotes?`<div class="admin-desc"><strong>Nota interna:</strong> ${escH(m.internalNotes)}</div>`:''}
       ${pedagogyMetaHtml(m)}
     </div>
     <div class="admin-actions wrap">
@@ -3059,6 +3067,7 @@ function openModal(id=null, preferredDiscId=null){
   renderContextosDatalist();
   document.getElementById('mTitulo').value=m?.titulo||'';
   document.getElementById('mDesc').value=m?.descricao||'';
+  document.getElementById('mInternalNotes').value=m?.internalNotes||'';
   document.getElementById('mOrdem').value=m?.ordem||'';
   document.getElementById('mFixado').checked=!!m?.fixado;
   document.getElementById('mHiddenProfessor').checked=!!m?.hiddenProfessor;
@@ -3146,6 +3155,7 @@ function salvarMaterial(options={}){
   const temaId=document.getElementById('mTema').value||'';
   const tipoId=document.querySelector('.tipo-opt.sel')?.dataset.tipo||'';
   const descricao=document.getElementById('mDesc').value.trim();
+  const internalNotes=document.getElementById('mInternalNotes').value.trim();
   const cursoTurma=document.getElementById('mCursoTurma').value.trim();
   const unidadeCurricular=document.getElementById('mUnidadeCurricular').value.trim();
   const aulaModulo=document.getElementById('mAulaModulo').value.trim();
@@ -3174,7 +3184,7 @@ function salvarMaterial(options={}){
   const now=isoNow();
   const createdAt=existing?.createdAt || now;
   const updatedAt=now;
-  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,reviewTags,checklist,ordem,fixado,hiddenProfessor,archived:!!existing?.archived,archivedAt:existing?.archivedAt||''};
+  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,internalNotes,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,reviewTags,checklist,ordem,fixado,hiddenProfessor,archived:!!existing?.archived,archivedAt:existing?.archivedAt||''};
   const wasEditing=Boolean(editingMaterialId);
   if(editingMaterialId){
     const idx=D.materiais.findIndex(x=>x.id===editingMaterialId);
@@ -3556,13 +3566,14 @@ function exportarAcervoPlanilha(){
       'Criado em':formatDateTime(m.createdAt),
       'Atualizado em':formatDateTime(m.updatedAt),
       Links:links.map((l,i)=>`${tituloLink(l,i)}: ${l.link}`).join('\n'),
-      Descrição:m.descricao||''
+      Descrição:m.descricao||'',
+      'Nota interna':m.internalNotes||''
     };
   });
   if(window.XLSX){
     const wb=XLSX.utils.book_new();
     const ws=XLSX.utils.json_to_sheet(rows);
-    ws['!cols']=[22,22,16,34,28,24,18,34,30,18,16,28,34,12,12,12,12,18,16,14,12,18,18,60,50].map(wch=>({wch}));
+    ws['!cols']=[22,22,16,34,28,24,18,34,30,18,16,28,34,12,12,12,12,18,16,14,12,18,18,60,50,50].map(wch=>({wch}));
     XLSX.utils.book_append_sheet(wb,ws,'Acervo');
     XLSX.writeFile(wb,'acervo_biblioteca_senai.xlsx');
   } else {
@@ -3664,7 +3675,7 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
     'Capacidade/competência','Conhecimento','Modalidade do material','Status','Etiquetas de revisão','Data de criação','Último upload',
     'Tem objetivo','Tem atividade','Tem avaliação','Tem gabarito','Revisado presencial','Revisado EaD',
     'Link','Origem','Título do link',
-    'Link 2','Origem 2','Título do link 2','Descrição','Somente admin','Fixado'
+    'Link 2','Origem 2','Título do link 2','Descrição','Nota interna','Somente admin','Fixado'
   ];
   const exemplos=[
     [
@@ -3674,7 +3685,7 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
       'sim','sim','não','não','sim','não',
       'https://www.canva.com/design/exemplo','Canva','Abrir slides',
       'https://drive.google.com/exemplo','Google Drive','Material de apoio',
-      'Slides principais da aula, com conceitos e roteiro de discussão.','não','sim'
+      'Slides principais da aula, com conceitos e roteiro de discussão.','Conferir se os exemplos servem para outra turma.','não','sim'
     ],
     [
       'Transformação Digital no Setor Industrial','EaD','Cultura digital','Atividade','Atividade avaliativa - Indústria 4.0',
@@ -3683,7 +3694,7 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
       'sim','sim','sim','não','não','sim',
       'https://docs.google.com/forms/d/exemplo','Google Forms','Responder formulário',
       '','','',
-      'Atividade para ser realizada no AVA ou enviada como link de apoio.','não','não'
+      'Atividade para ser realizada no AVA ou enviada como link de apoio.','Ajustar prazo antes de publicar.','não','não'
     ]
   ];
   const instrucoes=[
@@ -3704,10 +3715,10 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
   ws['!cols']=[
     {wch:26},{wch:13},{wch:24},{wch:14},{wch:34},{wch:30},{wch:26},{wch:18},
     {wch:38},{wch:34},{wch:22},{wch:18},{wch:26},{wch:18},{wch:18},{wch:14},{wch:14},{wch:14},{wch:14},{wch:20},{wch:16},{wch:44},{wch:18},{wch:22},
-    {wch:44},{wch:18},{wch:22},{wch:58},{wch:14},{wch:12}
+    {wch:44},{wch:18},{wch:22},{wch:58},{wch:42},{wch:14},{wch:12}
   ];
   ws['!rows']=[{hpt:22},{hpt:34},{hpt:34}];
-  ws['!autofilter']={ref:'A1:AD1'};
+  ws['!autofilter']={ref:'A1:AE1'};
   ws['!freeze']={xSplit:0,ySplit:1,topLeftCell:'A2',activePane:'bottomLeft',state:'frozen'};
   const headerStyle={
     fill:{fgColor:{rgb:'164194'}},
@@ -3788,6 +3799,7 @@ function importarPlanilhaMateriais(input){
         const tipo=valorLinha(row, header, ['tipo','tipo_de_material','categoria']);
         const tipoId=findOrCreateTipoByName(tipo);
         const descricao=valorLinha(row, header, ['descricao','descrição','observacao','observacoes','obs']);
+        const internalNotes=valorLinha(row, header, ['nota_interna','notas_internas','observacao_interna','observação_interna','admin_notes']);
         const cursoTurma=valorLinha(row, header, ['aplicavel_em','aplicável_em','contexto','contextos','curso_turma','curso','turma','curso_ou_turma']);
         const unidadeCurricular=valorLinha(row, header, ['unidade_curricular','uc','componente_curricular']);
         const aulaModulo=valorLinha(row, header, ['aula_modulo','aula','modulo','aula_ou_modulo']);
@@ -3826,7 +3838,7 @@ function importarPlanilhaMateriais(input){
         else if(titleDup) duplicateReason='Mesmo título na mesma disciplina/tema';
         novos.push({
           id:uid('mat'),titulo,link:principal.link,origem:principal.origem||'',links,
-          disciplinaId,temaId,tipoId,descricao,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,reviewTags,checklist,fixado,hiddenProfessor,archived,archivedAt:archived?now:'',
+          disciplinaId,temaId,tipoId,descricao,internalNotes,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,reviewTags,checklist,fixado,hiddenProfessor,archived,archivedAt:archived?now:'',
           _importRow:headerRowIndex+rowIdx+2,
           _duplicate:Boolean(duplicateReason),
           _duplicateReason:duplicateReason,
@@ -4322,7 +4334,13 @@ async function gerarVersaoProfessor(){
       ['encrypt']
     );
 
-    const plaintext = enc.encode(JSON.stringify(D));
+    const professorData = {
+      ...D,
+      materiais: D.materiais
+        .filter(isProfessorVisible)
+        .map(({internalNotes,hiddenProfessor,archived,archivedAt,...material})=>material)
+    };
+    const plaintext = enc.encode(JSON.stringify(professorData));
     const ciphertext = new Uint8Array(await crypto.subtle.encrypt(
       {name:'AES-GCM', iv},
       key,
