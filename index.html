@@ -868,6 +868,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         Cole um ou varios links, um por linha. A Biblioteca cria um material separado para cada link, sugere titulo, tipo e tema quando conseguir, e marca como "Revisar cadastro" para voce conferir depois.
       </div>
       <div class="form-group">
+        <label class="form-label">Titulo opcional</label>
+        <input type="text" class="form-input" id="quickTitle" placeholder="ex: Aula 01 - Introducao ao tema">
+        <div style="font-size:11px;color:var(--text3);margin-top:6px">Se colar varios links, este titulo vira a base e a Biblioteca acrescenta uma numeracao.</div>
+      </div>
+      <div class="form-group">
         <label class="form-label">Links *</label>
         <textarea class="form-input quick-textarea" id="quickLinksText" placeholder="https://...\nhttps://...\nhttps://..."></textarea>
       </div>
@@ -3217,9 +3222,10 @@ function openQuickMaterialModal(preferredDiscId=null){
   discSel.innerHTML=`<option value="${GERAL_ID}">${escH(D.nomeGeral||'Materiais gerais')}</option>`+discsOrdenadas().map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`).join('');
   discSel.value=selectedDisc;
   renderQuickThemeSelect(selectedDisc===lastMaterialDefaults.disciplinaId ? lastMaterialDefaults.temaId : '');
+  document.getElementById('quickTitle').value='';
   document.getElementById('quickLinksText').value='';
   document.getElementById('quickMaterialModalOverlay').classList.add('open');
-  setTimeout(()=>document.getElementById('quickLinksText').focus(),60);
+  setTimeout(()=>document.getElementById('quickTitle').focus(),60);
 }
 function renderQuickThemeSelect(preselect=''){
   const discId=document.getElementById('quickDisc').value||GERAL_ID;
@@ -3231,6 +3237,7 @@ function closeQuickMaterialModal(){
   document.getElementById('quickMaterialModalOverlay').classList.remove('open');
 }
 function salvarQuickMaterials(){
+  const quickTitle=document.getElementById('quickTitle').value.trim();
   const links=uniqueLinksFromText(document.getElementById('quickLinksText').value);
   const disciplinaId=document.getElementById('quickDisc').value||GERAL_ID;
   const chosenTemaId=document.getElementById('quickTema').value||'';
@@ -3247,7 +3254,9 @@ function salvarQuickMaterials(){
     const singleLinks=[{id:uid('lnk'),titulo:'',link,origem,ordem:1}];
     const tipoId=guessTypeIdFromLinks(singleLinks) || tiposOrdenados()[0]?.id || '';
     const temaId=chosenTemaId || suggestThemeIdForText(`${link} ${origem}`,disciplinaId);
-    const titulo=guessTitleForContext(link,disciplinaId,temaId);
+    const titulo=quickTitle
+      ? (links.length===1 ? quickTitle : `${quickTitle} ${String(created+1).padStart(2,'0')}`)
+      : guessTitleForContext(link,disciplinaId,temaId);
     const ordem=nextOrderFor(disciplinaId,temaId,tipoId);
     D.materiais.push({
       id:uid('mat'),
