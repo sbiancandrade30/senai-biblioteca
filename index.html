@@ -105,10 +105,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .admin-link:hover{text-decoration:underline}
 .admin-desc{font-size:12px;color:var(--text2)}
 .admin-actions{display:flex;gap:6px;flex-shrink:0}
+.admin-actions.wrap{flex-wrap:wrap;justify-content:flex-end;max-width:210px}
 .a-btn{background:none;border:1px solid var(--border);border-radius:var(--radius);padding:5px 10px;cursor:pointer;font-size:11px;font-weight:500;color:var(--text2);font-family:'DM Sans',sans-serif;transition:all .12s;white-space:nowrap}
 .a-btn:hover{background:var(--surface2);color:var(--text)}
 .a-btn.danger{color:var(--red);border-color:var(--red)}
 .a-btn.danger:hover{background:var(--red-bg)}
+.a-btn.primary-soft{background:var(--accent-bg);border-color:rgba(45,91,227,.18);color:var(--accent)}
+.card-more{position:relative}
+.card-more summary{list-style:none}
+.card-more summary::-webkit-details-marker{display:none}
+.card-more-menu{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;margin-top:6px}
+.quick-note{font-size:12px;color:var(--text2);line-height:1.5;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:14px}
+.quick-textarea{min-height:150px;font-family:'DM Mono',monospace;font-size:12px}
 
 /* ── ADMIN TOOLBAR ─────────────────────── */
 .admin-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
@@ -418,6 +426,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <div class="inner-actions">
           <button class="btn btn-outline" onclick="visualizarComoProfessor()">👁 Visualizar como professor</button>
           <button class="btn btn-outline" style="color:var(--green);border-color:rgba(42,125,79,.45);background:var(--green-bg)" onclick="gerarVersaoProfessor()">📦 Gerar versão para professor</button>
+          <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rapido</button>
           <button class="btn btn-primary" onclick="openModal()">+ Novo material</button>
         </div>
       </div>
@@ -439,6 +448,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           <button class="btn btn-outline" onclick="openThemeModal()">+ Novo tema</button>
           <button class="btn btn-outline" onclick="baixarModeloPlanilhaMateriais(currentAdminDiscId)">Baixar modelo</button>
           <button class="btn btn-outline" onclick="bulkSheetInput.click()">Importar planilha</button>
+          <button class="btn btn-outline" onclick="openQuickMaterialModal(currentAdminDiscId)">+ Cadastro rapido</button>
           <button class="btn btn-primary" onclick="openModal(null, currentAdminDiscId)">+ Novo material</button>
         </div>
       </div>
@@ -465,6 +475,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <p>Veja os materiais agrupados por aula ou módulo como sugestão de sequência reutilizável. No Planner, esses materiais poderão ser anexados a turmas e aulas específicas.</p>
       </div>
       <div class="inner-actions">
+        <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rapido</button>
         <button class="btn btn-primary" onclick="openModal()">+ Novo material</button>
       </div>
     </div>
@@ -700,6 +711,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <label class="form-label">Links de acesso * <span class="help-tip" tabindex="0" data-tip="Cole o link principal do material. Você pode adicionar Canva, Drive, YouTube, Forms ou outros links no mesmo cadastro.">?</span></label>
         <div id="mLinksList" class="link-editor"></div>
         <button type="button" class="btn btn-outline add-link-btn" onclick="addMaterialLinkRow()">+ Adicionar outro link</button>
+        <button type="button" class="btn btn-outline add-link-btn" onclick="openQuickMaterialModal(document.getElementById('mDisc').value)">Colar varios como materiais separados</button>
         <div style="font-size:11px;color:var(--text3);margin-top:7px">Um mesmo material pode reunir vários acessos, como slide no Canva, PDF no Drive e vídeo no YouTube. A plataforma é detectada automaticamente se você não preencher.</div>
       </div>
       <div class="form-row">
@@ -840,6 +852,39 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
       <button class="btn btn-outline" onclick="salvarMaterial({keepOpen:true})">Salvar e continuar</button>
       <button class="btn btn-primary" onclick="salvarMaterial()">Salvar rápido</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CADASTRO RAPIDO -->
+<div class="modal-overlay" id="quickMaterialModalOverlay">
+  <div class="modal" style="width:540px">
+    <div class="modal-head">
+      <h2>Cadastro rapido</h2>
+      <button class="close-btn" onclick="closeQuickMaterialModal()">x</button>
+    </div>
+    <div class="modal-body">
+      <div class="quick-note">
+        Cole um ou varios links, um por linha. A Biblioteca cria um material separado para cada link, sugere titulo, tipo e tema quando conseguir, e marca como "Revisar cadastro" para voce conferir depois.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Links *</label>
+        <textarea class="form-input quick-textarea" id="quickLinksText" placeholder="https://...\nhttps://...\nhttps://..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Disciplina / Area *</label>
+          <select class="form-input" id="quickDisc" onchange="renderQuickThemeSelect()"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tema opcional</label>
+          <select class="form-input" id="quickTema"></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeQuickMaterialModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarQuickMaterials()">Cadastrar links</button>
     </div>
   </div>
 </div>
@@ -997,7 +1042,7 @@ function defaults() {
     nomeGeral: 'Materiais gerais',
     contextosUso: ['Moldador de Plástico','Cursos técnicos','EaD','Presencial','Laboratório'],
     reviewStaleDays: 180,
-    reviewTags: ['Precisa adaptar','Aguardando gabarito','Link para conferir'],
+    reviewTags: ['Revisar cadastro','Precisa adaptar','Aguardando gabarito','Link para conferir'],
     logo: '',
     tipos: [
       {id:'tipo_aula', nome:'Aula', icone:'📖', cor:'#2d5be3', ordem:1},
@@ -1888,7 +1933,8 @@ function coerceData(raw) {
   out.disciplinas = Array.isArray(src.disciplinas) ? src.disciplinas : base.disciplinas;
   out.contextosUso = Array.isArray(src.contextosUso) ? src.contextosUso : ['Moldador de Plástico','Cursos técnicos','EaD','Presencial','Laboratório'];
   out.reviewStaleDays = Number.isFinite(Number(src.reviewStaleDays)) && Number(src.reviewStaleDays) > 0 ? Number(src.reviewStaleDays) : 180;
-  out.reviewTags = Array.isArray(src.reviewTags) ? src.reviewTags.map(t=>String(t||'').trim()).filter(Boolean) : ['Precisa adaptar','Aguardando gabarito','Link para conferir'];
+  out.reviewTags = Array.isArray(src.reviewTags) ? src.reviewTags.map(t=>String(t||'').trim()).filter(Boolean) : ['Revisar cadastro','Precisa adaptar','Aguardando gabarito','Link para conferir'];
+  if(!out.reviewTags.includes('Revisar cadastro')) out.reviewTags.unshift('Revisar cadastro');
   out.temas = Array.isArray(src.temas) ? src.temas : [];
   out.materiais = Array.isArray(src.materiais) ? src.materiais : [];
   out._syncMeta = src._syncMeta && typeof src._syncMeta === 'object' ? {...src._syncMeta} : (out._syncMeta || {});
@@ -2904,12 +2950,17 @@ function adminCardHtml(m){
       ${pedagogyMetaHtml(m)}
     </div>
     <div class="admin-actions wrap">
-      <button class="a-btn small-action" onclick="moverMaterial('${escJsStr(m.id)}',-1)" title="Subir">↑</button>
-      <button class="a-btn small-action" onclick="moverMaterial('${escJsStr(m.id)}',1)" title="Descer">↓</button>
-      <button class="a-btn" onclick="duplicarMaterial('${escJsStr(m.id)}')">Duplicar</button>
-      <button class="a-btn" onclick="arquivarMaterial('${escJsStr(m.id)}')">Arquivar</button>
-      <button class="a-btn" onclick="openModal('${escJsStr(m.id)}')">Editar</button>
-      <button class="a-btn danger" onclick="excluirMaterial('${escJsStr(m.id)}')">Excluir</button>
+      <button class="a-btn primary-soft" onclick="openModal('${escJsStr(m.id)}')">Editar</button>
+      <details class="card-more">
+        <summary class="a-btn">Mais</summary>
+        <div class="card-more-menu">
+          <button class="a-btn small-action" onclick="moverMaterial('${escJsStr(m.id)}',-1)" title="Subir">↑</button>
+          <button class="a-btn small-action" onclick="moverMaterial('${escJsStr(m.id)}',1)" title="Descer">↓</button>
+          <button class="a-btn" onclick="duplicarMaterial('${escJsStr(m.id)}')">Duplicar</button>
+          <button class="a-btn" onclick="arquivarMaterial('${escJsStr(m.id)}')">Arquivar</button>
+          <button class="a-btn danger" onclick="excluirMaterial('${escJsStr(m.id)}')">Excluir</button>
+        </div>
+      </details>
     </div>
   </div>`;
 }
@@ -3075,6 +3126,44 @@ function guessTitleFromLinks(links){
 function extractLinksFromText(text){
   return String(text||'').split(/\s+/).map(s=>s.trim()).filter(s=>/^https?:\/\//i.test(s));
 }
+function uniqueLinksFromText(text){
+  return [...new Set(extractLinksFromText(text).map(link=>link.replace(/[),.;]+$/,'')))];
+}
+function ensureReviewTag(tag){
+  const clean=String(tag||'').trim();
+  if(!clean) return '';
+  D.reviewTags=Array.isArray(D.reviewTags)?D.reviewTags:[];
+  if(!D.reviewTags.includes(clean)) D.reviewTags.push(clean);
+  D.reviewTags=[...new Set(D.reviewTags)].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  return clean;
+}
+function linkAlreadyExists(link){
+  const clean=String(link||'').trim();
+  if(!clean) return false;
+  return D.materiais.some(m=>materialLinks(m).some(l=>String(l.link||'').trim()===clean));
+}
+function guessTitleForContext(link, disciplinaId, temaId){
+  const origem=detectarOrigem(link||'');
+  const label=origem && origem!=='Link externo' ? origem : 'Material';
+  const temaName=temaId ? labelTema(temaId) : '';
+  const discName=disciplinaId ? labelDisc(disciplinaId) : '';
+  return [label,temaName||discName].filter(Boolean).join(' - ') || 'Material sem titulo';
+}
+function suggestThemeIdForText(text, disciplinaId){
+  const hay=normalizar(text);
+  if(!hay) return '';
+  const temas=temasDaDisc(disciplinaId||GERAL_ID);
+  let best='';
+  let bestScore=0;
+  temas.forEach(t=>{
+    const name=normalizar(t.nome);
+    if(!name) return;
+    let score=hay.includes(name) ? 6 : 0;
+    name.split(/\s+/).filter(w=>w.length>=4).forEach(w=>{ if(hay.includes(w)) score+=1; });
+    if(score>bestScore){ bestScore=score; best=t.id; }
+  });
+  return bestScore>=2 ? best : '';
+}
 function handleMaterialLinksPaste(event,input){
   const text=event.clipboardData?.getData('text') || '';
   const links=extractLinksFromText(text);
@@ -3122,6 +3211,87 @@ function renderMaterialReviewTags(selected=[]){
 function collectMaterialReviewTags(){
   return [...document.querySelectorAll('.m-review-tag:checked')].map(el=>el.value).filter(Boolean);
 }
+function openQuickMaterialModal(preferredDiscId=null){
+  const selectedDisc=preferredDiscId || currentAdminDiscId || lastMaterialDefaults.disciplinaId || GERAL_ID;
+  const discSel=document.getElementById('quickDisc');
+  discSel.innerHTML=`<option value="${GERAL_ID}">${escH(D.nomeGeral||'Materiais gerais')}</option>`+discsOrdenadas().map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`).join('');
+  discSel.value=selectedDisc;
+  renderQuickThemeSelect(selectedDisc===lastMaterialDefaults.disciplinaId ? lastMaterialDefaults.temaId : '');
+  document.getElementById('quickLinksText').value='';
+  document.getElementById('quickMaterialModalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('quickLinksText').focus(),60);
+}
+function renderQuickThemeSelect(preselect=''){
+  const discId=document.getElementById('quickDisc').value||GERAL_ID;
+  const sel=document.getElementById('quickTema');
+  sel.innerHTML='<option value="">Sugerir automaticamente</option>'+temasDaDisc(discId).map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
+  if(preselect) sel.value=preselect;
+}
+function closeQuickMaterialModal(){
+  document.getElementById('quickMaterialModalOverlay').classList.remove('open');
+}
+function salvarQuickMaterials(){
+  const links=uniqueLinksFromText(document.getElementById('quickLinksText').value);
+  const disciplinaId=document.getElementById('quickDisc').value||GERAL_ID;
+  const chosenTemaId=document.getElementById('quickTema').value||'';
+  if(!links.length){ showToast('Cole pelo menos um link para cadastrar.',true); return document.getElementById('quickLinksText').focus(); }
+  const reviewTag=ensureReviewTag('Revisar cadastro');
+  const now=isoNow();
+  let created=0;
+  let skipped=0;
+  let lastTemaId=chosenTemaId;
+  let lastTipoId=lastMaterialDefaults.tipoId||'';
+  links.forEach(link=>{
+    if(linkAlreadyExists(link)){ skipped++; return; }
+    const origem=detectarOrigem(link);
+    const singleLinks=[{id:uid('lnk'),titulo:'',link,origem,ordem:1}];
+    const tipoId=guessTypeIdFromLinks(singleLinks) || tiposOrdenados()[0]?.id || '';
+    const temaId=chosenTemaId || suggestThemeIdForText(`${link} ${origem}`,disciplinaId);
+    const titulo=guessTitleForContext(link,disciplinaId,temaId);
+    const ordem=nextOrderFor(disciplinaId,temaId,tipoId);
+    D.materiais.push({
+      id:uid('mat'),
+      titulo,
+      link,
+      origem,
+      links:singleLinks,
+      disciplinaId,
+      temaId,
+      tipoId,
+      descricao:'',
+      internalNotes:'',
+      createdAt:now,
+      updatedAt:now,
+      cursoTurma:'',
+      unidadeCurricular:'',
+      aulaModulo:'',
+      capacidadeCompetencia:'',
+      conhecimento:'',
+      modalidadeMaterial:'',
+      statusMaterial:'revisar',
+      readiness:'rascunho',
+      reviewTags:reviewTag?[reviewTag]:[],
+      checklist:{},
+      ordem,
+      fixado:false,
+      hiddenProfessor:false,
+      archived:false,
+      archivedAt:''
+    });
+    created++;
+    lastTemaId=temaId;
+    lastTipoId=tipoId;
+  });
+  if(!created && skipped){ showToast('Esses links ja estavam cadastrados.',true); return; }
+  lastMaterialDefaults={disciplinaId,temaId:lastTemaId,tipoId:lastTipoId};
+  salvar();
+  if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); } else renderAdminHome();
+  if(document.getElementById('tabPlanejamento')?.style.display !== 'none') renderPlanTab();
+  if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
+  renderReviewTagsConfig();
+  closeQuickMaterialModal();
+  showToast(`${created} material${created!==1?'is':''} cadastrado${created!==1?'s':''}.${skipped?` ${skipped} link${skipped!==1?'s':''} repetido${skipped!==1?'s':''} ignorado${skipped!==1?'s':''}.`:''}`);
+}
 function openModal(id=null, preferredDiscId=null){
   editingMaterialId=id||null;
   const m=id?D.materiais.find(x=>x.id===id):null;
@@ -3159,7 +3329,7 @@ function openModal(id=null, preferredDiscId=null){
   if(advanced){
     const hasAdvanced=Boolean(m && (
       m.cursoTurma || m.unidadeCurricular || m.aulaModulo || m.capacidadeCompetencia || m.conhecimento ||
-      m.modalidadeMaterial || m.statusMaterial || Object.values(chk).some(Boolean) || materialReviewTags(m).length
+      m.modalidadeMaterial || m.statusMaterial || m.readiness || Object.values(chk).some(Boolean) || materialReviewTags(m).length
     ));
     advanced.open=hasAdvanced;
   }
@@ -3220,7 +3390,7 @@ function salvarMaterial(options={}){
   let titulo=document.getElementById('mTitulo').value.trim();
   const links=collectModalLinks();
   const disciplinaId=document.getElementById('mDisc').value||GERAL_ID;
-  const temaId=document.getElementById('mTema').value||'';
+  let temaId=document.getElementById('mTema').value||'';
   let tipoId=document.querySelector('.tipo-opt.sel')?.dataset.tipo||'';
   const descricao=document.getElementById('mDesc').value.trim();
   const internalNotes=document.getElementById('mInternalNotes').value.trim();
@@ -3232,7 +3402,7 @@ function salvarMaterial(options={}){
   const modalidadeMaterial=document.getElementById('mModalidadeMaterial').value;
   const statusMaterial=document.getElementById('mStatusMaterial').value;
   const readiness=document.getElementById('mReadiness').value;
-  const reviewTags=collectMaterialReviewTags();
+  let reviewTags=collectMaterialReviewTags();
   const checklist={
     objetivo:document.getElementById('mChkObjetivo').checked,
     atividade:document.getElementById('mChkAtividade').checked,
@@ -3249,6 +3419,11 @@ function salvarMaterial(options={}){
   const autoType=!tipoId;
   if(autoTitle) titulo=guessTitleFromLinks(links);
   if(autoType) tipoId=guessTypeIdFromLinks(links);
+  if(!temaId) temaId=suggestThemeIdForText(`${titulo} ${links.map(l=>`${l.link} ${l.origem} ${l.titulo}`).join(' ')}`,disciplinaId);
+  if(autoTitle || autoType){
+    const tag=ensureReviewTag('Revisar cadastro');
+    if(tag && !reviewTags.includes(tag)) reviewTags.push(tag);
+  }
   if(!tipoId){ showToast('Não consegui identificar um tipo. Selecione um tipo para salvar.',true); return; }
   if(!Number.isFinite(ordem)||ordem<=0) ordem=nextOrderFor(disciplinaId,temaId,tipoId);
   const principal=links[0]||{link:'',origem:''};
