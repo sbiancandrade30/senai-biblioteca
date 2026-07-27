@@ -272,7 +272,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .search-result-head{font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 14px}
 .prof-home-note{background:var(--accent-bg);border:1px solid rgba(45,91,227,.15);border-radius:var(--radius-lg);padding:12px 14px;font-size:12px;color:var(--accent);line-height:1.55;margin-bottom:18px}
 .general-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);background:var(--purple-bg);border-radius:20px;padding:2px 8px}
-.modal-wide{width:620px}
+.modal-wide{width:560px}
 .hidden{display:none!important}
 /* ── BIBLIOTECA V8: TEMAS RECOLHÍVEIS E MÚLTIPLOS LINKS ─ */
 .collapse-controls{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
@@ -716,6 +716,31 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <label class="form-label">Tipo * <span class="help-tip" tabindex="0" data-tip="Marque o formato do material: slide, atividade, prova, vídeo, gabarito ou outro.">?</span></label>
         <div class="tipo-grid" id="tipoGrid"></div>
       </div>
+      <details class="pedagogy-box" id="quickDetailsBox">
+        <summary class="pedagogy-summary">Detalhes opcionais</summary>
+        <div class="pedagogy-content">
+          <div class="form-group">
+            <label class="form-label">Descrição <span style="font-weight:400;color:var(--text3)">(opcional)</span> <span class="help-tip" tabindex="0" data-tip="Escreva uma observação curta sobre como usar o material, para que serve ou o que precisa revisar.">?</span></label>
+            <textarea class="form-input" id="mDesc" placeholder="ex: Slides com exercícios de fixação sobre auto-retenção..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nota interna <span style="font-weight:400;color:var(--text3)">(somente admin)</span> <span class="help-tip" tabindex="0" data-tip="Use para lembretes seus, como ajustes a fazer, observações da turma ou restrições de uso. Não aparece para professor.">?</span></label>
+            <textarea class="form-input" id="mInternalNotes" placeholder="ex: Revisar exemplos antes de compartilhar com outra turma."></textarea>
+          </div>
+          <div class="form-row three">
+            <div class="form-group">
+              <label class="form-label">Ordem <span class="help-tip" tabindex="0" data-tip="Número usado para ordenar os materiais dentro do tema. Pode deixar vazio para a Biblioteca preencher automaticamente.">?</span></label>
+              <input type="number" class="form-input" id="mOrdem" min="1" placeholder="ex: 1">
+            </div>
+            <div class="form-group" style="display:flex;align-items:flex-end">
+              <label class="check-line"><input type="checkbox" id="mFixado"> Fixar no topo <span class="help-tip" tabindex="0" data-tip="Use para materiais que você consulta sempre, como plano base, slide principal ou atividade essencial.">?</span></label>
+            </div>
+            <div class="form-group" style="display:flex;align-items:flex-end">
+              <label class="check-line"><input type="checkbox" id="mHiddenProfessor"> Somente admin <span class="help-tip" tabindex="0" data-tip="Mantém o material no seu acervo, mas oculta no acesso e na versão gerada para professor.">?</span></label>
+            </div>
+          </div>
+        </div>
+      </details>
       <details class="pedagogy-box" id="advancedPedagogyDetails">
         <summary class="pedagogy-summary">Organização pedagógica opcional</summary>
         <div class="pedagogy-content">
@@ -810,31 +835,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           </div>
         </div>
       </details>
-      <div class="form-row three">
-        <div class="form-group">
-          <label class="form-label">Ordem <span class="help-tip" tabindex="0" data-tip="Número usado para ordenar os materiais dentro do tema. Pode deixar vazio para a Biblioteca preencher automaticamente.">?</span></label>
-          <input type="number" class="form-input" id="mOrdem" min="1" placeholder="ex: 1">
-        </div>
-        <div class="form-group" style="display:flex;align-items:flex-end">
-          <label class="check-line"><input type="checkbox" id="mFixado"> Fixar no topo <span class="help-tip" tabindex="0" data-tip="Use para materiais que você consulta sempre, como plano base, slide principal ou atividade essencial.">?</span></label>
-        </div>
-        <div class="form-group" style="display:flex;align-items:flex-end">
-          <label class="check-line"><input type="checkbox" id="mHiddenProfessor"> Somente admin <span class="help-tip" tabindex="0" data-tip="Mantém o material no seu acervo, mas oculta no acesso e na versão gerada para professor.">?</span></label>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Descrição <span style="font-weight:400;color:var(--text3)">(opcional)</span> <span class="help-tip" tabindex="0" data-tip="Escreva uma observação curta sobre como usar o material, para que serve ou o que precisa revisar.">?</span></label>
-        <textarea class="form-input" id="mDesc" placeholder="ex: Slides com exercícios de fixação sobre auto-retenção..."></textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Nota interna <span style="font-weight:400;color:var(--text3)">(somente admin)</span> <span class="help-tip" tabindex="0" data-tip="Use para lembretes seus, como ajustes a fazer, observações da turma ou restrições de uso. Não aparece para professor.">?</span></label>
-        <textarea class="form-input" id="mInternalNotes" placeholder="ex: Revisar exemplos antes de compartilhar com outra turma."></textarea>
-      </div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-outline" onclick="salvarMaterial({keepOpen:true})">Salvar e adicionar outro</button>
-      <button class="btn btn-primary" onclick="salvarMaterial()">Salvar material</button>
+      <button class="btn btn-outline" onclick="salvarMaterial({keepOpen:true})">Salvar e continuar</button>
+      <button class="btn btn-primary" onclick="salvarMaterial()">Salvar rápido</button>
     </div>
   </div>
 </div>
@@ -3126,6 +3131,10 @@ function openModal(id=null, preferredDiscId=null){
   renderMaterialReviewTags(materialReviewTags(m));
   document.getElementById('mCreatedAtInfo').value=formatDateTime(m?.createdAt)||'Será definido ao salvar';
   document.getElementById('mUpdatedAtInfo').value=formatDateTime(m?.updatedAt)||'Será definido ao salvar';
+  const quick=document.getElementById('quickDetailsBox');
+  if(quick){
+    quick.open=Boolean(m && (m.descricao || m.internalNotes || m.ordem || m.fixado || m.hiddenProfessor));
+  }
   const advanced=document.getElementById('advancedPedagogyDetails');
   if(advanced){
     const hasAdvanced=Boolean(m && (
