@@ -420,8 +420,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div id="adminHome">
       <div class="library-top">
         <div>
-          <h2>Banco de materiais</h2>
-          <p>Pesquise, filtre e edite os materiais do acervo. As disciplinas e areas continuam como categorias de organizacao, sem prender os materiais a uma turma especifica.</p>
+          <h2>Visao geral do acervo</h2>
+          <p>Acompanhe o tamanho da biblioteca e entre em uma disciplina/area para ver materiais, temas e detalhes. A Biblioteca continua independente de turmas especificas.</p>
         </div>
         <div class="inner-actions">
           <button class="btn btn-outline" onclick="visualizarComoProfessor()">👁 Visualizar como professor</button>
@@ -431,12 +431,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         </div>
       </div>
       <div class="summary-row" id="adminSummary"></div>
-      <div class="inner-filters">
-        <input class="search-input" type="text" id="adminDiscSearch" placeholder="Buscar material, disciplina, tema, tipo ou link..." oninput="renderAdminHome()">
-        <select class="filter-sel" id="adminHomeDisc" onchange="renderAdminHome()"><option value="">Todas as disciplinas/areas</option></select>
-        <select class="filter-sel" id="adminHomeTipo" onchange="renderAdminHome()"><option value="">Todos os tipos</option></select>
-        <select class="filter-sel" id="adminHomeStatus" onchange="renderAdminHome()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="stale">Desatualizados</option><option value="ready">Prontos</option></select>
-        <select class="filter-sel" id="adminHomeVisibilidade" onchange="renderAdminHome()"><option value="">Toda visibilidade</option><option value="professor">Visivel para professor</option><option value="admin">Somente admin</option></select>
+      <div class="disc-search">
+        <input class="search-input" type="text" id="adminDiscSearch" placeholder="Buscar disciplina/area..." oninput="renderAdminHome()">
       </div>
       <div id="adminHomeContent"></div>
     </div>
@@ -2742,47 +2738,20 @@ function renderAdminHome(){
   ];
   if(totalA) summaryItems.push([totalA,'arquivados']);
   document.getElementById('adminSummary').innerHTML = summaryItems.map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
-  renderAdminHomeFilterOptions(scopedMaterials);
-
-  const search=document.getElementById('adminDiscSearch')?.value||'';
-  const discId=document.getElementById('adminHomeDisc')?.value||'';
-  const tipoId=document.getElementById('adminHomeTipo')?.value||'';
-  const revisao=document.getElementById('adminHomeStatus')?.value||'';
-  const visibilidade=document.getElementById('adminHomeVisibilidade')?.value||'';
-  let mats=scopedMaterials.filter(m=>{
-    if(discId && (m.disciplinaId||GERAL_ID)!==discId) return false;
-    if(visibilidade==='professor' && m.hiddenProfessor) return false;
-    if(visibilidade==='admin' && !m.hiddenProfessor) return false;
-    return true;
-  });
-  mats=filterMats(mats,{search,tipoId,revisao,includeInternal:true});
-
-  const q=normalizar(search);
-  const hasFilters=Boolean(q||discId||tipoId||revisao||visibilidade);
-  const relatedDiscs=[getDisc(GERAL_ID),...discsOrdenadas()].filter(d=>{
-    if(discId && d.id!==discId) return false;
-    if(q && !normalizar(`${d.nome} ${modalidadeLabel(modalidadeDisciplina(d))}`).includes(q) && !mats.some(m=>(m.disciplinaId||GERAL_ID)===d.id)) return false;
-    return mats.some(m=>(m.disciplinaId||GERAL_ID)===d.id) || (!hasFilters && d.id===GERAL_ID) || (!hasFilters && D.disciplinas.some(x=>x.id===d.id));
-  });
-  const discCards=relatedDiscs.map(d=>discCardHtml(d,false)).join('');
-  const materialSection=mats.length
-    ? `<section class="theme-section"><div class="theme-head"><div><div class="theme-name">Materiais do acervo</div><div class="theme-meta">${mats.length} material${mats.length!==1?'is':''}${hasFilters?' filtrado'+(mats.length!==1?'s':''):''}</div></div></div><div class="theme-body">${mats.map(m=>adminCardHtml(m)).join('')}</div></section>`
-    : '<div class="empty"><h3>Nenhum material encontrado.</h3><p>Ajuste a busca ou os filtros do acervo.</p></div>';
-  const categoriesSection=discCards
-    ? `<section class="theme-section"><div class="theme-head"><div><div class="theme-name">Categorias por disciplina/area</div><div class="theme-meta">Use para entrar em uma area e organizar temas.</div></div></div><div class="theme-body"><div class="disc-grid">${discCards}</div></div></section>`
-    : '';
-  document.getElementById('adminHomeContent').innerHTML=materialSection+categoriesSection;
-}
-function renderAdminHomeFilterOptions(base){
-  const discSel=document.getElementById('adminHomeDisc');
-  const tipoSel=document.getElementById('adminHomeTipo');
-  if(!discSel || !tipoSel) return;
-  const oldDisc=discSel.value;
-  const oldTipo=tipoSel.value;
-  discSel.innerHTML='<option value="">Todas as disciplinas/areas</option>'+[getDisc(GERAL_ID),...discsOrdenadas()].map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`).join('');
-  tipoSel.innerHTML='<option value="">Todos os tipos</option>'+tiposOrdenados().filter(t=>base.some(m=>m.tipoId===t.id)).map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
-  if(oldDisc) discSel.value=oldDisc;
-  if(oldTipo) tipoSel.value=oldTipo;
+  const q=normalizar(document.getElementById('adminDiscSearch')?.value||'');
+  const geralDisc=getDisc(GERAL_ID);
+  const geral=!q||normalizar(geralDisc.nome).includes(q) ? discCardHtml(geralDisc,false) : '';
+  const passa=d=>!q||normalizar(d.nome+' '+modalidadeLabel(modalidadeDisciplina(d))).includes(q);
+  const presList=discsPorModalidade('presencial').filter(passa);
+  const eadList=discsPorModalidade('ead').filter(passa);
+  const pres=presList.map(d=>discCardHtml(d,false)).join('');
+  const ead=eadList.map(d=>discCardHtml(d,false)).join('');
+  const blocks=[
+    geral?renderDiscGroupHtml('Materiais gerais', geral, 1, false):'',
+    renderDiscGroupHtml('Disciplinas/areas presenciais', pres, presList.length, true),
+    renderDiscGroupHtml('Disciplinas/areas EaD', ead, eadList.length, true)
+  ].filter(Boolean).join('');
+  document.getElementById('adminHomeContent').innerHTML = blocks || `<div class="empty"><h3>Nenhuma disciplina/area encontrada.</h3></div>`;
 }
 function abrirAdminDisc(discId){
   currentAdminDiscId=discId;
