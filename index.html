@@ -721,7 +721,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         </div>
         <div class="form-group">
           <label class="form-label">Tema <span style="font-weight:400;color:var(--text3)">(opcional)</span> <span class="help-tip" tabindex="0" data-tip="Use para separar assuntos dentro da disciplina, como segurança, ensaios, extrusão ou cultura digital.">?</span></label>
-          <select class="form-input" id="mTema"></select>
+          <select class="form-input" id="mTema" onchange="toggleNewThemeInput('mTema','mNewTema')"></select>
+          <input type="text" class="form-input" id="mNewTema" placeholder="Nome do novo tema" style="display:none;margin-top:8px">
         </div>
       </div>
       <div class="form-group">
@@ -883,7 +884,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         </div>
         <div class="form-group">
           <label class="form-label">Tema opcional</label>
-          <select class="form-input" id="quickTema"></select>
+          <select class="form-input" id="quickTema" onchange="toggleNewThemeInput('quickTema','quickNewTema')"></select>
+          <input type="text" class="form-input" id="quickNewTema" placeholder="Nome do novo tema" style="display:none;margin-top:8px">
         </div>
       </div>
     </div>
@@ -3231,18 +3233,43 @@ function openQuickMaterialModal(preferredDiscId=null){
 function renderQuickThemeSelect(preselect=''){
   const discId=document.getElementById('quickDisc').value||GERAL_ID;
   const sel=document.getElementById('quickTema');
-  sel.innerHTML='<option value="">Sugerir automaticamente</option>'+temasDaDisc(discId).map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
+  sel.innerHTML='<option value="">Sugerir automaticamente</option>'+temasDaDisc(discId).map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('')+'<option value="__new__">+ Criar novo tema</option>';
   if(preselect) sel.value=preselect;
+  const input=document.getElementById('quickNewTema');
+  if(input) input.value='';
+  toggleNewThemeInput('quickTema','quickNewTema');
 }
 function closeQuickMaterialModal(){
   document.getElementById('quickMaterialModalOverlay').classList.remove('open');
+}
+function toggleNewThemeInput(selectId,inputId){
+  const sel=document.getElementById(selectId);
+  const input=document.getElementById(inputId);
+  if(!sel || !input) return;
+  const show=sel.value==='__new__';
+  input.style.display=show?'block':'none';
+  if(show) setTimeout(()=>input.focus(),30);
+}
+function resolveThemeSelection(selectId,inputId,disciplinaId,emptyValue=''){
+  const selected=document.getElementById(selectId)?.value||'';
+  if(selected!=='__new__') return selected;
+  const input=document.getElementById(inputId);
+  const nome=(input?.value||'').trim();
+  if(!nome){
+    showToast('Digite o nome do novo tema.',true);
+    input?.focus();
+    return null;
+  }
+  return findOrCreateTemaByName(nome,disciplinaId||GERAL_ID) || emptyValue;
 }
 function salvarQuickMaterials(options={}){
   const quickTitle=document.getElementById('quickTitle').value.trim();
   const links=uniqueLinksFromText(document.getElementById('quickLinksText').value);
   const disciplinaId=document.getElementById('quickDisc').value||GERAL_ID;
-  const chosenTemaId=document.getElementById('quickTema').value||'';
   if(!links.length){ showToast('Cole pelo menos um link para cadastrar.',true); return document.getElementById('quickLinksText').focus(); }
+  if(!links.some(link=>!linkAlreadyExists(link))){ showToast('Esses links ja estavam cadastrados.',true); return; }
+  const chosenTemaId=resolveThemeSelection('quickTema','quickNewTema',disciplinaId,'');
+  if(chosenTemaId===null) return;
   const reviewTag=ensureReviewTag('Revisar cadastro');
   const now=isoNow();
   let created=0;
@@ -3401,8 +3428,11 @@ function renderThemeSelectForMaterial(preselect=''){
   const discId=document.getElementById('mDisc').value||GERAL_ID;
   const temas=temasDaDisc(discId);
   const sel=document.getElementById('mTema');
-  sel.innerHTML='<option value="">Sem tema</option>'+temas.map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
+  sel.innerHTML='<option value="">Sem tema</option>'+temas.map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('')+'<option value="__new__">+ Criar novo tema</option>';
   if(preselect) sel.value=preselect;
+  const input=document.getElementById('mNewTema');
+  if(input) input.value='';
+  toggleNewThemeInput('mTema','mNewTema');
 }
 function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); editingMaterialId=null; }
 function selecionarTipo(el){ document.querySelectorAll('.tipo-opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); }
@@ -3410,7 +3440,7 @@ function salvarMaterial(options={}){
   let titulo=document.getElementById('mTitulo').value.trim();
   const links=collectModalLinks();
   const disciplinaId=document.getElementById('mDisc').value||GERAL_ID;
-  let temaId=document.getElementById('mTema').value||'';
+  let temaId='';
   let tipoId=document.querySelector('.tipo-opt.sel')?.dataset.tipo||'';
   const descricao=document.getElementById('mDesc').value.trim();
   const internalNotes=document.getElementById('mInternalNotes').value.trim();
@@ -3435,6 +3465,8 @@ function salvarMaterial(options={}){
   const hiddenProfessor=document.getElementById('mHiddenProfessor').checked;
   let ordem=Number(document.getElementById('mOrdem').value);
   if(!links.length){ showToast('Adicione pelo menos um link de acesso.',true); return document.querySelector('.link-url-input')?.focus(); }
+  temaId=resolveThemeSelection('mTema','mNewTema',disciplinaId,'');
+  if(temaId===null) return;
   const autoTitle=!titulo;
   const autoType=!tipoId;
   if(autoTitle) titulo=guessTitleFromLinks(links);
