@@ -65,11 +65,13 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 .h-btn:hover{background:var(--surface2);color:var(--text)}
 
 /* ── BODY ──────────────────────────────── */
-.app-body{max-width:1180px;margin:0 auto;padding:28px 24px 80px}
+.app-body{width:100%;max-width:none;margin:0;padding:28px 32px 80px}
+#viewAdmin.app-body{padding-left:232px}
+#viewProfessor.app-body{max-width:none}
 
 /* ── BUSCA / FILTROS ────────────────────── */
 .search-bar{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
-.search-input{flex:1;min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:10px 15px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:all .15s;box-shadow:0 1px 0 rgba(21,24,33,.02)}
+.search-input{flex:1;min-width:180px;background-color:var(--surface);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%239aa3b2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:15px center;border:1px solid var(--border);border-radius:999px;padding:11px 15px 11px 42px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:all .15s;box-shadow:0 1px 0 rgba(21,24,33,.02)}
 .search-input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(37,87,214,.1)}
 .filter-sel{background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:10px 13px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;cursor:pointer}
 .filter-sel:focus{border-color:var(--accent)}
@@ -143,8 +145,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .btn-outline:hover{background:var(--surface2);color:var(--text)}
 
 /* ── TABS ──────────────────────────────── */
-.tabs{display:inline-flex;gap:4px;border:1px solid var(--border);background:rgba(255,255,255,.75);border-radius:999px;padding:4px;margin-bottom:28px;box-shadow:0 1px 0 rgba(21,24,33,.03)}
-.tab-btn{background:none;border:none;border-radius:999px;padding:8px 16px;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s;margin-bottom:0}
+.tabs{position:fixed;left:24px;top:86px;width:176px;display:flex;flex-direction:column;gap:6px;border:1px solid var(--border);background:rgba(255,255,255,.86);backdrop-filter:blur(14px);border-radius:18px;padding:8px;margin-bottom:0;box-shadow:var(--shadow-soft);z-index:80}
+.tab-btn{background:none;border:none;border-radius:12px;padding:10px 13px;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s;margin-bottom:0;text-align:left}
 .tab-btn:hover{color:var(--text)}
 .tab-btn.active{color:var(--accent);background:var(--surface);box-shadow:0 3px 12px rgba(21,24,33,.08)}
 
@@ -203,7 +205,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .summary-card{background:linear-gradient(180deg,#fff,#fbfcff);border:1px solid var(--border);border-radius:18px;padding:16px 17px;box-shadow:0 1px 0 rgba(21,24,33,.02)}
 .summary-num{font-size:26px;font-weight:800;line-height:1;margin-bottom:7px;letter-spacing:-.03em}
 .summary-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;font-weight:800}
-.disc-search{margin-bottom:16px}
+.disc-search{margin-bottom:18px;max-width:520px}
+.disc-search .search-input{width:100%;min-width:100%;font-size:14px;padding-top:13px;padding-bottom:13px}
 .disc-group-block{margin-bottom:28px}
 .disc-group-block:last-child{margin-bottom:0}
 .disc-group-head{display:flex;align-items:center;gap:10px;margin:0 0 12px}
@@ -215,11 +218,10 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .disc-config-type.ead{background:var(--purple-bg);color:var(--purple)}
 .disc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
 .disc-card{background:linear-gradient(180deg,#fff,#fbfcff);border:1px solid var(--border);border-radius:18px;padding:17px;cursor:pointer;transition:all .15s;text-align:left;color:inherit;font-family:'DM Sans',sans-serif;min-height:138px;box-shadow:0 1px 0 rgba(21,24,33,.02);position:relative;overflow:hidden}
-.disc-card::before{content:'';position:absolute;left:16px;top:14px;width:36px;height:28px;border-radius:6px 9px 6px 6px;background:linear-gradient(135deg,var(--accent-bg),#dfe8ff);opacity:.95}
-.disc-card::after{content:'';position:absolute;left:16px;top:11px;width:18px;height:8px;border-radius:6px 6px 0 0;background:#d9e4ff}
+.disc-card::before,.disc-card::after{display:none}
 .disc-card:hover{border-color:var(--accent);box-shadow:var(--shadow-soft);transform:translateY(-2px)}
 .disc-card.general{border-style:dashed}
-.disc-card-title{font-size:14px;font-weight:800;line-height:1.4;margin:40px 0 5px}
+.disc-card-title{font-size:14px;font-weight:800;line-height:1.4;margin:0 0 5px}
 .disc-card-sub{font-size:12px;color:var(--text2);line-height:1.45;margin-bottom:12px;min-height:34px}
 .disc-card-metrics{display:flex;flex-wrap:wrap;gap:5px}
 .mini-pill{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);border-radius:20px;padding:3px 8px;font-size:10px;font-weight:600}
@@ -351,8 +353,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 }
 
 @media(max-width:760px){
-  .app-body{padding:20px 14px 70px}
-  .tabs{display:flex;width:100%;overflow-x:auto;border-radius:16px}
+  .app-body,#viewAdmin.app-body{padding:20px 14px 70px}
+  .tabs{position:static;left:auto;top:auto;width:100%;display:flex;flex-direction:row;overflow-x:auto;border-radius:16px;margin-bottom:22px}
   .tab-btn{white-space:nowrap;flex:1}
   .summary-row{grid-template-columns:repeat(2,minmax(0,1fr))}
   .recent-grid,.shelf-grid{grid-template-columns:1fr}
@@ -479,8 +481,6 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           <p>Acompanhe o tamanho da biblioteca e entre em uma disciplina/area para ver materiais, temas e detalhes. A Biblioteca continua independente de turmas especificas.</p>
         </div>
         <div class="inner-actions">
-          <button class="btn btn-outline" onclick="visualizarComoProfessor()">👁 Visualizar como professor</button>
-          <button class="btn btn-outline" style="color:var(--green);border-color:rgba(42,125,79,.45);background:var(--green-bg)" onclick="gerarVersaoProfessor()">📦 Gerar versão para professor</button>
           <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rapido</button>
           <button class="btn btn-primary" onclick="openModal()">+ Novo material</button>
         </div>
@@ -2832,7 +2832,7 @@ function recentCardHtml(m){
     <div class="recent-body">
       <div class="recent-title">${escH(m.titulo)}</div>
       <div class="recent-meta">${escH(labelDisc(m.disciplinaId))}${m.temaId?' · '+escH(labelTema(m.temaId)):''}</div>
-      <div class="recent-date">${date?`Atualizado: ${escH(date)}`:'Sem data registrada'}</div>
+      ${date?`<div class="recent-date">Atualizado: ${escH(date)}</div>`:''}
     </div>
   </button>`;
 }
