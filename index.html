@@ -432,7 +432,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       </div>
       <div class="summary-row" id="adminSummary"></div>
       <div class="disc-search">
-        <input class="search-input" type="text" id="adminDiscSearch" placeholder="Buscar disciplina..." oninput="renderAdminHome()">
+        <input class="search-input" type="text" id="adminDiscSearch" placeholder="Buscar material, disciplina, tema, tipo ou link..." oninput="renderAdminHome()">
       </div>
       <div id="adminHomeContent"></div>
     </div>
@@ -2738,6 +2738,20 @@ function renderAdminHome(){
   if(totalA) summaryItems.push([totalA,'arquivados']);
   document.getElementById('adminSummary').innerHTML = summaryItems.map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
   const q=normalizar(document.getElementById('adminDiscSearch')?.value||'');
+  if(q){
+    const mats=filterMats(activeMaterials(),{search:q,includeInternal:true});
+    const discs=[getDisc(GERAL_ID),...discsOrdenadas()].filter(d=>
+      normalizar(`${d.nome} ${modalidadeLabel(modalidadeDisciplina(d))}`).includes(q) ||
+      mats.some(m=>(m.disciplinaId||GERAL_ID)===d.id)
+    );
+    const discCards=discs.map(d=>discCardHtml(d,false)).join('');
+    document.getElementById('adminHomeContent').innerHTML = `
+      <div class="search-result-head">${mats.length} material${mats.length!==1?'is':''} encontrado${mats.length!==1?'s':''}</div>
+      ${mats.length?`<div class="theme-section"><div class="theme-body">${mats.map(m=>adminCardHtml(m)).join('')}</div></div>`:'<div class="empty"><h3>Nenhum material encontrado.</h3><p>Tente outra palavra ou busque por disciplina.</p></div>'}
+      ${discCards?`<div class="search-result-head" style="margin-top:22px">${discs.length} disciplina${discs.length!==1?'s':''} relacionada${discs.length!==1?'s':''}</div><div class="disc-grid">${discCards}</div>`:''}
+    `;
+    return;
+  }
   const geralDisc=getDisc(GERAL_ID);
   const geral=!q||normalizar(geralDisc.nome).includes(q) ? discCardHtml(geralDisc,false) : '';
   const passa=d=>!q||normalizar(d.nome+' '+modalidadeLabel(modalidadeDisciplina(d))).includes(q);
