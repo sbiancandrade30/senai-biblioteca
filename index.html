@@ -328,6 +328,35 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .review-pill.danger{background:var(--red-bg)!important;color:var(--red)!important;border-color:rgba(185,50,50,.25)!important}
 .check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;margin-bottom:14px}
 .check-grid .check-line{margin-top:0;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px}
+.admin-card{padding:9px 11px;border-radius:12px;gap:10px;margin-bottom:6px;align-items:center}
+.admin-card:hover{transform:none;box-shadow:0 4px 16px rgba(21,24,33,.05)}
+.admin-card .mat-icon{width:30px;height:30px;border-radius:8px;font-size:15px}
+.admin-title{font-size:12.5px;margin-bottom:2px;line-height:1.25}
+.admin-meta{gap:5px;margin-bottom:2px}
+.admin-desc{font-size:11.5px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.admin-link-list{margin-top:4px}
+.admin-link-pill,.mat-source-badge,.mat-tipo-badge,.pedagogy-pill{font-size:9.5px;padding:2px 7px}
+.admin-actions{align-items:center}
+.admin-actions.wrap{max-width:none;flex-wrap:nowrap}
+.a-btn{padding:5px 9px;font-size:10.5px}
+.theme-section{border-radius:14px;margin-bottom:10px}
+.theme-head{padding:10px 12px}
+.theme-body{padding:10px 12px}
+.material-group{margin-bottom:12px}
+.material-group-title{font-size:10px;margin-bottom:6px}
+.shelf-grid{display:flex;flex-direction:column;gap:6px}
+.shelf-grid .admin-card{flex-direction:row;min-height:0;border-top:0;margin-bottom:0}
+.shelf-grid .admin-card .mat-icon{width:30px;height:30px}
+.shelf-grid .admin-card .admin-actions{width:auto;justify-content:flex-end;margin-top:0}
+.shelf-grid .admin-link-list{margin-top:4px}
+.shelf-grid .admin-desc{margin-top:0}
+#planContent,#reviewContent{padding:10px}
+#planContent>.theme-section>.theme-head,#reviewContent>.theme-section>.theme-head{padding:2px 2px 10px}
+.shelf-overview{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px}
+.shelf-stat{padding:7px 9px;border-radius:12px}
+.shelf-stat-icon{width:26px;height:32px;font-size:14px}
+.shelf-stat-name{font-size:11px}
+.shelf-stat-count{font-size:10px}
 .search-result-head{font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 14px}
 .prof-home-note{background:var(--accent-bg);border:1px solid rgba(45,91,227,.15);border-radius:var(--radius-lg);padding:12px 14px;font-size:12px;color:var(--accent);line-height:1.55;margin-bottom:18px}
 .general-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);background:var(--purple-bg);border-radius:20px;padding:2px 8px}
@@ -377,14 +406,14 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   .tabs{position:static;left:auto;top:auto;width:100%;display:flex;flex-direction:row;overflow-x:auto;border-radius:16px;margin-bottom:22px}
   .tab-btn{white-space:nowrap;flex:1}
   .summary-row{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .recent-grid,.shelf-grid{grid-template-columns:1fr}
+  .recent-grid{grid-template-columns:1fr}
   #tabConfiguracoes{grid-template-columns:1fr}
   #tabPlanejamento>.library-top,#tabRevisao>.library-top,#tabPlanejamento>.summary-row,#tabRevisao>.summary-row,#planContent,#reviewContent,#tabConfiguracoes .settings-intro{border-radius:18px;padding:14px}
   .form-row,.form-row.three{grid-template-columns:1fr}
   .disc-grid{grid-template-columns:1fr}
-  .admin-card{flex-direction:column}
-  .admin-card .mat-icon{width:42px;height:42px}
-  .admin-actions.wrap{max-width:none;justify-content:flex-start}
+  .admin-card{flex-direction:row;align-items:flex-start}
+  .admin-card .mat-icon{width:30px;height:30px}
+  .admin-actions.wrap{max-width:none;justify-content:flex-start;flex-wrap:wrap}
   .inner-filters .search-input{min-width:100%}
   .filter-sel{width:100%}
   .modal{width:calc(100vw - 24px)}
