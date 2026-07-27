@@ -282,7 +282,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .material-group{margin-bottom:18px}
 .material-group:last-child{margin-bottom:0}
 .material-group-title{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:9px}
-.shelf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;align-items:stretch}
+.shelf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:10px;align-items:stretch}
 .shelf-grid .admin-card{display:flex;flex-direction:column;gap:10px;margin-bottom:0;min-height:210px;border-top:4px solid var(--border2)}
 .shelf-grid .admin-card .mat-icon{width:42px;height:42px}
 .shelf-grid .admin-card .admin-body{width:100%}
@@ -342,10 +342,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .theme-section{border-radius:14px;margin-bottom:10px}
 .theme-head{padding:10px 12px}
 .theme-body{padding:10px 12px}
-.material-group{margin-bottom:12px}
-.material-group-title{font-size:10px;margin-bottom:6px}
-.shelf-grid{display:flex;flex-direction:column;gap:6px}
-.shelf-grid .admin-card{flex-direction:row;min-height:0;border-top:0;margin-bottom:0}
+.material-group{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:10px;margin-bottom:14px}
+.material-group-title{grid-column:1/-1;font-size:10px;margin-bottom:-2px}
+.material-group>.admin-card{margin-bottom:0;min-height:84px}
+.shelf-grid{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:10px}
+.shelf-grid .admin-card{flex-direction:row;min-height:84px;border-top:0;margin-bottom:0}
 .shelf-grid .admin-card .mat-icon{width:30px;height:30px}
 .shelf-grid .admin-card .admin-actions{width:auto;justify-content:flex-end;margin-top:0}
 .shelf-grid .admin-link-list{margin-top:4px}
@@ -407,6 +408,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   .tab-btn{white-space:nowrap;flex:1}
   .summary-row{grid-template-columns:repeat(2,minmax(0,1fr))}
   .recent-grid{grid-template-columns:1fr}
+  .material-group,.shelf-grid{grid-template-columns:1fr}
   #tabConfiguracoes{grid-template-columns:1fr}
   #tabPlanejamento>.library-top,#tabRevisao>.library-top,#tabPlanejamento>.summary-row,#tabRevisao>.summary-row,#planContent,#reviewContent,#tabConfiguracoes .settings-intro{border-radius:18px;padding:14px}
   .form-row,.form-row.three{grid-template-columns:1fr}
