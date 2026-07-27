@@ -402,7 +402,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 <div class="app-body" id="viewAdmin" style="display:none">
   <div class="tabs">
     <button class="tab-btn active" onclick="setTab('materiais',this)">Materiais</button>
-    <button class="tab-btn" onclick="setTab('planejamento',this)">Planejamento</button>
+    <button class="tab-btn" onclick="setTab('planejamento',this)">Sequência</button>
     <button class="tab-btn" onclick="setTab('revisao',this)">Revisão</button>
     <button class="tab-btn" onclick="setTab('configuracoes',this)">Configurações</button>
   </div>
@@ -451,6 +451,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <select class="filter-sel" id="adminMatTipo" onchange="renderAdminDisc()"><option value="">Todos os tipos</option></select>
         <select class="filter-sel" id="adminMatTema" onchange="renderAdminDisc()"><option value="">Todos os temas</option></select>
         <select class="filter-sel" id="adminMatRevisao" onchange="renderAdminDisc()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="stale">Desatualizados</option><option value="ready">Prontos</option></select>
+        <select class="filter-sel" id="adminMatVisibilidade" onchange="renderAdminDisc()"><option value="">Toda visibilidade</option><option value="professor">Visível para professor</option><option value="admin">Somente admin</option></select>
       </div>
       <div id="adminDiscContent"></div>
     </div>
@@ -625,8 +626,12 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           <strong>📦 Gerar versão para professor</strong><br>
           Cria um único arquivo HTML em modo consulta. Os materiais são protegidos no próprio arquivo e só ficam legíveis após digitar a senha do professor — sem painel administrativo, sem importação e sem configuração.
         </div>
-        <button class="btn btn-primary" style="background:var(--green);border-color:var(--green);align-self:flex-start" onclick="gerarVersaoProfessor()">📦 Gerar versão para professor</button>
-        <button class="btn btn-outline" style="align-self:flex-start" onclick="copiarLinkProfessorOnline()">Copiar link do professor online</button>
+        <div class="summary-row" id="professorPublishPreview"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline" onclick="renderProfessorPublishPreview()">Atualizar prévia</button>
+          <button class="btn btn-primary" style="background:var(--green);border-color:var(--green)" onclick="gerarVersaoProfessor()">📦 Gerar versão para professor</button>
+          <button class="btn btn-outline" onclick="copiarLinkProfessorOnline()">Copiar link do professor online</button>
+        </div>
         <hr style="border:none;border-top:1px solid var(--border)">
         <p style="font-size:12px;color:var(--text2)"><strong>Backup / transferência entre computadores:</strong> exporte um <code>.json</code> e importe em outro computador.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -775,6 +780,16 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
                 <option value="revisar">Revisar</option>
                 <option value="substituir">Substituir depois</option>
                 <option value="producao">Em produção</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Prontidão <span class="help-tip" tabindex="0" data-tip="Indica o grau de maturidade do material no seu acervo, separado do status de revisão.">?</span></label>
+              <select class="form-input" id="mReadiness">
+                <option value="">Sem nível</option>
+                <option value="rascunho">Rascunho</option>
+                <option value="em_uso">Em uso</option>
+                <option value="validado">Validado</option>
+                <option value="modelo">Modelo</option>
               </select>
             </div>
           </div>
@@ -1959,6 +1974,7 @@ function coerceData(raw) {
       conhecimento:String(m.conhecimento||m.conteudoRelacionado||'').trim(),
       modalidadeMaterial:normalizeModalidadeMaterial(m.modalidadeMaterial||m.modalidadeDoMaterial||''),
       statusMaterial:normalizeStatusMaterial(m.statusMaterial||m.status||''),
+      readiness:normalizeReadiness(m.readiness||m.prontidao||m.prontidão||''),
       reviewTags:Array.isArray(m.reviewTags) ? m.reviewTags.map(t=>String(t||'').trim()).filter(Boolean) : [],
       archived:!!(m.archived||m.arquivado),
       archivedAt:normalizeDateValue(m.archivedAt||m.arquivadoEm||''),
@@ -2089,6 +2105,9 @@ function modalidadeMaterialLabel(v){
 function statusMaterialLabel(v){
   return ({pronto:'Pronto',revisar:'Revisar',substituir:'Substituir',producao:'Em produção'})[String(v||'').toLowerCase()] || '';
 }
+function readinessLabel(v){
+  return ({rascunho:'Rascunho',em_uso:'Em uso',validado:'Validado',modelo:'Modelo'})[String(v||'').toLowerCase()] || '';
+}
 function normalizeModalidadeMaterial(v){
   const n=normalizar(v);
   if(!n) return '';
@@ -2106,10 +2125,19 @@ function normalizeStatusMaterial(v){
   if(n.includes('produc') || n.includes('andamento')) return 'producao';
   return '';
 }
+function normalizeReadiness(v){
+  const n=normalizar(v);
+  if(!n) return '';
+  if(n.includes('rascunho')) return 'rascunho';
+  if(n.includes('uso') || n.includes('usando')) return 'em_uso';
+  if(n.includes('valid')) return 'validado';
+  if(n.includes('modelo')) return 'modelo';
+  return '';
+}
 function pedagogicalSearchText(m){
   return [
     m.cursoTurma,m.unidadeCurricular,m.aulaModulo,m.capacidadeCompetencia,m.conhecimento,
-    modalidadeMaterialLabel(m.modalidadeMaterial),statusMaterialLabel(m.statusMaterial),checklistLabels(m).join(' '),materialReviewTags(m).join(' '),formatDateTime(m.createdAt),formatDateTime(m.updatedAt)
+    modalidadeMaterialLabel(m.modalidadeMaterial),statusMaterialLabel(m.statusMaterial),readinessLabel(m.readiness),checklistLabels(m).join(' '),materialReviewTags(m).join(' '),formatDateTime(m.createdAt),formatDateTime(m.updatedAt)
   ].join(' ');
 }
 function checklistLabels(m){
@@ -2136,6 +2164,8 @@ function pedagogyMetaHtml(m){
   const status=statusMaterialLabel(m.statusMaterial);
   const reviewBadge=reviewBadgeHtml(m);
   if(status && !reviewBadge) chips.push(`Status: ${status}`);
+  const readiness=readinessLabel(m.readiness);
+  if(readiness) chips.push(`Prontidão: ${readiness}`);
   const chipHtml=chips.map(c=>`<span class="pedagogy-pill">${escH(c)}</span>`).join('');
   const lines=[];
   if(m.capacidadeCompetencia) lines.push(`<div class="pedagogy-line"><strong>Capacidade:</strong> ${escH(m.capacidadeCompetencia)}</div>`);
@@ -2641,6 +2671,7 @@ function abrirAdminDisc(discId){
   document.getElementById('adminMatTipo').value='';
   document.getElementById('adminMatTema').value='';
   document.getElementById('adminMatRevisao').value='';
+  document.getElementById('adminMatVisibilidade').value='';
   renderAdminDiscSelectors();
   renderAdminDisc();
 }
@@ -2663,7 +2694,13 @@ function renderAdminDisc(){
   const tipoId=document.getElementById('adminMatTipo').value;
   let temaId=document.getElementById('adminMatTema').value;
   const revisao=document.getElementById('adminMatRevisao').value;
-  const list=filterMats(base,{search,tipoId,temaId:temaId==='__semtema__'?'':temaId,revisao,includeInternal:true});
+  const visibilidade=document.getElementById('adminMatVisibilidade')?.value||'';
+  const visibleBase=base.filter(m=>{
+    if(visibilidade==='professor') return isProfessorVisible(m);
+    if(visibilidade==='admin') return !!m.hiddenProfessor;
+    return true;
+  });
+  const list=filterMats(visibleBase,{search,tipoId,temaId:temaId==='__semtema__'?'':temaId,revisao,includeInternal:true});
   document.getElementById('adminDiscContent').innerHTML=renderAdminGrouped(list,disc.id);
 }
 function renderAdminGrouped(list,discId){
@@ -3078,6 +3115,7 @@ function openModal(id=null, preferredDiscId=null){
   document.getElementById('mConhecimento').value=m?.conhecimento||'';
   document.getElementById('mModalidadeMaterial').value=m?.modalidadeMaterial||'';
   document.getElementById('mStatusMaterial').value=m?.statusMaterial||'';
+  document.getElementById('mReadiness').value=m?.readiness||'';
   const chk=m?.checklist||{};
   document.getElementById('mChkObjetivo').checked=!!chk.objetivo;
   document.getElementById('mChkAtividade').checked=!!chk.atividade;
@@ -3125,6 +3163,7 @@ function aplicarModeloPedagogico(modelo){
     document.querySelectorAll('.m-review-tag').forEach(el=>{ el.checked=false; });
     document.getElementById('mModalidadeMaterial').value='';
     document.getElementById('mStatusMaterial').value='';
+    document.getElementById('mReadiness').value='';
     showToast('Organização pedagógica limpa.');
     return;
   }
@@ -3163,6 +3202,7 @@ function salvarMaterial(options={}){
   const conhecimento=document.getElementById('mConhecimento').value.trim();
   const modalidadeMaterial=document.getElementById('mModalidadeMaterial').value;
   const statusMaterial=document.getElementById('mStatusMaterial').value;
+  const readiness=document.getElementById('mReadiness').value;
   const reviewTags=collectMaterialReviewTags();
   const checklist={
     objetivo:document.getElementById('mChkObjetivo').checked,
@@ -3184,7 +3224,7 @@ function salvarMaterial(options={}){
   const now=isoNow();
   const createdAt=existing?.createdAt || now;
   const updatedAt=now;
-  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,internalNotes,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,reviewTags,checklist,ordem,fixado,hiddenProfessor,archived:!!existing?.archived,archivedAt:existing?.archivedAt||''};
+  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,internalNotes,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,readiness,reviewTags,checklist,ordem,fixado,hiddenProfessor,archived:!!existing?.archived,archivedAt:existing?.archivedAt||''};
   const wasEditing=Boolean(editingMaterialId);
   if(editingMaterialId){
     const idx=D.materiais.findIndex(x=>x.id===editingMaterialId);
@@ -3296,6 +3336,7 @@ function renderConfigTab(){
   const reviewDaysInput=document.getElementById('cfgReviewStaleDays');
   if(reviewDaysInput) reviewDaysInput.value=reviewStaleDays();
   renderReviewTagsConfig();
+  renderProfessorPublishPreview();
   const cloudUrlInput=document.getElementById('cfgCloudUrl');
   if(cloudUrlInput) cloudUrlInput.value=getCloudUrl();
   const cloudTokenInput=document.getElementById('cfgCloudToken');
@@ -3553,6 +3594,7 @@ function exportarAcervoPlanilha(){
       Conhecimento:m.conhecimento||'',
       Modalidade:modalidadeMaterialLabel(m.modalidadeMaterial)||modalidadeLabel(modalidadeDisciplina(getDisc(m.disciplinaId)||{})),
       Status:statusMaterialLabel(m.statusMaterial)||'',
+      Prontidão:readinessLabel(m.readiness)||'',
       'Etiquetas de revisão':materialReviewTags(m).join(', '),
       Checklist:checklistLabels(m).join(', '),
       'Tem objetivo':chk.objetivo?'sim':'não',
@@ -3573,7 +3615,7 @@ function exportarAcervoPlanilha(){
   if(window.XLSX){
     const wb=XLSX.utils.book_new();
     const ws=XLSX.utils.json_to_sheet(rows);
-    ws['!cols']=[22,22,16,34,28,24,18,34,30,18,16,28,34,12,12,12,12,18,16,14,12,18,18,60,50,50].map(wch=>({wch}));
+    ws['!cols']=[22,22,16,34,28,24,18,34,30,18,16,16,28,34,12,12,12,12,18,16,14,12,18,18,60,50,50].map(wch=>({wch}));
     XLSX.utils.book_append_sheet(wb,ws,'Acervo');
     XLSX.writeFile(wb,'acervo_biblioteca_senai.xlsx');
   } else {
@@ -3672,7 +3714,7 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
   const modalidade=disc && disciplinaId ? modalidadeLabel(modalidadeDisciplina(disc)) : 'Presencial';
   const headers=[
     'Disciplina','Modalidade','Tema','Tipo','Título','Aplicável em','Unidade curricular','Aula/Módulo',
-    'Capacidade/competência','Conhecimento','Modalidade do material','Status','Etiquetas de revisão','Data de criação','Último upload',
+    'Capacidade/competência','Conhecimento','Modalidade do material','Status','Prontidão','Etiquetas de revisão','Data de criação','Último upload',
     'Tem objetivo','Tem atividade','Tem avaliação','Tem gabarito','Revisado presencial','Revisado EaD',
     'Link','Origem','Título do link',
     'Link 2','Origem 2','Título do link 2','Descrição','Nota interna','Somente admin','Fixado'
@@ -3681,7 +3723,7 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
     [
       nomeDisc,modalidade,'Ensaio de tração','Slide','Aula 01 - Ensaio de tração',
       'Moldador de Plástico, laboratório','Ensaios','Aula 01 / Módulo 1',
-      'Interpretar resultados de ensaios mecânicos.','Propriedades mecânicas e ensaio de tração','Presencial','Pronto','Link para conferir','','',
+      'Interpretar resultados de ensaios mecânicos.','Propriedades mecânicas e ensaio de tração','Presencial','Pronto','Em uso','Link para conferir','','',
       'sim','sim','não','não','sim','não',
       'https://www.canva.com/design/exemplo','Canva','Abrir slides',
       'https://drive.google.com/exemplo','Google Drive','Material de apoio',
@@ -3690,7 +3732,7 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
     [
       'Transformação Digital no Setor Industrial','EaD','Cultura digital','Atividade','Atividade avaliativa - Indústria 4.0',
       'EaD, cursos técnicos','Transformação Digital','Semana 02',
-      'Reconhecer tecnologias digitais aplicadas à indústria.','Indústria 4.0, dados e automação','EaD','Revisar','Precisa adaptar','','',
+      'Reconhecer tecnologias digitais aplicadas à indústria.','Indústria 4.0, dados e automação','EaD','Revisar','Rascunho','Precisa adaptar','','',
       'sim','sim','sim','não','não','sim',
       'https://docs.google.com/forms/d/exemplo','Google Forms','Responder formulário',
       '','','',
@@ -3714,11 +3756,11 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
   const ws=XLSX.utils.aoa_to_sheet([headers,...exemplos]);
   ws['!cols']=[
     {wch:26},{wch:13},{wch:24},{wch:14},{wch:34},{wch:30},{wch:26},{wch:18},
-    {wch:38},{wch:34},{wch:22},{wch:18},{wch:26},{wch:18},{wch:18},{wch:14},{wch:14},{wch:14},{wch:14},{wch:20},{wch:16},{wch:44},{wch:18},{wch:22},
+    {wch:38},{wch:34},{wch:22},{wch:18},{wch:16},{wch:26},{wch:18},{wch:18},{wch:14},{wch:14},{wch:14},{wch:14},{wch:20},{wch:16},{wch:44},{wch:18},{wch:22},
     {wch:44},{wch:18},{wch:22},{wch:58},{wch:42},{wch:14},{wch:12}
   ];
   ws['!rows']=[{hpt:22},{hpt:34},{hpt:34}];
-  ws['!autofilter']={ref:'A1:AE1'};
+  ws['!autofilter']={ref:'A1:AF1'};
   ws['!freeze']={xSplit:0,ySplit:1,topLeftCell:'A2',activePane:'bottomLeft',state:'frozen'};
   const headerStyle={
     fill:{fgColor:{rgb:'164194'}},
@@ -3807,6 +3849,7 @@ function importarPlanilhaMateriais(input){
         const conhecimento=valorLinha(row, header, ['conhecimento','conteudo_relacionado','conteúdo_relacionado']);
         const modalidadeMaterial=normalizeModalidadeMaterial(valorLinha(row, header, ['modalidade_do_material','modalidade_material','uso']));
         const statusMaterial=normalizeStatusMaterial(valorLinha(row, header, ['status','status_do_material','situacao','situação']));
+        const readiness=normalizeReadiness(valorLinha(row, header, ['prontidao','prontidão','nivel_de_prontidao','nível_de_prontidão']));
         const reviewTags=valorLinha(row, header, ['etiquetas_de_revisao','etiquetas_de_revisão','etiquetas','tags_de_revisao','tags'])
           .split(',')
           .map(t=>t.trim())
@@ -3838,7 +3881,7 @@ function importarPlanilhaMateriais(input){
         else if(titleDup) duplicateReason='Mesmo título na mesma disciplina/tema';
         novos.push({
           id:uid('mat'),titulo,link:principal.link,origem:principal.origem||'',links,
-          disciplinaId,temaId,tipoId,descricao,internalNotes,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,reviewTags,checklist,fixado,hiddenProfessor,archived,archivedAt:archived?now:'',
+          disciplinaId,temaId,tipoId,descricao,internalNotes,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,readiness,reviewTags,checklist,fixado,hiddenProfessor,archived,archivedAt:archived?now:'',
           _importRow:headerRowIndex+rowIdx+2,
           _duplicate:Boolean(duplicateReason),
           _duplicateReason:duplicateReason,
@@ -3984,6 +4027,21 @@ function copiarLinkProfessorOnline(){
   navigator.clipboard.writeText(url)
     .then(()=>showToast('Link do professor copiado!'))
     .catch(()=>showToast('Não consegui copiar o link automaticamente.',true));
+}
+function renderProfessorPublishPreview(){
+  const el=document.getElementById('professorPublishPreview');
+  if(!el) return;
+  const visible=professorMaterials();
+  const active=activeMaterials();
+  const hidden=active.filter(m=>m.hiddenProfessor).length;
+  const archived=D.materiais.filter(isArchived).length;
+  const review=visible.filter(needsMaterialReview).length;
+  el.innerHTML=[
+    [visible.length,'visíveis ao professor'],
+    [hidden,'somente admin'],
+    [archived,'arquivados'],
+    [review,'visíveis a revisar']
+  ].map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
 }
 function getDeviceId(){
   let id=localStorage.getItem('mat_cloud_device_id_v1');
@@ -4514,6 +4572,7 @@ function origens(m){return [...new Set(links(m).map(origemLink).filter(Boolean))
 function sourceBadges(m){return origens(m).map(o=>'<span class="mat-source-badge">'+escH(o)+'</span>').join('')}
 function modalidadeMaterialLabel(v){return ({presencial:'Presencial',ead:'EaD',ambos:'Presencial e EaD'})[String(v||'').toLowerCase()]||''}
 function statusMaterialLabel(v){return ({pronto:'Pronto',revisar:'Revisar',substituir:'Substituir',producao:'Em produção'})[String(v||'').toLowerCase()]||''}
+function readinessLabel(v){return ({rascunho:'Rascunho',em_uso:'Em uso',validado:'Validado',modelo:'Modelo'})[String(v||'').toLowerCase()]||''}
 function formatDateTime(v){if(!v)return '';const d=new Date(v);return Number.isNaN(d.getTime())?'':d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}
 const REVIEW_STALE_DAYS=Number(META.reviewStaleDays)||180;
 function daysSinceDate(v){if(!v)return null;const d=new Date(v);if(Number.isNaN(d.getTime()))return null;const diff=Date.now()-d.getTime();return diff<0?0:Math.floor(diff/86400000)}
@@ -4522,8 +4581,8 @@ function needsMaterialReview(m){return ['revisar','substituir'].includes(String(
 function reviewBadge(m){if(m.statusMaterial==='substituir')return '<span class="pedagogy-pill review-pill danger">Substituir</span>';if(m.statusMaterial==='revisar')return '<span class="pedagogy-pill review-pill">Revisar</span>';if(isMaterialStale(m))return '<span class="pedagogy-pill review-pill">Mais de '+REVIEW_STALE_DAYS+' dias sem atualização</span>';if(m.statusMaterial==='pronto')return '<span class="pedagogy-pill">Pronto</span>';return ''}
 function checklistLabels(m){const c=m&&m.checklist||{};return [c.objetivo?'objetivo':'',c.atividade?'atividade':'',c.avaliacao?'avaliação':'',c.gabarito?'gabarito':'',c.presencial?'revisado presencial':'',c.ead?'revisado EaD':''].filter(Boolean)}
 function materialReviewTags(m){return Array.isArray(m&&m.reviewTags)?m.reviewTags.map(t=>String(t||'').trim()).filter(Boolean):[]}
-function pedagogyText(m){return [m.cursoTurma,m.unidadeCurricular,m.aulaModulo,m.capacidadeCompetencia,m.conhecimento,modalidadeMaterialLabel(m.modalidadeMaterial),statusMaterialLabel(m.statusMaterial),checklistLabels(m).join(' '),materialReviewTags(m).join(' '),formatDateTime(m.createdAt),formatDateTime(m.updatedAt)].join(' ')}
-function pedagogyMeta(m){const chips=[];if(m.createdAt)chips.push('Criado: '+formatDateTime(m.createdAt));if(m.updatedAt)chips.push('Atualizado: '+formatDateTime(m.updatedAt));if(m.cursoTurma)chips.push('Aplicável em: '+m.cursoTurma);if(m.unidadeCurricular)chips.push('UC: '+m.unidadeCurricular);if(m.aulaModulo)chips.push('Aula: '+m.aulaModulo);const mod=modalidadeMaterialLabel(m.modalidadeMaterial);if(mod)chips.push(mod);const rb=reviewBadge(m);const st=statusMaterialLabel(m.statusMaterial);if(st&&!rb)chips.push('Status: '+st);const chipHtml=chips.map(c=>'<span class="pedagogy-pill">'+escH(c)+'</span>').join('');const lines=[];if(m.capacidadeCompetencia)lines.push('<div class="pedagogy-line"><strong>Capacidade:</strong> '+escH(m.capacidadeCompetencia)+'</div>');if(m.conhecimento)lines.push('<div class="pedagogy-line"><strong>Conhecimento:</strong> '+escH(m.conhecimento)+'</div>');const checks=checklistLabels(m);if(checks.length)lines.push('<div class="pedagogy-line"><strong>Checklist:</strong> '+escH(checks.join(', '))+'</div>');const tags=materialReviewTags(m);if(tags.length)lines.push('<div class="pedagogy-line"><strong>Etiquetas:</strong> '+escH(tags.join(', '))+'</div>');return chipHtml||rb||lines.length?'<div class="pedagogy-meta">'+rb+chipHtml+'</div>'+lines.join(''):''}
+function pedagogyText(m){return [m.cursoTurma,m.unidadeCurricular,m.aulaModulo,m.capacidadeCompetencia,m.conhecimento,modalidadeMaterialLabel(m.modalidadeMaterial),statusMaterialLabel(m.statusMaterial),readinessLabel(m.readiness),checklistLabels(m).join(' '),materialReviewTags(m).join(' '),formatDateTime(m.createdAt),formatDateTime(m.updatedAt)].join(' ')}
+function pedagogyMeta(m){const chips=[];if(m.createdAt)chips.push('Criado: '+formatDateTime(m.createdAt));if(m.updatedAt)chips.push('Atualizado: '+formatDateTime(m.updatedAt));if(m.cursoTurma)chips.push('Aplicável em: '+m.cursoTurma);if(m.unidadeCurricular)chips.push('UC: '+m.unidadeCurricular);if(m.aulaModulo)chips.push('Aula: '+m.aulaModulo);const mod=modalidadeMaterialLabel(m.modalidadeMaterial);if(mod)chips.push(mod);const rb=reviewBadge(m);const st=statusMaterialLabel(m.statusMaterial);if(st&&!rb)chips.push('Status: '+st);const rd=readinessLabel(m.readiness);if(rd)chips.push('Prontidão: '+rd);const chipHtml=chips.map(c=>'<span class="pedagogy-pill">'+escH(c)+'</span>').join('');const lines=[];if(m.capacidadeCompetencia)lines.push('<div class="pedagogy-line"><strong>Capacidade:</strong> '+escH(m.capacidadeCompetencia)+'</div>');if(m.conhecimento)lines.push('<div class="pedagogy-line"><strong>Conhecimento:</strong> '+escH(m.conhecimento)+'</div>');const checks=checklistLabels(m);if(checks.length)lines.push('<div class="pedagogy-line"><strong>Checklist:</strong> '+escH(checks.join(', '))+'</div>');const tags=materialReviewTags(m);if(tags.length)lines.push('<div class="pedagogy-line"><strong>Etiquetas:</strong> '+escH(tags.join(', '))+'</div>');return chipHtml||rb||lines.length?'<div class="pedagogy-meta">'+rb+chipHtml+'</div>'+lines.join(''):''}
 function searchable(m){return norm([m.titulo,m.descricao,links(m).map((l,i)=>tituloLink(l,i)+' '+origemLink(l)+' '+l.link).join(' '),disc(m.disciplinaId)?.nome,tema(m.temaId)?.nome,tipo(m.tipoId)?.nome,pedagogyText(m)].join(' '))}
 function filtered(list,{search='',tipoId='',temaId='',revisao=''}={}){const s=norm(search);return sortM(list.filter(m=>{if(tipoId&&m.tipoId!==tipoId)return false;if(temaId&&(m.temaId||'')!==temaId)return false;if(revisao==='review'&&!needsMaterialReview(m))return false;if(revisao==='stale'&&!isMaterialStale(m))return false;if(revisao==='ready'&&needsMaterialReview(m))return false;if(s&&!searchable(m).includes(s))return false;return true}))}
 function bg(id){return colorAlpha(tipo(id).cor,.12)}
