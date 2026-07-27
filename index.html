@@ -4278,6 +4278,13 @@ function updatedMs(data){
   const ms=raw?Date.parse(raw):0;
   return Number.isFinite(ms)?ms:0;
 }
+function wait(ms){ return new Promise(resolve=>setTimeout(resolve,ms)); }
+async function fetchCloudSnapshot(){
+  const url=cloudUrlWithToken()+(cloudUrlWithToken().includes('?')?'&':'?')+'t='+Date.now();
+  const resp=await fetch(url,{cache:'no-store'});
+  const text=await resp.text();
+  return text ? JSON.parse(text) : {};
+}
 function fmtCloudTime(raw){
   if(!raw) return 'Ainda não registrado';
   const d=new Date(raw);
@@ -4414,10 +4421,14 @@ async function syncToCloud(manual=false){
       headers:{'Content-Type':'text/plain;charset=utf-8'},
       body:payload
     });
-    const confirmUrl=cloudUrlWithToken()+(cloudUrlWithToken().includes('?')?'&':'?')+'t='+Date.now();
-    const confirmResp=await fetch(confirmUrl);
-    const confirmText=await confirmResp.text();
-    const confirmed=confirmText ? JSON.parse(confirmText) : {};
+    setSyncBadge('syncing','Confirmando envio');
+    let confirmed={};
+    for(let attempt=0; attempt<5; attempt++){
+      if(attempt>0) await wait(700);
+      confirmed=await fetchCloudSnapshot();
+      if(confirmed && confirmed.error) break;
+      if(updatedMs(confirmed) >= localUpdated) break;
+    }
     if(confirmed && confirmed.error){
       setSyncBadge('error','Chave inválida');
       if(manual) showToast('A chave da nuvem não confere com o Apps Script.',true);
@@ -4425,7 +4436,7 @@ async function syncToCloud(manual=false){
     }
     if(updatedMs(confirmed) < localUpdated){
       setSyncBadge('error','Envio não confirmado');
-      if(manual) showToast('Envio não confirmado. Confira se a chave do Apps Script é igual à chave da Biblioteca e publique uma nova versão.',true);
+      if(manual) showToast('Envio ainda não apareceu na confirmação. Espere alguns segundos e clique em Carregar da nuvem para conferir. A cópia local continua salva.',true);
       return;
     }
     localStorage.setItem(CLOUD_PUSHED_AT_KEY,new Date().toISOString());
