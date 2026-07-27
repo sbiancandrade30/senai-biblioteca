@@ -301,6 +301,9 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .admin-actions.wrap{flex-wrap:wrap;justify-content:flex-end;max-width:220px}
 .small-action{min-width:32px;text-align:center;padding-left:8px;padding-right:8px}
 .cfg-list{display:flex;flex-direction:column;gap:8px}
+.cfg-list.collapsed{max-height:260px;overflow:hidden;position:relative}
+.cfg-list.collapsed::after{content:'';position:absolute;left:0;right:0;bottom:0;height:44px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff)}
+.cfg-expand-btn{align-self:flex-start;margin-top:2px}
 .cfg-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface2);padding:10px 12px}
 .cfg-row-main{display:flex;align-items:center;gap:10px;min-width:0}
 .cfg-row-name{font-size:13px;font-weight:500;color:var(--text);word-break:break-word}
@@ -3867,6 +3870,34 @@ function renderConfigTab(){
       </div>
     </div>`).join('');
   renderContextosConfig();
+  setupConfigExpandableLists();
+}
+function setupConfigExpandableLists(){
+  [
+    ['contextosConfigList','contextos'],
+    ['reviewTagsConfigList','etiquetas'],
+    ['tiposConfigList','tipos'],
+    ['discsConfigList','disciplinas']
+  ].forEach(([id,label])=>{
+    const list=document.getElementById(id);
+    if(!list) return;
+    const oldBtn=document.getElementById(id+'ExpandBtn');
+    if(oldBtn) oldBtn.remove();
+    const total=list.querySelectorAll('.cfg-row').length;
+    list.classList.remove('collapsed');
+    if(total<=4) return;
+    list.classList.add('collapsed');
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.id=id+'ExpandBtn';
+    btn.className='btn btn-outline cfg-expand-btn';
+    btn.textContent=`Mostrar todos (${total})`;
+    btn.onclick=()=>{
+      const collapsed=list.classList.toggle('collapsed');
+      btn.textContent=collapsed?`Mostrar todos (${total})`:'Mostrar menos';
+    };
+    list.insertAdjacentElement('afterend',btn);
+  });
 }
 function salvarNome(){
   D.nomeCurso=document.getElementById('cfgNomeCurso').value.trim()||D.nomeCurso;
