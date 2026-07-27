@@ -216,11 +216,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 #planContent>.theme-section,#reviewContent>.theme-section{background:transparent;border:none;border-radius:0;box-shadow:none;margin-bottom:0}
 #planContent>.theme-section>.theme-head,#reviewContent>.theme-section>.theme-head{background:transparent;padding:4px 2px 14px}
 #planContent>.theme-section>.theme-body,#reviewContent>.theme-section>.theme-body{padding:0}
-#tabConfiguracoes{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px;align-items:start}
-#tabConfiguracoes .settings-intro{grid-column:1/-1;background:rgba(255,255,255,.72);border:1px solid var(--border);border-radius:22px;padding:18px;box-shadow:0 1px 0 rgba(21,24,33,.02)}
+#tabConfiguracoes{display:block;column-count:3;column-gap:16px}
+#tabConfiguracoes .settings-intro{column-span:all;background:rgba(255,255,255,.72);border:1px solid var(--border);border-radius:22px;padding:18px;box-shadow:0 1px 0 rgba(21,24,33,.02);margin-bottom:16px}
 #tabConfiguracoes .settings-intro .library-top{margin-bottom:0}
-#tabConfiguracoes .cfg-section{margin-bottom:0}
-#tabConfiguracoes .cfg-section:nth-last-of-type(-n+2){grid-column:1/-1}
+#tabConfiguracoes .cfg-section{display:inline-block;width:100%;break-inside:avoid;margin-bottom:16px}
+#tabConfiguracoes .cfg-section:nth-last-of-type(-n+2){column-span:all;display:block}
 .summary-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
 .summary-card{background:linear-gradient(180deg,#fff,#fbfcff);border:1px solid var(--border);border-radius:18px;padding:16px 17px;box-shadow:0 1px 0 rgba(21,24,33,.02)}
 .summary-num{font-size:26px;font-weight:800;line-height:1;margin-bottom:7px;letter-spacing:-.03em}
@@ -408,6 +408,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 
 @media(max-width:1200px){
   .material-group,.shelf-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #tabConfiguracoes{column-count:2}
 }
 
 @media(max-width:760px){
@@ -417,7 +418,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   .summary-row{grid-template-columns:repeat(2,minmax(0,1fr))}
   .recent-grid{grid-template-columns:1fr}
   .material-group,.shelf-grid{grid-template-columns:1fr}
-  #tabConfiguracoes{grid-template-columns:1fr}
+  #tabConfiguracoes{column-count:1}
   #tabPlanejamento>.library-top,#tabRevisao>.library-top,#tabPlanejamento>.summary-row,#tabRevisao>.summary-row,#planContent,#reviewContent,#tabConfiguracoes .settings-intro{border-radius:18px;padding:14px}
   .form-row,.form-row.three{grid-template-columns:1fr}
   .disc-grid{grid-template-columns:1fr}
