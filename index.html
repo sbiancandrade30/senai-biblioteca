@@ -865,12 +865,12 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
     <div class="modal-body">
       <div class="quick-note">
-        Cole um ou varios links, um por linha. A Biblioteca cria um material separado para cada link, sugere titulo, tipo e tema quando conseguir, e marca como "Revisar cadastro" para voce conferir depois.
+        Cole um ou varios links, um por linha. A Biblioteca cria um material separado para cada link. Depois de cadastrar, voce pode continuar na mesma disciplina e tema.
       </div>
       <div class="form-group">
         <label class="form-label">Titulo opcional</label>
         <input type="text" class="form-input" id="quickTitle" placeholder="ex: Aula 01 - Introducao ao tema">
-        <div style="font-size:11px;color:var(--text3);margin-top:6px">Se colar varios links, este titulo vira a base e a Biblioteca acrescenta uma numeracao.</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px">Se colar varios links, este titulo vira a base: Aula 01 - Material 1, Aula 01 - Material 2...</div>
       </div>
       <div class="form-group">
         <label class="form-label">Links *</label>
@@ -889,7 +889,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
     <div class="modal-foot">
       <button class="btn btn-outline" onclick="closeQuickMaterialModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarQuickMaterials()">Cadastrar links</button>
+      <button class="btn btn-outline" onclick="salvarQuickMaterials({keepOpen:false})">Cadastrar e fechar</button>
+      <button class="btn btn-primary" onclick="salvarQuickMaterials({keepOpen:true})">Cadastrar e continuar</button>
     </div>
   </div>
 </div>
@@ -3236,7 +3237,7 @@ function renderQuickThemeSelect(preselect=''){
 function closeQuickMaterialModal(){
   document.getElementById('quickMaterialModalOverlay').classList.remove('open');
 }
-function salvarQuickMaterials(){
+function salvarQuickMaterials(options={}){
   const quickTitle=document.getElementById('quickTitle').value.trim();
   const links=uniqueLinksFromText(document.getElementById('quickLinksText').value);
   const disciplinaId=document.getElementById('quickDisc').value||GERAL_ID;
@@ -3255,7 +3256,7 @@ function salvarQuickMaterials(){
     const tipoId=guessTypeIdFromLinks(singleLinks) || tiposOrdenados()[0]?.id || '';
     const temaId=chosenTemaId || suggestThemeIdForText(`${link} ${origem}`,disciplinaId);
     const titulo=quickTitle
-      ? (links.length===1 ? quickTitle : `${quickTitle} ${String(created+1).padStart(2,'0')}`)
+      ? (links.length===1 ? quickTitle : `${quickTitle} - Material ${created+1}`)
       : guessTitleForContext(link,disciplinaId,temaId);
     const ordem=nextOrderFor(disciplinaId,temaId,tipoId);
     D.materiais.push({
@@ -3298,8 +3299,18 @@ function salvarQuickMaterials(){
   if(document.getElementById('tabPlanejamento')?.style.display !== 'none') renderPlanTab();
   if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
   renderReviewTagsConfig();
-  closeQuickMaterialModal();
-  showToast(`${created} material${created!==1?'is':''} cadastrado${created!==1?'s':''}.${skipped?` ${skipped} link${skipped!==1?'s':''} repetido${skipped!==1?'s':''} ignorado${skipped!==1?'s':''}.`:''}`);
+  const message=`${created} material${created!==1?'is':''} cadastrado${created!==1?'s':''}.${skipped?` ${skipped} link${skipped!==1?'s':''} repetido${skipped!==1?'s':''} ignorado${skipped!==1?'s':''}.`:''}`;
+  if(options.keepOpen){
+    document.getElementById('quickTitle').value='';
+    document.getElementById('quickLinksText').value='';
+    document.getElementById('quickDisc').value=disciplinaId;
+    renderQuickThemeSelect(chosenTemaId||lastTemaId);
+    document.getElementById('quickTitle').focus();
+    showToast(message+' Continue cadastrando na mesma disciplina/tema.');
+  } else {
+    closeQuickMaterialModal();
+    showToast(message);
+  }
 }
 function openModal(id=null, preferredDiscId=null){
   editingMaterialId=id||null;
