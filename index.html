@@ -803,6 +803,9 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <div class="form-group" style="display:flex;align-items:flex-end">
           <label class="check-line"><input type="checkbox" id="mFixado"> Fixar no topo <span class="help-tip" tabindex="0" data-tip="Use para materiais que você consulta sempre, como plano base, slide principal ou atividade essencial.">?</span></label>
         </div>
+        <div class="form-group" style="display:flex;align-items:flex-end">
+          <label class="check-line"><input type="checkbox" id="mHiddenProfessor"> Somente admin <span class="help-tip" tabindex="0" data-tip="Mantém o material no seu acervo, mas oculta no acesso e na versão gerada para professor.">?</span></label>
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Descrição <span style="font-weight:400;color:var(--text3)">(opcional)</span> <span class="help-tip" tabindex="0" data-tip="Escreva uma observação curta sobre como usar o material, para que serve ou o que precisa revisar.">?</span></label>
@@ -1954,6 +1957,7 @@ function coerceData(raw) {
       reviewTags:Array.isArray(m.reviewTags) ? m.reviewTags.map(t=>String(t||'').trim()).filter(Boolean) : [],
       archived:!!(m.archived||m.arquivado),
       archivedAt:normalizeDateValue(m.archivedAt||m.arquivadoEm||''),
+      hiddenProfessor:!!(m.hiddenProfessor||m.ocultarProfessor||m.somenteAdmin),
       checklist:{
         objetivo:!!(m.checklist?.objetivo||m.temObjetivo),
         atividade:!!(m.checklist?.atividade||m.temAtividade),
@@ -2140,7 +2144,10 @@ function pedagogyMetaHtml(m){
 }
 function isArchived(m){ return !!m?.archived; }
 function activeMaterials(){ return D.materiais.filter(m=>!isArchived(m)); }
+function isProfessorVisible(m){ return !isArchived(m) && !m?.hiddenProfessor; }
+function professorMaterials(){ return D.materiais.filter(isProfessorVisible); }
 function matsDaDisc(discId){ return activeMaterials().filter(m=>m.disciplinaId===discId); }
+function professorMatsDaDisc(discId){ return professorMaterials().filter(m=>m.disciplinaId===discId); }
 function materialCourse(m){ return String(m?.cursoTurma||'').trim(); }
 function courseMatches(m, course){ return !course || materialCourse(m).split(',').map(x=>x.trim()).includes(course) || materialCourse(m)===course; }
 function cursosOrdenados(){
@@ -2443,7 +2450,7 @@ function renderProfessorHome(){
   const s = normalizar(document.getElementById('profGlobalSearch')?.value || '');
   const el = document.getElementById('professorHomeContent');
   if(s){
-    const mats = filterMats(activeMaterials(),{search:s});
+    const mats = filterMats(professorMaterials(),{search:s});
     el.innerHTML = `<div class="search-result-head">${mats.length} resultado${mats.length!==1?'s':''} encontrado${mats.length!==1?'s':''}</div>` + renderProfessorSearchResults(mats);
     return;
   }
@@ -2470,7 +2477,7 @@ function renderDiscGroupHtml(titulo,cardsHtml,total,mostrarContador=true){
   </section>`;
 }
 function discCardHtml(d, professor=false){
-  const mats=matsDaDisc(d.id);
+  const mats=professor?professorMatsDaDisc(d.id):matsDaDisc(d.id);
   const temas=countTema(d.id);
   const fix=mats.filter(m=>m.fixado).length;
   const review=mats.filter(needsMaterialReview).length;
@@ -2508,7 +2515,7 @@ function abrirProfessorDisc(discId){
 }
 function voltarProfessorHome(){ renderProfessorHome(); }
 function renderProfessorDiscSelectors(){
-  const base=matsDaDisc(currentProfessorDiscId);
+  const base=professorMatsDaDisc(currentProfessorDiscId);
   const tipos = tiposOrdenados().filter(t=>base.some(m=>m.tipoId===t.id));
   const temas = temasDaDisc(currentProfessorDiscId);
   document.getElementById('profDiscTipo').innerHTML='<option value="">Todos os tipos</option>'+tipos.map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
@@ -2518,7 +2525,7 @@ function renderProfessorDisc(){
   const disc=getDisc(currentProfessorDiscId); if(!disc) return voltarProfessorHome();
   document.getElementById('profBreadcrumbDisc').textContent=disc.nome;
   document.getElementById('profDiscTitle').textContent=disc.nome;
-  const base=matsDaDisc(disc.id);
+  const base=professorMatsDaDisc(disc.id);
   const total=base.length, temas=countTema(disc.id);
   document.getElementById('profDiscSubtitle').textContent=`${total} material${total!==1?'is':''} · ${temas} tema${temas!==1?'s':''}`;
   const search=document.getElementById('profDiscSearch').value;
@@ -2840,6 +2847,7 @@ function adminCardHtml(m){
       <div class="admin-title">${m.fixado?'<span class="mat-pin">📌 Fixado</span> ':''}${escH(m.titulo)}</div>
       <div class="admin-meta">
         <span class="mat-tipo-badge" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.nome)}</span>
+        ${m.hiddenProfessor?'<span class="pedagogy-pill">Somente admin</span>':''}
         ${sourceBadgesHtml(m)}
       </div>
       <div class="admin-link-list">${linkPills || '<span class="mat-source-badge">Sem link</span>'}</div>
@@ -3053,6 +3061,7 @@ function openModal(id=null, preferredDiscId=null){
   document.getElementById('mDesc').value=m?.descricao||'';
   document.getElementById('mOrdem').value=m?.ordem||'';
   document.getElementById('mFixado').checked=!!m?.fixado;
+  document.getElementById('mHiddenProfessor').checked=!!m?.hiddenProfessor;
   document.getElementById('mCursoTurma').value=m?.cursoTurma||'';
   document.getElementById('mUnidadeCurricular').value=m?.unidadeCurricular||'';
   document.getElementById('mAulaModulo').value=m?.aulaModulo||'';
@@ -3154,6 +3163,7 @@ function salvarMaterial(options={}){
     ead:document.getElementById('mChkEad').checked
   };
   const fixado=document.getElementById('mFixado').checked;
+  const hiddenProfessor=document.getElementById('mHiddenProfessor').checked;
   let ordem=Number(document.getElementById('mOrdem').value);
   if(!titulo){ showToast('Preencha o título.',true); return document.getElementById('mTitulo').focus(); }
   if(!links.length){ showToast('Adicione pelo menos um link de acesso.',true); return document.querySelector('.link-url-input')?.focus(); }
@@ -3164,7 +3174,7 @@ function salvarMaterial(options={}){
   const now=isoNow();
   const createdAt=existing?.createdAt || now;
   const updatedAt=now;
-  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,reviewTags,checklist,ordem,fixado,archived:!!existing?.archived,archivedAt:existing?.archivedAt||''};
+  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,reviewTags,checklist,ordem,fixado,hiddenProfessor,archived:!!existing?.archived,archivedAt:existing?.archivedAt||''};
   const wasEditing=Boolean(editingMaterialId);
   if(editingMaterialId){
     const idx=D.materiais.findIndex(x=>x.id===editingMaterialId);
@@ -3541,6 +3551,7 @@ function exportarAcervoPlanilha(){
       'Tem gabarito':chk.gabarito?'sim':'não',
       'Revisado presencial':chk.presencial?'sim':'não',
       'Revisado EaD':chk.ead?'sim':'não',
+      'Somente admin':m.hiddenProfessor?'sim':'não',
       Arquivado:m.archived?'sim':'não',
       'Criado em':formatDateTime(m.createdAt),
       'Atualizado em':formatDateTime(m.updatedAt),
@@ -3551,7 +3562,7 @@ function exportarAcervoPlanilha(){
   if(window.XLSX){
     const wb=XLSX.utils.book_new();
     const ws=XLSX.utils.json_to_sheet(rows);
-    ws['!cols']=[22,22,16,34,28,24,18,34,30,18,16,28,34,12,12,12,12,18,16,12,18,18,60,50].map(wch=>({wch}));
+    ws['!cols']=[22,22,16,34,28,24,18,34,30,18,16,28,34,12,12,12,12,18,16,14,12,18,18,60,50].map(wch=>({wch}));
     XLSX.utils.book_append_sheet(wb,ws,'Acervo');
     XLSX.writeFile(wb,'acervo_biblioteca_senai.xlsx');
   } else {
@@ -3653,7 +3664,7 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
     'Capacidade/competência','Conhecimento','Modalidade do material','Status','Etiquetas de revisão','Data de criação','Último upload',
     'Tem objetivo','Tem atividade','Tem avaliação','Tem gabarito','Revisado presencial','Revisado EaD',
     'Link','Origem','Título do link',
-    'Link 2','Origem 2','Título do link 2','Descrição','Fixado'
+    'Link 2','Origem 2','Título do link 2','Descrição','Somente admin','Fixado'
   ];
   const exemplos=[
     [
@@ -3663,7 +3674,7 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
       'sim','sim','não','não','sim','não',
       'https://www.canva.com/design/exemplo','Canva','Abrir slides',
       'https://drive.google.com/exemplo','Google Drive','Material de apoio',
-      'Slides principais da aula, com conceitos e roteiro de discussão.','sim'
+      'Slides principais da aula, com conceitos e roteiro de discussão.','não','sim'
     ],
     [
       'Transformação Digital no Setor Industrial','EaD','Cultura digital','Atividade','Atividade avaliativa - Indústria 4.0',
@@ -3672,7 +3683,7 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
       'sim','sim','sim','não','não','sim',
       'https://docs.google.com/forms/d/exemplo','Google Forms','Responder formulário',
       '','','',
-      'Atividade para ser realizada no AVA ou enviada como link de apoio.','não'
+      'Atividade para ser realizada no AVA ou enviada como link de apoio.','não','não'
     ]
   ];
   const instrucoes=[
@@ -3682,7 +3693,7 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
     ['Se Disciplina, Tema ou Tipo não existirem, a Biblioteca cria automaticamente.'],
     ['Os campos pedagógicos são opcionais e ajudam a reaproveitar materiais em diferentes planos de curso.'],
     ['Para materiais com mais de um acesso, use Link 2, Origem 2 e Título do link 2.'],
-    ['Na coluna Fixado, use sim ou não.'],
+    ['Nas colunas Somente admin e Fixado, use sim ou não.'],
     ['Modalidade aceita Presencial ou EaD. Se ficar vazia, entra como Presencial.'],
     ['Status aceita Pronto, Revisar, Substituir depois ou Em produção.'],
     ['Data de criação e Último upload são opcionais. Se ficarem vazias, a Biblioteca preenche automaticamente ao importar.'],
@@ -3693,10 +3704,10 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
   ws['!cols']=[
     {wch:26},{wch:13},{wch:24},{wch:14},{wch:34},{wch:30},{wch:26},{wch:18},
     {wch:38},{wch:34},{wch:22},{wch:18},{wch:26},{wch:18},{wch:18},{wch:14},{wch:14},{wch:14},{wch:14},{wch:20},{wch:16},{wch:44},{wch:18},{wch:22},
-    {wch:44},{wch:18},{wch:22},{wch:58},{wch:12}
+    {wch:44},{wch:18},{wch:22},{wch:58},{wch:14},{wch:12}
   ];
   ws['!rows']=[{hpt:22},{hpt:34},{hpt:34}];
-  ws['!autofilter']={ref:'A1:AC1'};
+  ws['!autofilter']={ref:'A1:AD1'};
   ws['!freeze']={xSplit:0,ySplit:1,topLeftCell:'A2',activePane:'bottomLeft',state:'frozen'};
   const headerStyle={
     fill:{fgColor:{rgb:'164194'}},
@@ -3793,6 +3804,7 @@ function importarPlanilhaMateriais(input){
         const createdAt=normalizeDateValue(valorLinha(row, header, ['data_de_criacao','data_criacao','criado_em','data_cadastro'])) || now;
         const updatedAt=normalizeDateValue(valorLinha(row, header, ['ultimo_upload','último_upload','data_upload','data_atualizacao','data_atualização'])) || createdAt;
         const fixado=boolPlanilha(valorLinha(row, header, ['fixado','destaque','principal']));
+        const hiddenProfessor=boolPlanilha(valorLinha(row, header, ['somente_admin','ocultar_professor','oculto_professor','nao_mostrar_professor','não_mostrar_professor']));
         const archived=boolPlanilha(valorLinha(row, header, ['arquivado','archived','inativo']));
         const checklist={
           objetivo:boolPlanilha(valorLinha(row, header, ['tem_objetivo','objetivo','objetivo_de_aprendizagem'])),
@@ -3814,7 +3826,7 @@ function importarPlanilhaMateriais(input){
         else if(titleDup) duplicateReason='Mesmo título na mesma disciplina/tema';
         novos.push({
           id:uid('mat'),titulo,link:principal.link,origem:principal.origem||'',links,
-          disciplinaId,temaId,tipoId,descricao,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,reviewTags,checklist,fixado,archived,archivedAt:archived?now:'',
+          disciplinaId,temaId,tipoId,descricao,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,reviewTags,checklist,fixado,hiddenProfessor,archived,archivedAt:archived?now:'',
           _importRow:headerRowIndex+rowIdx+2,
           _duplicate:Boolean(duplicateReason),
           _duplicateReason:duplicateReason,
@@ -4471,7 +4483,7 @@ function disc(id){return id===GERAL_ID?{id:GERAL_ID,nome:DATA.nomeGeral||'Materi
 function tipo(id){return DATA.tipos.find(t=>t.id===id)||{nome:'Outro',icone:'📎',cor:'#888888'}}
 function tema(id){return DATA.temas.find(t=>t.id===id)}
 function themes(id){return DATA.temas.filter(t=>t.disciplinaId===id).sort((a,b)=>(a.ordem||0)-(b.ordem||0)||a.nome.localeCompare(b.nome,'pt-BR'))}
-function activeMats(){return DATA.materiais.filter(m=>!m.archived)}
+function activeMats(){return DATA.materiais.filter(m=>!m.archived&&!m.hiddenProfessor)}
 function mats(id){return activeMats().filter(m=>m.disciplinaId===id)}
 function matCourse(m){return String(m?.cursoTurma||'').trim()}
 function courseMatches(m,c){return !c||matCourse(m)===c}
