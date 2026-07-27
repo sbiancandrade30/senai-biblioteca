@@ -1016,7 +1016,14 @@ const ADMIN_DEFAULT_AUTH = {
 const GERAL_ID = 'geral';
 
 function uid(prefix='id') { return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-function normalizar(v){ return String(v||'').trim().toLowerCase(); }
+function normalizar(v){
+  return String(v||'')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,' ')
+    .trim();
+}
 function modalidadeDisciplinaFallback(d){
   const raw=normalizar(d?.modalidade);
   if(raw==='ead') return 'ead';
@@ -2280,7 +2287,7 @@ function totalByTypeList(list){
 function aulaModuloLabel(m){ return String(m?.aulaModulo||'').trim() || 'Sem aula/módulo definido'; }
 function aulaModuloSortValue(label){
   const s=normalizar(label);
-  if(s.includes('sem_aula')) return 999999;
+  if(s.includes('sem aula')) return 999999;
   const nums=[...String(label||'').matchAll(/\d+/g)].map(m=>Number(m[0])).filter(Number.isFinite);
   if(!nums.length) return 500000;
   let weight=0;
@@ -2291,18 +2298,36 @@ function aulaModuloSortValue(label){
 }
 function searchable(m, includeInternal=false){
   return normalizar([
-    m.titulo,m.descricao,includeInternal?m.internalNotes:'',materialLinksSearchText(m),labelDisc(m.disciplinaId),labelTema(m.temaId),labelTipo(m.tipoId),pedagogicalSearchText(m)
+    m.titulo,
+    m.descricao,
+    includeInternal?m.internalNotes:'',
+    materialLinksSearchText(m),
+    labelDisc(m.disciplinaId),
+    labelTema(m.temaId),
+    labelTipo(m.tipoId),
+    origemMaterial(m),
+    origensMaterial(m).join(' '),
+    pedagogicalSearchText(m),
+    materialQualityIssues(m).join(' '),
+    isArchived(m)?'arquivado inativo':'',
+    m.hiddenProfessor?'somente admin oculto professor':'',
+    m.fixado?'fixado destaque':''
   ].join(' '));
 }
+function searchMatchesMaterial(m, search, includeInternal=false){
+  const terms=normalizar(search).split(/\s+/).filter(Boolean);
+  if(!terms.length) return true;
+  const hay=searchable(m,includeInternal);
+  return terms.every(term=>hay.includes(term));
+}
 function filterMats(list, {search='', tipoId='', temaId='', revisao='', includeInternal=false}={}){
-  const s = normalizar(search);
   return sortMats(list.filter(m=>{
     if (tipoId && m.tipoId!==tipoId) return false;
     if (temaId && (m.temaId||'')!==temaId) return false;
     if (revisao==='review' && !needsMaterialReview(m)) return false;
     if (revisao==='stale' && !isMaterialStale(m)) return false;
     if (revisao==='ready' && needsMaterialReview(m)) return false;
-    if (s && !searchable(m,includeInternal).includes(s)) return false;
+    if (!searchMatchesMaterial(m,search,includeInternal)) return false;
     return true;
   }));
 }
@@ -2861,7 +2886,7 @@ function reviewList(){
     if(f==='semTema' && ((m.disciplinaId||GERAL_ID)===GERAL_ID || String(m.temaId||'').trim())) return false;
     if(f==='semChecklist' && checklistLabels(m).length) return false;
     if(f.startsWith('tag:') && !materialReviewTags(m).includes(f.slice(4))) return false;
-    if(q && !searchable(m,true).includes(q)) return false;
+    if(q && !searchMatchesMaterial(m,q,true)) return false;
     return true;
   }));
 }
@@ -4835,7 +4860,7 @@ ${professorOnlyJs()}
 
 function professorOnlyJs(){ return `
 function escH(v){if(v==null)return '';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function norm(v){return String(v||'').trim().toLowerCase()}
+function norm(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}
 function modalidadeDisciplinaFallback(d){
   const raw=norm(d&&d.modalidade);
   if(raw==='ead') return 'ead';
@@ -4884,8 +4909,9 @@ function checklistLabels(m){const c=m&&m.checklist||{};return [c.objetivo?'objet
 function materialReviewTags(m){return Array.isArray(m&&m.reviewTags)?m.reviewTags.map(t=>String(t||'').trim()).filter(Boolean):[]}
 function pedagogyText(m){return [m.cursoTurma,m.unidadeCurricular,m.aulaModulo,m.capacidadeCompetencia,m.conhecimento,modalidadeMaterialLabel(m.modalidadeMaterial),statusMaterialLabel(m.statusMaterial),readinessLabel(m.readiness),checklistLabels(m).join(' '),materialReviewTags(m).join(' '),formatDateTime(m.createdAt),formatDateTime(m.updatedAt)].join(' ')}
 function pedagogyMeta(m){const chips=[];if(m.createdAt)chips.push('Criado: '+formatDateTime(m.createdAt));if(m.updatedAt)chips.push('Atualizado: '+formatDateTime(m.updatedAt));if(m.cursoTurma)chips.push('Aplicável em: '+m.cursoTurma);if(m.unidadeCurricular)chips.push('UC: '+m.unidadeCurricular);if(m.aulaModulo)chips.push('Aula: '+m.aulaModulo);const mod=modalidadeMaterialLabel(m.modalidadeMaterial);if(mod)chips.push(mod);const rb=reviewBadge(m);const st=statusMaterialLabel(m.statusMaterial);if(st&&!rb)chips.push('Status: '+st);const rd=readinessLabel(m.readiness);if(rd)chips.push('Prontidão: '+rd);const chipHtml=chips.map(c=>'<span class="pedagogy-pill">'+escH(c)+'</span>').join('');const lines=[];if(m.capacidadeCompetencia)lines.push('<div class="pedagogy-line"><strong>Capacidade:</strong> '+escH(m.capacidadeCompetencia)+'</div>');if(m.conhecimento)lines.push('<div class="pedagogy-line"><strong>Conhecimento:</strong> '+escH(m.conhecimento)+'</div>');const checks=checklistLabels(m);if(checks.length)lines.push('<div class="pedagogy-line"><strong>Checklist:</strong> '+escH(checks.join(', '))+'</div>');const tags=materialReviewTags(m);if(tags.length)lines.push('<div class="pedagogy-line"><strong>Etiquetas:</strong> '+escH(tags.join(', '))+'</div>');return chipHtml||rb||lines.length?'<div class="pedagogy-meta">'+rb+chipHtml+'</div>'+lines.join(''):''}
-function searchable(m){return norm([m.titulo,m.descricao,links(m).map((l,i)=>tituloLink(l,i)+' '+origemLink(l)+' '+l.link).join(' '),disc(m.disciplinaId)?.nome,tema(m.temaId)?.nome,tipo(m.tipoId)?.nome,pedagogyText(m)].join(' '))}
-function filtered(list,{search='',tipoId='',temaId='',revisao=''}={}){const s=norm(search);return sortM(list.filter(m=>{if(tipoId&&m.tipoId!==tipoId)return false;if(temaId&&(m.temaId||'')!==temaId)return false;if(revisao==='review'&&!needsMaterialReview(m))return false;if(revisao==='stale'&&!isMaterialStale(m))return false;if(revisao==='ready'&&needsMaterialReview(m))return false;if(s&&!searchable(m).includes(s))return false;return true}))}
+function searchable(m){return norm([m.titulo,m.descricao,links(m).map((l,i)=>tituloLink(l,i)+' '+origemLink(l)+' '+l.link).join(' '),disc(m.disciplinaId)?.nome,tema(m.temaId)?.nome,tipo(m.tipoId)?.nome,pedagogyText(m),m.fixado?'fixado destaque':''].join(' '))}
+function matchesSearch(m,search){const terms=norm(search).split(/\s+/).filter(Boolean);if(!terms.length)return true;const hay=searchable(m);return terms.every(t=>hay.includes(t))}
+function filtered(list,{search='',tipoId='',temaId='',revisao=''}={}){return sortM(list.filter(m=>{if(tipoId&&m.tipoId!==tipoId)return false;if(temaId&&(m.temaId||'')!==temaId)return false;if(revisao==='review'&&!needsMaterialReview(m))return false;if(revisao==='stale'&&!isMaterialStale(m))return false;if(revisao==='ready'&&needsMaterialReview(m))return false;if(!matchesSearch(m,search))return false;return true}))}
 function bg(id){return colorAlpha(tipo(id).cor,.12)}
 function cor(id){return tipo(id).cor||'#888888'}
 const collapsedProfessorOnlyThemes=new Set();
@@ -5014,7 +5040,7 @@ function cardDisc(id){
   +'</button>';
 }
 function searchCards(s){
-  const list=sortM(activeMats().filter(m=>searchable(m).includes(s)));
+  const list=sortM(activeMats().filter(m=>matchesSearch(m,s)));
   const el=document.getElementById('professorHomeContent');
   if(!list.length){el.innerHTML='<div class="empty"><h3>Nenhum material encontrado.</h3><p>Tente outra palavra.</p></div>';return}
   el.innerHTML='<div class="search-results-title">Resultados da busca</div><div class="prof-card-grid">'+list.map(cardMat).join('')+'</div>';
