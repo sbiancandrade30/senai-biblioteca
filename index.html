@@ -410,7 +410,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 <div class="app-body" id="viewAdmin" style="display:none">
   <div class="tabs">
     <button class="tab-btn active" onclick="setTab('materiais',this)">Materiais</button>
-    <button class="tab-btn" onclick="setTab('planejamento',this)">Sequência</button>
+    <button class="tab-btn" onclick="setTab('planejamento',this)">Acervo</button>
     <button class="tab-btn" onclick="setTab('revisao',this)">Revisão</button>
     <button class="tab-btn" onclick="setTab('configuracoes',this)">Configurações</button>
   </div>
@@ -467,12 +467,12 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
   </div>
 
-  <!-- TAB PLANEJAMENTO -->
+  <!-- TAB ACERVO -->
   <div id="tabPlanejamento" style="display:none">
     <div class="library-top">
       <div>
-        <h2>Sequência sugerida</h2>
-        <p>Veja os materiais agrupados por aula ou módulo como sugestão de sequência reutilizável. No Planner, esses materiais poderão ser anexados a turmas e aulas específicas.</p>
+        <h2>Banco de materiais</h2>
+        <p>Consulte todo o acervo por contexto, disciplina, tema, tipo e status. A organiza??o aqui ? reutiliz?vel e n?o depende de uma turma ou aula espec?fica.</p>
       </div>
       <div class="inner-actions">
         <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rapido</button>
@@ -481,9 +481,10 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
     <div class="summary-row" id="planSummary"></div>
     <div class="inner-filters">
-      <input class="search-input" type="text" id="planSearch" placeholder="Buscar no planejamento..." oninput="renderPlanTab()">
+      <input class="search-input" type="text" id="planSearch" placeholder="Buscar no banco de materiais..." oninput="renderPlanTab()">
       <select class="filter-sel" id="planCourse" onchange="renderPlanTab()"><option value="">Todos os contextos</option></select>
       <select class="filter-sel" id="planDisc" onchange="renderPlanTab()"><option value="">Todas as disciplinas</option></select>
+      <select class="filter-sel" id="planTipo" onchange="renderPlanTab()"><option value="">Todos os tipos</option></select>
       <select class="filter-sel" id="planStatus" onchange="renderPlanTab()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="ready">Prontos</option></select>
     </div>
     <div id="planContent"></div>
@@ -599,7 +600,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
             <input type="number" class="form-input" id="cfgReviewStaleDays" min="30" step="30" placeholder="180" style="max-width:160px">
             <button class="btn btn-primary" onclick="salvarPrazoRevisao()">Salvar prazo</button>
             <div style="flex-basis:100%;margin-top:8px">
-              <label class="form-label">Etiquetas personalizadas de revisão</label>
+              <label class="form-label">Etiquetas personalizadas de revisao</label>
               <div class="cfg-list" id="reviewTagsConfigList"></div>
               <div class="cfg-addline">
                 <input type="text" class="form-input" id="novaReviewTag" placeholder="ex: Falta adaptar para EaD" style="flex:1;min-width:260px">
@@ -607,7 +608,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
               </div>
             </div>
           </div>
-          <div style="font-size:12px;color:var(--text2);margin-top:6px">Sugestão: 180 dias para revisão semestral ou 365 dias para revisão anual.</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:6px">Sugestão: 180 dias para revisao semestral ou 365 dias para revisao anual.</div>
         </div>
       </div>
     </div>
@@ -651,7 +652,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           <button class="btn btn-outline" onclick="importFileInput.click()">↑ Importar backup (.json)</button>
         </div>
         <hr style="border:none;border-top:1px solid var(--border)">
-        <p style="font-size:12px;color:var(--text2)"><strong>Cadastro em lote:</strong> importe uma planilha <code>.xlsx</code>, <code>.xls</code> ou <code>.csv</code> com materiais, links e campos pedagógicos opcionais, como curso/turma, unidade curricular, aula/módulo, capacidade, conhecimento e status.</p>
+        <p style="font-size:12px;color:var(--text2)"><strong>Cadastro em lote:</strong> importe uma planilha <code>.xlsx</code>, <code>.xls</code> ou <code>.csv</code> com materiais, links e campos pedagógicos opcionais, como curso/turma, unidade curricular, referencia, capacidade, conhecimento e status.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-outline" onclick="baixarModeloPlanilhaMateriais()">Baixar modelo de planilha</button>
           <button class="btn btn-outline" onclick="bulkSheetInput.click()">Importar planilha de materiais</button>
@@ -783,8 +784,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Aula / módulo <span class="help-tip" tabindex="0" data-tip="Use apenas quando o material já estiver ligado a uma sequência sugerida. A Biblioteca não depende disso.">?</span></label>
-              <input type="text" class="form-input" id="mAulaModulo" placeholder="ex: Aula 03 / Módulo 2">
+              <label class="form-label">Referencia opcional <span class="help-tip" tabindex="0" data-tip="Use se quiser registrar uma referencia livre, como modulo, encontro, unidade ou etapa. A Biblioteca nao depende disso.">?</span></label>
+              <input type="text" class="form-input" id="mAulaModulo" placeholder="ex: M?dulo 2, Unidade 3, Etapa de revisao">
             </div>
             <div class="form-group">
               <label class="form-label">Modalidade do material <span class="help-tip" tabindex="0" data-tip="Escolha se o material foi pensado para presencial, EaD ou ambos. Se deixar vazio, vale a modalidade da disciplina.">?</span></label>
@@ -816,7 +817,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
               <input type="text" class="form-input" id="mConhecimento" placeholder="ex: Ensaio de tração, propriedades mecânicas">
             </div>
             <div class="form-group">
-              <label class="form-label">Status do material <span class="help-tip" tabindex="0" data-tip="Use para controlar revisão: pronto, revisar, substituir depois ou em produção.">?</span></label>
+              <label class="form-label">Status do material <span class="help-tip" tabindex="0" data-tip="Use para controlar revisao: pronto, revisar, substituir depois ou em produção.">?</span></label>
               <select class="form-input" id="mStatusMaterial">
                 <option value="">Sem status</option>
                 <option value="pronto">Pronto para usar</option>
@@ -826,7 +827,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Prontidão <span class="help-tip" tabindex="0" data-tip="Indica o grau de maturidade do material no seu acervo, separado do status de revisão.">?</span></label>
+              <label class="form-label">Prontidão <span class="help-tip" tabindex="0" data-tip="Indica o grau de maturidade do material no seu acervo, separado do status de revisao.">?</span></label>
               <select class="form-input" id="mReadiness">
                 <option value="">Sem nível</option>
                 <option value="rascunho">Rascunho</option>
@@ -837,7 +838,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Checklist pedagógico <span class="help-tip" tabindex="0" data-tip="Marque só quando quiser conferir se o material já tem objetivo, atividade, avaliação, gabarito e revisão por modalidade.">?</span></label>
+            <label class="form-label">Checklist pedagógico <span class="help-tip" tabindex="0" data-tip="Marque só quando quiser conferir se o material já tem objetivo, atividade, avaliação, gabarito e revisao por modalidade.">?</span></label>
             <div class="check-grid">
               <label class="check-line"><input type="checkbox" id="mChkObjetivo"> Tem objetivo de aprendizagem</label>
               <label class="check-line"><input type="checkbox" id="mChkAtividade"> Tem atividade prática/avaliativa</label>
@@ -848,7 +849,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Etiquetas de revisão <span class="help-tip" tabindex="0" data-tip="Use etiquetas criadas por você para filtrar materiais depois na aba Revisão.">?</span></label>
+            <label class="form-label">Etiquetas de revisao <span class="help-tip" tabindex="0" data-tip="Use etiquetas criadas por você para filtrar materiais depois na aba Revisão.">?</span></label>
             <div class="check-grid" id="mReviewTagsList"></div>
           </div>
         </div>
@@ -1255,7 +1256,7 @@ function defaults() {
                 "disciplinaId": "disc_eletromecanica",
                 "temaId": "tema_eletro_grandezas",
                 "tipoId": "tipo_video",
-                "descricao": "Vídeo complementar para revisão em casa.",
+                "descricao": "Vídeo complementar para revisao em casa.",
                 "ordem": 1,
                 "fixado": false
           },
@@ -1325,7 +1326,7 @@ function defaults() {
           },
           {
                 "id": "mat_008",
-                "titulo": "Formulário de revisão — Multímetro",
+                "titulo": "Formulário de revisao — Multímetro",
                 "link": "https://docs.google.com/forms/d/e/1FAIpQLSdMultimetro/viewform",
                 "origem": "Google Forms",
                 "disciplinaId": "disc_eletromecanica",
@@ -1450,7 +1451,7 @@ function defaults() {
                 "disciplinaId": "disc_eletromecanica",
                 "temaId": "tema_eletro_motores",
                 "tipoId": "tipo_video",
-                "descricao": "Conteúdo de apoio para revisão.",
+                "descricao": "Conteúdo de apoio para revisao.",
                 "ordem": 1,
                 "fixado": false
           },
@@ -1742,7 +1743,7 @@ function defaults() {
                 "disciplinaId": "disc_tecnologia",
                 "temaId": "tema_tecnologia_polimeros",
                 "tipoId": "tipo_estudo",
-                "descricao": "Resumo visual para revisão.",
+                "descricao": "Resumo visual para revisao.",
                 "ordem": 1,
                 "fixado": false
           },
@@ -2229,7 +2230,7 @@ function pedagogyMetaHtml(m){
   if(m.updatedAt) chips.push(`Atualizado: ${formatDateTime(m.updatedAt)}`);
   if(m.cursoTurma) chips.push(`Aplicável em: ${m.cursoTurma}`);
   if(m.unidadeCurricular) chips.push(`UC: ${m.unidadeCurricular}`);
-  if(m.aulaModulo) chips.push(`Aula: ${m.aulaModulo}`);
+  if(m.aulaModulo) chips.push(`Referencia: ${m.aulaModulo}`);
   const mod=modalidadeMaterialLabel(m.modalidadeMaterial);
   if(mod) chips.push(mod);
   const status=statusMaterialLabel(m.statusMaterial);
@@ -2284,7 +2285,7 @@ function totalByTypeList(list){
   list.forEach(m=>map.set(m.tipoId,(map.get(m.tipoId)||0)+1));
   return [...map.entries()].map(([tipoId,total])=>({tipoId,total}));
 }
-function aulaModuloLabel(m){ return String(m?.aulaModulo||'').trim() || 'Sem aula/módulo definido'; }
+function aulaModuloLabel(m){ return String(m?.aulaModulo||'').trim() || 'Sem referencia definido'; }
 function aulaModuloSortValue(label){
   const s=normalizar(label);
   if(s.includes('sem aula')) return 999999;
@@ -2923,7 +2924,7 @@ function renderReviewTab(){
   const list=reviewList();
   const el=document.getElementById('reviewContent');
   if(!list.length){
-    el.innerHTML='<div class="empty"><h3>Nenhum material nesta revisão.</h3><p>Ajuste os filtros ou continue cadastrando seus materiais.</p></div>';
+    el.innerHTML='<div class="empty"><h3>Nenhum material nesta revisao.</h3><p>Ajuste os filtros ou continue cadastrando seus materiais.</p></div>';
     return;
   }
   el.innerHTML=`<div class="theme-section">
@@ -3024,60 +3025,66 @@ function adminCardHtml(m){
 function renderPlanSelectors(){
   const courseSel=document.getElementById('planCourse');
   const discSel=document.getElementById('planDisc');
+  const tipoSel=document.getElementById('planTipo');
   const oldCourse=courseSel.value;
   const oldDisc=discSel.value;
+  const oldTipo=tipoSel?.value||'';
+  const base=activeMaterials();
   courseSel.innerHTML='<option value="">Todos os contextos</option>'+cursosOrdenados().map(c=>`<option value="${escH(c)}">${escH(c)}</option>`).join('');
   discSel.innerHTML='<option value="">Todas as disciplinas</option>'+[getDisc(GERAL_ID),...discsOrdenadas()].map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`).join('');
+  if(tipoSel) tipoSel.innerHTML='<option value="">Todos os tipos</option>'+tiposOrdenados().filter(t=>base.some(m=>m.tipoId===t.id)).map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
   if(oldCourse) courseSel.value=oldCourse;
   if(oldDisc) discSel.value=oldDisc;
+  if(tipoSel && oldTipo) tipoSel.value=oldTipo;
 }
 function planFilteredMaterials(){
   const search=document.getElementById('planSearch')?.value||'';
   const course=document.getElementById('planCourse')?.value||'';
   const discId=document.getElementById('planDisc')?.value||'';
+  const tipoId=document.getElementById('planTipo')?.value||'';
   const status=document.getElementById('planStatus')?.value||'';
   return filterMats(activeMaterials().filter(m=>{
     if(course && !courseMatches(m,course)) return false;
     if(discId && m.disciplinaId!==discId) return false;
     return true;
-  }),{search,revisao:status,includeInternal:true});
+  }),{search,tipoId,revisao:status,includeInternal:true});
 }
 function renderPlanTab(){
   renderPlanSelectors();
   const list=planFilteredMaterials();
-  const aulas=[...new Set(list.map(aulaModuloLabel))];
-  const withAula=list.filter(m=>String(m.aulaModulo||'').trim()).length;
+  const discs=[...new Set(list.map(m=>m.disciplinaId||GERAL_ID))];
+  const temas=[...new Set(list.map(m=>m.temaId||''))];
   const review=list.filter(needsMaterialReview).length;
   document.getElementById('planSummary').innerHTML=[
     [list.length,'materiais'],
-    [aulas.length,'aulas/módulos'],
-    [withAula,'com aula definida'],
+    [discs.length,'disciplinas/areas'],
+    [temas.length,'temas'],
     [review,'a revisar']
   ].map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
   const el=document.getElementById('planContent');
   if(!list.length){
-    el.innerHTML='<div class="empty"><h3>Nenhum material no planejamento.</h3><p>Preencha o campo Aula/Módulo nos materiais ou ajuste os filtros.</p></div>';
+    el.innerHTML='<div class="empty"><h3>Nenhum material encontrado.</h3><p>Ajuste a busca ou os filtros do acervo.</p></div>';
     return;
   }
   const grouped=new Map();
   list.forEach(m=>{
-    const key=aulaModuloLabel(m);
+    const key=m.disciplinaId||GERAL_ID;
     if(!grouped.has(key)) grouped.set(key,[]);
     grouped.get(key).push(m);
   });
-  const sections=[...grouped.entries()].sort((a,b)=>aulaModuloSortValue(a[0])-aulaModuloSortValue(b[0])||a[0].localeCompare(b[0],'pt-BR'));
-  el.innerHTML=sections.map(([aula,mats])=>planSectionHtml(aula,mats)).join('');
+  const sections=[...grouped.entries()].sort((a,b)=>labelDisc(a[0]).localeCompare(labelDisc(b[0]),'pt-BR'));
+  el.innerHTML=sections.map(([discId,mats])=>planSectionHtml(discId,mats)).join('');
 }
-function planSectionHtml(aula,mats){
-  const byDisc=new Map();
+function planSectionHtml(discId,mats){
+  const byTema=new Map();
   mats.forEach(m=>{
-    const key=m.disciplinaId||GERAL_ID;
-    if(!byDisc.has(key)) byDisc.set(key,[]);
-    byDisc.get(key).push(m);
+    const key=m.temaId||'';
+    if(!byTema.has(key)) byTema.set(key,[]);
+    byTema.get(key).push(m);
   });
-  const body=[...byDisc.entries()].map(([discId,items])=>`
+  const body=[...byTema.entries()].sort((a,b)=>labelTema(a[0]).localeCompare(labelTema(b[0]),'pt-BR')).map(([temaId,items])=>`
     <div class="material-group">
-      <div class="material-group-title"><div class="tipo-dot" style="background:var(--accent)"></div>${escH(labelDisc(discId))}</div>
+      <div class="material-group-title"><div class="tipo-dot" style="background:var(--accent)"></div>${escH(temaId?labelTema(temaId):'Sem tema')}</div>
       ${items.map(planCardHtml).join('')}
     </div>
   `).join('');
@@ -3085,8 +3092,8 @@ function planSectionHtml(aula,mats){
   return `<section class="theme-section">
     <div class="theme-head">
       <div>
-        <div class="theme-name">${escH(aula)}</div>
-        <div class="theme-meta">${mats.length} material${mats.length!==1?'is':''}${review?` · ${review} a revisar`:''}</div>
+        <div class="theme-name">${escH(labelDisc(discId))}</div>
+        <div class="theme-meta">${mats.length} material${mats.length!==1?'is':''}${review?` ? ${review} a revisar`:''}</div>
       </div>
     </div>
     <div class="theme-body">${body}</div>
@@ -3466,7 +3473,7 @@ function aplicarModeloPedagogico(modelo){
   }
   if(modelo==='revisar'){
     document.getElementById('mStatusMaterial').value='revisar';
-    showToast('Material marcado para revisão.');
+    showToast('Material marcado para revisao.');
   }
 }
 function renderThemeSelectForMaterial(preselect=''){
@@ -3734,7 +3741,7 @@ function salvarPrazoRevisao(){
   salvar();
   renderConfigTab();
   if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
-  showToast('Prazo de revisão salvo!');
+  showToast('Prazo de revisao salvo!');
 }
 function reviewTagsOrdenadas(){
   return [...new Set((D.reviewTags||[]).map(t=>String(t||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
@@ -3918,13 +3925,13 @@ function exportarAcervoPlanilha(){
       Título:m.titulo,
       'Aplicável em':m.cursoTurma||'',
       'Unidade curricular':m.unidadeCurricular||'',
-      'Aula/Módulo':m.aulaModulo||'',
+      'referencia':m.aulaModulo||'',
       'Capacidade/competência':m.capacidadeCompetencia||'',
       Conhecimento:m.conhecimento||'',
       Modalidade:modalidadeMaterialLabel(m.modalidadeMaterial)||modalidadeLabel(modalidadeDisciplina(getDisc(m.disciplinaId)||{})),
       Status:statusMaterialLabel(m.statusMaterial)||'',
       Prontidão:readinessLabel(m.readiness)||'',
-      'Etiquetas de revisão':materialReviewTags(m).join(', '),
+      'Etiquetas de revisao':materialReviewTags(m).join(', '),
       Checklist:checklistLabels(m).join(', '),
       'Tem objetivo':chk.objetivo?'sim':'não',
       'Tem atividade':chk.atividade?'sim':'não',
@@ -4042,8 +4049,8 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
   const nomeDisc=disc && disciplinaId ? disc.nome : 'Ensaios';
   const modalidade=disc && disciplinaId ? modalidadeLabel(modalidadeDisciplina(disc)) : 'Presencial';
   const headers=[
-    'Disciplina','Modalidade','Tema','Tipo','Título','Aplicável em','Unidade curricular','Aula/Módulo',
-    'Capacidade/competência','Conhecimento','Modalidade do material','Status','Prontidão','Etiquetas de revisão','Data de criação','Último upload',
+    'Disciplina','Modalidade','Tema','Tipo','Título','Aplicável em','Unidade curricular','referencia',
+    'Capacidade/competência','Conhecimento','Modalidade do material','Status','Prontidão','Etiquetas de revisao','Data de criação','Último upload',
     'Tem objetivo','Tem atividade','Tem avaliação','Tem gabarito','Revisado presencial','Revisado EaD',
     'Link','Origem','Título do link',
     'Link 2','Origem 2','Título do link 2','Descrição','Nota interna','Somente admin','Fixado'
@@ -4179,7 +4186,7 @@ function importarPlanilhaMateriais(input){
         const modalidadeMaterial=normalizeModalidadeMaterial(valorLinha(row, header, ['modalidade_do_material','modalidade_material','uso']));
         const statusMaterial=normalizeStatusMaterial(valorLinha(row, header, ['status','status_do_material','situacao','situação']));
         const readiness=normalizeReadiness(valorLinha(row, header, ['prontidao','prontidão','nivel_de_prontidao','nível_de_prontidão']));
-        const reviewTags=valorLinha(row, header, ['etiquetas_de_revisao','etiquetas_de_revisão','etiquetas','tags_de_revisao','tags'])
+        const reviewTags=valorLinha(row, header, ['etiquetas_de_revisao','etiquetas_de_revisao','etiquetas','tags_de_revisao','tags'])
           .split(',')
           .map(t=>t.trim())
           .filter(Boolean);
@@ -4922,7 +4929,7 @@ function reviewBadge(m){if(m.statusMaterial==='substituir')return '<span class="
 function checklistLabels(m){const c=m&&m.checklist||{};return [c.objetivo?'objetivo':'',c.atividade?'atividade':'',c.avaliacao?'avaliação':'',c.gabarito?'gabarito':'',c.presencial?'revisado presencial':'',c.ead?'revisado EaD':''].filter(Boolean)}
 function materialReviewTags(m){return Array.isArray(m&&m.reviewTags)?m.reviewTags.map(t=>String(t||'').trim()).filter(Boolean):[]}
 function pedagogyText(m){return [m.cursoTurma,m.unidadeCurricular,m.aulaModulo,m.capacidadeCompetencia,m.conhecimento,modalidadeMaterialLabel(m.modalidadeMaterial),statusMaterialLabel(m.statusMaterial),readinessLabel(m.readiness),checklistLabels(m).join(' '),materialReviewTags(m).join(' '),formatDateTime(m.createdAt),formatDateTime(m.updatedAt)].join(' ')}
-function pedagogyMeta(m){const chips=[];if(m.createdAt)chips.push('Criado: '+formatDateTime(m.createdAt));if(m.updatedAt)chips.push('Atualizado: '+formatDateTime(m.updatedAt));if(m.cursoTurma)chips.push('Aplicável em: '+m.cursoTurma);if(m.unidadeCurricular)chips.push('UC: '+m.unidadeCurricular);if(m.aulaModulo)chips.push('Aula: '+m.aulaModulo);const mod=modalidadeMaterialLabel(m.modalidadeMaterial);if(mod)chips.push(mod);const rb=reviewBadge(m);const st=statusMaterialLabel(m.statusMaterial);if(st&&!rb)chips.push('Status: '+st);const rd=readinessLabel(m.readiness);if(rd)chips.push('Prontidão: '+rd);const chipHtml=chips.map(c=>'<span class="pedagogy-pill">'+escH(c)+'</span>').join('');const lines=[];if(m.capacidadeCompetencia)lines.push('<div class="pedagogy-line"><strong>Capacidade:</strong> '+escH(m.capacidadeCompetencia)+'</div>');if(m.conhecimento)lines.push('<div class="pedagogy-line"><strong>Conhecimento:</strong> '+escH(m.conhecimento)+'</div>');const checks=checklistLabels(m);if(checks.length)lines.push('<div class="pedagogy-line"><strong>Checklist:</strong> '+escH(checks.join(', '))+'</div>');const tags=materialReviewTags(m);if(tags.length)lines.push('<div class="pedagogy-line"><strong>Etiquetas:</strong> '+escH(tags.join(', '))+'</div>');return chipHtml||rb||lines.length?'<div class="pedagogy-meta">'+rb+chipHtml+'</div>'+lines.join(''):''}
+function pedagogyMeta(m){const chips=[];if(m.createdAt)chips.push('Criado: '+formatDateTime(m.createdAt));if(m.updatedAt)chips.push('Atualizado: '+formatDateTime(m.updatedAt));if(m.cursoTurma)chips.push('Aplicável em: '+m.cursoTurma);if(m.unidadeCurricular)chips.push('UC: '+m.unidadeCurricular);if(m.aulaModulo)chips.push('Referencia: '+m.aulaModulo);const mod=modalidadeMaterialLabel(m.modalidadeMaterial);if(mod)chips.push(mod);const rb=reviewBadge(m);const st=statusMaterialLabel(m.statusMaterial);if(st&&!rb)chips.push('Status: '+st);const rd=readinessLabel(m.readiness);if(rd)chips.push('Prontidão: '+rd);const chipHtml=chips.map(c=>'<span class="pedagogy-pill">'+escH(c)+'</span>').join('');const lines=[];if(m.capacidadeCompetencia)lines.push('<div class="pedagogy-line"><strong>Capacidade:</strong> '+escH(m.capacidadeCompetencia)+'</div>');if(m.conhecimento)lines.push('<div class="pedagogy-line"><strong>Conhecimento:</strong> '+escH(m.conhecimento)+'</div>');const checks=checklistLabels(m);if(checks.length)lines.push('<div class="pedagogy-line"><strong>Checklist:</strong> '+escH(checks.join(', '))+'</div>');const tags=materialReviewTags(m);if(tags.length)lines.push('<div class="pedagogy-line"><strong>Etiquetas:</strong> '+escH(tags.join(', '))+'</div>');return chipHtml||rb||lines.length?'<div class="pedagogy-meta">'+rb+chipHtml+'</div>'+lines.join(''):''}
 function searchable(m){return norm([m.titulo,m.descricao,links(m).map((l,i)=>tituloLink(l,i)+' '+origemLink(l)+' '+l.link).join(' '),disc(m.disciplinaId)?.nome,tema(m.temaId)?.nome,tipo(m.tipoId)?.nome,pedagogyText(m),m.fixado?'fixado destaque':''].join(' '))}
 function matchesSearch(m,search){const terms=norm(search).split(/\s+/).filter(Boolean);if(!terms.length)return true;const hay=searchable(m);return terms.every(t=>hay.includes(t))}
 function filtered(list,{search='',tipoId='',temaId='',revisao=''}={}){return sortM(list.filter(m=>{if(tipoId&&m.tipoId!==tipoId)return false;if(temaId&&(m.temaId||'')!==temaId)return false;if(revisao==='review'&&!needsMaterialReview(m))return false;if(revisao==='stale'&&!isMaterialStale(m))return false;if(revisao==='ready'&&needsMaterialReview(m))return false;if(!matchesSearch(m,search))return false;return true}))}
