@@ -212,7 +212,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .disc-config-type.presencial{background:var(--accent-bg);color:var(--accent)}
 .disc-config-type.ead{background:var(--purple-bg);color:var(--purple)}
 .disc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
-.disc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:all .15s;text-align:left;color:inherit;font-family:'DM Sans',sans-serif}
+.disc-card{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:all .15s;text-align:left;color:inherit;font-family:'DM Sans',sans-serif;min-height:134px}
 .disc-card:hover{border-color:var(--accent);box-shadow:0 3px 14px rgba(45,91,227,.1);transform:translateY(-1px)}
 .disc-card.general{border-style:dashed}
 .disc-card-title{font-size:14px;font-weight:600;line-height:1.4;margin-bottom:5px}
@@ -235,7 +235,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .course-chip.active{border-color:var(--accent);background:var(--accent);color:#fff}
 .theme-admin-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .theme-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px}
-.theme-head{background:var(--surface2);border-bottom:1px solid var(--border);padding:13px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.theme-head{background:linear-gradient(90deg,var(--surface2),#faf9f5);border-bottom:1px solid var(--border);padding:13px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .theme-name{font-size:14px;font-weight:600;color:var(--text)}
 .theme-meta{font-size:11px;color:var(--text3);margin-top:3px}
 .theme-actions{display:flex;gap:6px;flex-wrap:wrap}
@@ -244,6 +244,19 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .material-group{margin-bottom:18px}
 .material-group:last-child{margin-bottom:0}
 .material-group-title{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:9px}
+.shelf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;align-items:stretch}
+.shelf-grid .admin-card{display:flex;flex-direction:column;gap:10px;margin-bottom:0;min-height:210px;border-top:4px solid var(--border2)}
+.shelf-grid .admin-card .mat-icon{width:42px;height:42px}
+.shelf-grid .admin-card .admin-body{width:100%}
+.shelf-grid .admin-card .admin-actions{width:100%;justify-content:flex-start;margin-top:auto}
+.shelf-grid .admin-link-list{margin-top:9px}
+.shelf-grid .admin-desc{margin-top:4px}
+.shelf-overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:0 0 16px}
+.shelf-stat{border:1px solid var(--border);background:var(--surface);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;gap:9px}
+.shelf-stat-icon{width:32px;height:42px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.shelf-stat-main{min-width:0}
+.shelf-stat-name{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shelf-stat-count{font-size:11px;color:var(--text3);margin-top:2px}
 .mat-pin{font-size:10px;font-weight:700;background:var(--amber-bg);color:var(--amber);border-radius:20px;padding:2px 7px}
 .admin-card.pinned{border-color:rgba(154,98,0,.28);background:linear-gradient(0deg,var(--surface),#fffaf0)}
 .admin-card-order{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
@@ -2791,7 +2804,21 @@ function renderAdminDisc(){
     return true;
   });
   const list=filterMats(visibleBase,{search,tipoId,temaId:temaId==='__semtema__'?'':temaId,revisao,includeInternal:true});
-  document.getElementById('adminDiscContent').innerHTML=renderAdminGrouped(list,disc.id);
+  document.getElementById('adminDiscContent').innerHTML=renderShelfOverview(base)+renderAdminGrouped(list,disc.id);
+}
+function renderShelfOverview(base){
+  const rows=tiposOrdenados().map(tipo=>{
+    const count=base.filter(m=>m.tipoId===tipo.id).length;
+    if(!count) return '';
+    return `<div class="shelf-stat">
+      <div class="shelf-stat-icon" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.icone||'📎')}</div>
+      <div class="shelf-stat-main">
+        <div class="shelf-stat-name">${escH(tipo.nome)}</div>
+        <div class="shelf-stat-count">${count} material${count!==1?'is':''}</div>
+      </div>
+    </div>`;
+  }).join('');
+  return rows?`<div class="shelf-overview">${rows}</div>`:'';
 }
 function renderAdminGrouped(list,discId){
   const realThemes=temasDaDisc(discId);
@@ -2806,7 +2833,7 @@ function renderAdminGrouped(list,discId){
       if(!items.length) return '';
       return `<div class="material-group">
         <div class="material-group-title"><div class="tipo-dot" style="background:${tipoCor(tipo.id)}"></div>${escH(tipo.nome)}</div>
-        ${items.map(m=>adminCardHtml(m)).join('')}
+        <div class="shelf-grid">${items.map(m=>adminCardHtml(m)).join('')}</div>
       </div>`;
     }).join('');
     const actions = theme.id ? `<div class="theme-actions" onclick="event.stopPropagation()">
