@@ -220,6 +220,18 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .disc-card-metrics{display:flex;flex-wrap:wrap;gap:5px}
 .mini-pill{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);border-radius:20px;padding:3px 8px;font-size:10px;font-weight:600}
 .mini-pill.pin{background:var(--amber-bg);color:var(--amber);border-color:rgba(154,98,0,.18)}
+.recent-strip{margin:0 0 24px}
+.recent-strip-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px}
+.recent-strip-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2)}
+.recent-strip-sub{font-size:11px;color:var(--text3)}
+.recent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.recent-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;display:flex;gap:10px;align-items:flex-start;text-align:left;color:inherit;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;min-height:96px}
+.recent-card:hover{border-color:var(--accent);box-shadow:0 3px 14px rgba(45,91,227,.1);transform:translateY(-1px)}
+.recent-icon{width:36px;height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.recent-body{min-width:0}
+.recent-title{font-size:13px;font-weight:700;line-height:1.35;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.recent-meta{font-size:11px;color:var(--text2);line-height:1.35;margin-top:5px}
+.recent-date{font-size:10px;color:var(--text3);margin-top:5px}
 .breadcrumb{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin-bottom:16px}
 .breadcrumb button{background:none;border:none;color:var(--accent);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;padding:0}
 .breadcrumb button:hover{text-decoration:underline}
@@ -2760,11 +2772,39 @@ function renderAdminHome(){
   const pres=presList.map(d=>discCardHtml(d,false)).join('');
   const ead=eadList.map(d=>discCardHtml(d,false)).join('');
   const blocks=[
+    renderRecentHomeSection(scopedMaterials),
     geral?renderDiscGroupHtml('Materiais gerais', geral, 1, false):'',
     renderDiscGroupHtml('Disciplinas/areas presenciais', pres, presList.length, true),
     renderDiscGroupHtml('Disciplinas/areas EaD', ead, eadList.length, true)
   ].filter(Boolean).join('');
   document.getElementById('adminHomeContent').innerHTML = blocks || `<div class="empty"><h3>Nenhuma disciplina/area encontrada.</h3></div>`;
+}
+function renderRecentHomeSection(materials){
+  const recent=[...materials]
+    .sort((a,b)=>Date.parse(b.updatedAt||b.createdAt||'')-Date.parse(a.updatedAt||a.createdAt||''))
+    .slice(0,6);
+  if(!recent.length) return '';
+  return `<section class="recent-strip">
+    <div class="recent-strip-head">
+      <div>
+        <div class="recent-strip-title">Recentes</div>
+        <div class="recent-strip-sub">Ultimos materiais criados ou atualizados</div>
+      </div>
+    </div>
+    <div class="recent-grid">${recent.map(recentCardHtml).join('')}</div>
+  </section>`;
+}
+function recentCardHtml(m){
+  const tipo=getTipo(m.tipoId);
+  const date=formatDateTime(m.updatedAt||m.createdAt);
+  return `<button class="recent-card" onclick="openModal('${escJsStr(m.id)}')">
+    <div class="recent-icon" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.icone||'📎')}</div>
+    <div class="recent-body">
+      <div class="recent-title">${escH(m.titulo)}</div>
+      <div class="recent-meta">${escH(labelDisc(m.disciplinaId))}${m.temaId?' · '+escH(labelTema(m.temaId)):''}</div>
+      <div class="recent-date">${date?`Atualizado: ${escH(date)}`:'Sem data registrada'}</div>
+    </div>
+  </button>`;
 }
 function abrirAdminDisc(discId){
   currentAdminDiscId=discId;
