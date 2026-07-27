@@ -4436,7 +4436,7 @@ async function syncToCloud(manual=false){
     }
     if(updatedMs(confirmed) < localUpdated){
       setSyncBadge('error','Envio não confirmado');
-      if(manual) showToast('Envio ainda não apareceu na confirmação. Espere alguns segundos e clique em Carregar da nuvem para conferir. A cópia local continua salva.',true);
+      if(manual) showToast('Envio ainda não confirmou. Se isso continuar, atualize o código do Apps Script para a versão que salva o JSON em partes. A cópia local continua salva.',true);
       return;
     }
     localStorage.setItem(CLOUD_PUSHED_AT_KEY,new Date().toISOString());
