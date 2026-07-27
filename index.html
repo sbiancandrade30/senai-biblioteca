@@ -693,8 +693,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label class="form-label">Título * <span class="help-tip" tabindex="0" data-tip="Use um nome que você consiga reconhecer depois. Exemplo: Aula 01 - Ensaio de tração.">?</span></label>
-        <input type="text" class="form-input" id="mTitulo" placeholder="ex: Aula 3 — Contato de Selo">
+        <label class="form-label">Título <span style="font-weight:400;color:var(--text3)">(opcional)</span> <span class="help-tip" tabindex="0" data-tip="Se deixar vazio, a Biblioteca cria um nome provisório a partir do link. Depois você pode editar com calma.">?</span></label>
+        <input type="text" class="form-input" id="mTitulo" placeholder="opcional: ex: Aula 3 — Contato de Selo">
       </div>
       <div class="form-group">
         <label class="form-label">Links de acesso * <span class="help-tip" tabindex="0" data-tip="Cole o link principal do material. Você pode adicionar Canva, Drive, YouTube, Forms ou outros links no mesmo cadastro.">?</span></label>
@@ -713,7 +713,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Tipo * <span class="help-tip" tabindex="0" data-tip="Marque o formato do material: slide, atividade, prova, vídeo, gabarito ou outro.">?</span></label>
+        <label class="form-label">Tipo <span style="font-weight:400;color:var(--text3)">(opcional)</span> <span class="help-tip" tabindex="0" data-tip="Se você não escolher, a Biblioteca tenta identificar pelo link: Canva/Slides, YouTube/Vídeo, Forms/Atividade etc.">?</span></label>
         <div class="tipo-grid" id="tipoGrid"></div>
       </div>
       <details class="pedagogy-box" id="quickDetailsBox">
@@ -3052,6 +3052,26 @@ function autoDetectLinkOrigin(input){
   const detected=detectarOrigem(input.value);
   if(input.value.trim() && detected) origin.value=detected;
 }
+function guessTypeIdFromLinks(links){
+  const text=links.map(l=>`${l.link||''} ${l.origem||''} ${l.titulo||''}`).join(' ').toLowerCase();
+  const byName=name=>tiposOrdenados().find(t=>normalizar(t.nome).includes(normalizar(name)))?.id;
+  if(text.includes('youtube') || text.includes('youtu.be') || text.includes('vídeo') || text.includes('video')) return byName('vídeo') || byName('video');
+  if(text.includes('canva') || text.includes('presentation') || text.includes('slides')) return byName('slide') || byName('aula');
+  if(text.includes('forms') || text.includes('formulário') || text.includes('formulario')) return byName('atividade');
+  if(text.includes('gabarito') || text.includes('correção') || text.includes('correcao')) return byName('gabarito');
+  if(text.includes('prova') || text.includes('avalia')) return byName('prova');
+  if(text.includes('docs.google.com/document') || text.includes('pdf') || text.includes('drive.google')) return byName('material de estudo') || byName('outro');
+  return byName('outro') || tiposOrdenados()[0]?.id || '';
+}
+function guessTitleFromLinks(links){
+  const first=links[0]||{};
+  if(first.titulo) return first.titulo;
+  const origem=first.origem||detectarOrigem(first.link||'');
+  const label=origem && origem!=='Link externo' ? origem : 'Material';
+  const discName=document.getElementById('mDisc')?.selectedOptions?.[0]?.textContent?.trim()||'';
+  const temaName=document.getElementById('mTema')?.selectedOptions?.[0]?.textContent?.trim()||'';
+  return [label,temaName && temaName!=='Sem tema'?temaName:discName].filter(Boolean).join(' - ') || 'Material sem título';
+}
 function extractLinksFromText(text){
   return String(text||'').split(/\s+/).map(s=>s.trim()).filter(s=>/^https?:\/\//i.test(s));
 }
@@ -3154,7 +3174,7 @@ function openModal(id=null, preferredDiscId=null){
   sel.value=selectedDisc;
   renderThemeSelectForMaterial(m?.temaId||(!m && selectedDisc===lastMaterialDefaults.disciplinaId ? lastMaterialDefaults.temaId : ''));
 
-  const tipoSel=m?.tipoId||(!m ? lastMaterialDefaults.tipoId : '')||tiposOrdenados()[0]?.id||'';
+  const tipoSel=m?.tipoId||(!m ? lastMaterialDefaults.tipoId : '')||'';
   document.getElementById('tipoGrid').innerHTML=tiposOrdenados().map(t=>`
     <div class="tipo-opt${t.id===tipoSel?' sel':''}" onclick="selecionarTipo(this)" data-tipo="${escH(t.id)}">
       <div class="tipo-opt-icon">${escH(t.icone||'📎')}</div><span>${escH(t.nome)}</span>
@@ -3197,11 +3217,11 @@ function renderThemeSelectForMaterial(preselect=''){
 function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); editingMaterialId=null; }
 function selecionarTipo(el){ document.querySelectorAll('.tipo-opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); }
 function salvarMaterial(options={}){
-  const titulo=document.getElementById('mTitulo').value.trim();
+  let titulo=document.getElementById('mTitulo').value.trim();
   const links=collectModalLinks();
   const disciplinaId=document.getElementById('mDisc').value||GERAL_ID;
   const temaId=document.getElementById('mTema').value||'';
-  const tipoId=document.querySelector('.tipo-opt.sel')?.dataset.tipo||'';
+  let tipoId=document.querySelector('.tipo-opt.sel')?.dataset.tipo||'';
   const descricao=document.getElementById('mDesc').value.trim();
   const internalNotes=document.getElementById('mInternalNotes').value.trim();
   const cursoTurma=document.getElementById('mCursoTurma').value.trim();
@@ -3224,9 +3244,12 @@ function salvarMaterial(options={}){
   const fixado=document.getElementById('mFixado').checked;
   const hiddenProfessor=document.getElementById('mHiddenProfessor').checked;
   let ordem=Number(document.getElementById('mOrdem').value);
-  if(!titulo){ showToast('Preencha o título.',true); return document.getElementById('mTitulo').focus(); }
   if(!links.length){ showToast('Adicione pelo menos um link de acesso.',true); return document.querySelector('.link-url-input')?.focus(); }
-  if(!tipoId){ showToast('Selecione o tipo.',true); return; }
+  const autoTitle=!titulo;
+  const autoType=!tipoId;
+  if(autoTitle) titulo=guessTitleFromLinks(links);
+  if(autoType) tipoId=guessTypeIdFromLinks(links);
+  if(!tipoId){ showToast('Não consegui identificar um tipo. Selecione um tipo para salvar.',true); return; }
   if(!Number.isFinite(ordem)||ordem<=0) ordem=nextOrderFor(disciplinaId,temaId,tipoId);
   const principal=links[0]||{link:'',origem:''};
   const existing=editingMaterialId?D.materiais.find(x=>x.id===editingMaterialId):null;
@@ -3244,7 +3267,7 @@ function salvarMaterial(options={}){
   if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); } else renderAdminHome();
   if(document.getElementById('tabPlanejamento')?.style.display !== 'none') renderPlanTab();
   if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
-  showToast(wasEditing?'Material atualizado!':'Material adicionado!');
+  showToast(wasEditing?'Material atualizado!':(autoTitle||autoType?'Material adicionado com sugestÃ£o automÃ¡tica.':'Material adicionado!'));
   if(options.keepOpen && !wasEditing){
     openModal(null,disciplinaId);
     document.getElementById('mTema').value=temaId;
