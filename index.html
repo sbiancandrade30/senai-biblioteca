@@ -728,6 +728,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       <div class="form-group">
         <label class="form-label">Tipo <span style="font-weight:400;color:var(--text3)">(opcional)</span> <span class="help-tip" tabindex="0" data-tip="Se você não escolher, a Biblioteca tenta identificar pelo link: Canva/Slides, YouTube/Vídeo, Forms/Atividade etc.">?</span></label>
         <div class="tipo-grid" id="tipoGrid"></div>
+        <button type="button" class="btn btn-outline add-link-btn" onclick="showNewTipoInput()">+ Criar novo tipo</button>
+        <div id="mNewTipoBox" style="display:none;margin-top:8px">
+          <input type="text" class="form-input" id="mNewTipo" placeholder="Nome do novo tipo. Ex: Roteiro, Checklist, Plano de aula">
+          <div style="font-size:11px;color:var(--text3);margin-top:6px">O tipo criado fica salvo para os proximos materiais. Depois voce pode ajustar icone e cor em Configuracoes.</div>
+        </div>
       </div>
       <details class="pedagogy-box" id="quickDetailsBox">
         <summary class="pedagogy-summary">Detalhes opcionais</summary>
@@ -3396,6 +3401,7 @@ function openModal(id=null, preferredDiscId=null){
     <div class="tipo-opt${t.id===tipoSel?' sel':''}" onclick="selecionarTipo(this)" data-tipo="${escH(t.id)}">
       <div class="tipo-opt-icon">${escH(t.icone||'📎')}</div><span>${escH(t.nome)}</span>
     </div>`).join('');
+  hideNewTipoInput();
 
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('mTitulo').focus(),60);
@@ -3435,7 +3441,25 @@ function renderThemeSelectForMaterial(preselect=''){
   toggleNewThemeInput('mTema','mNewTema');
 }
 function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); editingMaterialId=null; }
-function selecionarTipo(el){ document.querySelectorAll('.tipo-opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); }
+function selecionarTipo(el){ document.querySelectorAll('.tipo-opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); hideNewTipoInput(); }
+function showNewTipoInput(){
+  document.querySelectorAll('.tipo-opt').forEach(o=>o.classList.remove('sel'));
+  const box=document.getElementById('mNewTipoBox');
+  const input=document.getElementById('mNewTipo');
+  if(box) box.style.display='block';
+  setTimeout(()=>input?.focus(),30);
+}
+function hideNewTipoInput(){
+  const box=document.getElementById('mNewTipoBox');
+  const input=document.getElementById('mNewTipo');
+  if(input) input.value='';
+  if(box) box.style.display='none';
+}
+function resolveTipoSelection(currentTipoId){
+  const nome=(document.getElementById('mNewTipo')?.value||'').trim();
+  if(nome) return findOrCreateTipoByName(nome);
+  return currentTipoId||'';
+}
 function salvarMaterial(options={}){
   let titulo=document.getElementById('mTitulo').value.trim();
   const links=collectModalLinks();
@@ -3467,6 +3491,7 @@ function salvarMaterial(options={}){
   if(!links.length){ showToast('Adicione pelo menos um link de acesso.',true); return document.querySelector('.link-url-input')?.focus(); }
   temaId=resolveThemeSelection('mTema','mNewTema',disciplinaId,'');
   if(temaId===null) return;
+  tipoId=resolveTipoSelection(tipoId);
   const autoTitle=!titulo;
   const autoType=!tipoId;
   if(autoTitle) titulo=guessTitleFromLinks(links);
@@ -3498,6 +3523,12 @@ function salvarMaterial(options={}){
   if(options.keepOpen && !wasEditing){
     openModal(null,disciplinaId);
     document.getElementById('mTema').value=temaId;
+    renderThemeSelectForMaterial(temaId);
+    document.getElementById('tipoGrid').innerHTML=tiposOrdenados().map(t=>`
+      <div class="tipo-opt${t.id===tipoId?' sel':''}" onclick="selecionarTipo(this)" data-tipo="${escH(t.id)}">
+        <div class="tipo-opt-icon">${escH(t.icone||'📎')}</div><span>${escH(t.nome)}</span>
+      </div>`).join('');
+    hideNewTipoInput();
     document.querySelectorAll('.tipo-opt').forEach(o=>o.classList.toggle('sel',o.dataset.tipo===tipoId));
     document.getElementById('mTitulo').focus();
   } else {
