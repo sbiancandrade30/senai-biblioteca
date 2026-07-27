@@ -498,6 +498,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <option value="semContexto">Sem contexto de uso</option>
         <option value="semTema">Sem tema</option>
         <option value="semChecklist">Checklist vazio</option>
+        <option value="archived">Arquivados</option>
         <option value="all">Todos os materiais</option>
       </select>
     </div>
@@ -1951,6 +1952,8 @@ function coerceData(raw) {
       modalidadeMaterial:normalizeModalidadeMaterial(m.modalidadeMaterial||m.modalidadeDoMaterial||''),
       statusMaterial:normalizeStatusMaterial(m.statusMaterial||m.status||''),
       reviewTags:Array.isArray(m.reviewTags) ? m.reviewTags.map(t=>String(t||'').trim()).filter(Boolean) : [],
+      archived:!!(m.archived||m.arquivado),
+      archivedAt:normalizeDateValue(m.archivedAt||m.arquivadoEm||''),
       checklist:{
         objetivo:!!(m.checklist?.objetivo||m.temObjetivo),
         atividade:!!(m.checklist?.atividade||m.temAtividade),
@@ -2135,16 +2138,18 @@ function pedagogyMetaHtml(m){
   if(!chipHtml && !reviewBadge && !lines.length) return '';
   return `<div class="pedagogy-meta">${reviewBadge}${chipHtml}</div>${lines.join('')}`;
 }
-function matsDaDisc(discId){ return D.materiais.filter(m=>m.disciplinaId===discId); }
+function isArchived(m){ return !!m?.archived; }
+function activeMaterials(){ return D.materiais.filter(m=>!isArchived(m)); }
+function matsDaDisc(discId){ return activeMaterials().filter(m=>m.disciplinaId===discId); }
 function materialCourse(m){ return String(m?.cursoTurma||'').trim(); }
 function courseMatches(m, course){ return !course || materialCourse(m).split(',').map(x=>x.trim()).includes(course) || materialCourse(m)===course; }
 function cursosOrdenados(){
-  return [...new Set(D.materiais.flatMap(m=>materialCourse(m).split(',').map(x=>x.trim()).filter(Boolean)))]
+  return [...new Set(activeMaterials().flatMap(m=>materialCourse(m).split(',').map(x=>x.trim()).filter(Boolean)))]
     .sort((a,b)=>a.localeCompare(b,'pt-BR'));
 }
-function matsDaDiscCurso(discId, course=''){ return D.materiais.filter(m=>m.disciplinaId===discId && courseMatches(m,course)); }
+function matsDaDiscCurso(discId, course=''){ return activeMaterials().filter(m=>m.disciplinaId===discId && courseMatches(m,course)); }
 function countTema(discId){ return D.temas.filter(t=>t.disciplinaId===discId).length; }
-function countFixados(discId){ return D.materiais.filter(m=>m.disciplinaId===discId && m.fixado).length; }
+function countFixados(discId){ return activeMaterials().filter(m=>m.disciplinaId===discId && m.fixado).length; }
 function sortMats(lista){
   return [...lista].sort((a,b)=>
     Number(!!b.fixado)-Number(!!a.fixado) ||
@@ -2153,7 +2158,7 @@ function sortMats(lista){
   );
 }
 function nextOrderFor(disciplinaId, temaId, tipoId){
-  const ords = D.materiais.filter(m=>m.disciplinaId===disciplinaId && (m.temaId||'')===(temaId||'') && m.tipoId===tipoId).map(m=>Number(m.ordem)||0);
+  const ords = activeMaterials().filter(m=>m.disciplinaId===disciplinaId && (m.temaId||'')===(temaId||'') && m.tipoId===tipoId).map(m=>Number(m.ordem)||0);
   return (ords.length ? Math.max(...ords) : 0) + 1;
 }
 function totalByType(discId){
@@ -2438,7 +2443,7 @@ function renderProfessorHome(){
   const s = normalizar(document.getElementById('profGlobalSearch')?.value || '');
   const el = document.getElementById('professorHomeContent');
   if(s){
-    const mats = filterMats(D.materiais,{search:s});
+    const mats = filterMats(activeMaterials(),{search:s});
     el.innerHTML = `<div class="search-result-head">${mats.length} resultado${mats.length!==1?'s':''} encontrado${mats.length!==1?'s':''}</div>` + renderProfessorSearchResults(mats);
     return;
   }
@@ -2590,15 +2595,17 @@ function renderAdminHome(){
   currentAdminDiscId=null;
   document.getElementById('adminHome').style.display='';
   document.getElementById('adminDiscView').style.display='none';
-  const scopedMaterials=D.materiais;
-  const totalM=scopedMaterials.length, totalD=D.disciplinas.length, totalT=D.temas.length, totalF=scopedMaterials.filter(m=>m.fixado).length, totalR=scopedMaterials.filter(needsMaterialReview).length;
-  document.getElementById('adminSummary').innerHTML = [
+  const scopedMaterials=activeMaterials();
+  const totalM=scopedMaterials.length, totalD=D.disciplinas.length, totalT=D.temas.length, totalF=scopedMaterials.filter(m=>m.fixado).length, totalR=scopedMaterials.filter(needsMaterialReview).length, totalA=D.materiais.filter(isArchived).length;
+  const summaryItems=[
     [totalD,'disciplinas'],
     [totalT,'temas'],
     [totalM,'materiais'],
     [totalF,'fixados'],
     [totalR,'a revisar']
-  ].map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
+  ];
+  if(totalA) summaryItems.push([totalA,'arquivados']);
+  document.getElementById('adminSummary').innerHTML = summaryItems.map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
   const q=normalizar(document.getElementById('adminDiscSearch')?.value||'');
   const geralDisc=getDisc(GERAL_ID);
   const geral=!q||normalizar(geralDisc.nome).includes(q) ? discCardHtml(geralDisc,false) : '';
@@ -2717,6 +2724,7 @@ function renderReviewFilterOptions(){
     ['semContexto','Sem contexto de uso'],
     ['semTema','Sem tema'],
     ['semChecklist','Checklist vazio'],
+    ['archived','Arquivados'],
     ['all','Todos os materiais']
   ];
   const custom=reviewTagsOrdenadas().map(tag=>[`tag:${tag}`,`Etiqueta: ${tag}`]);
@@ -2728,6 +2736,8 @@ function reviewList(){
   const q=normalizar(document.getElementById('reviewSearch')?.value||'');
   const f=document.getElementById('reviewFilter')?.value||'review';
   return sortMats(D.materiais.filter(m=>{
+    if(f!=='archived' && isArchived(m)) return false;
+    if(f==='archived' && !isArchived(m)) return false;
     if(f==='review' && !needsMaterialReview(m)) return false;
     if(f==='stale' && !isMaterialStale(m)) return false;
     if(f==='substituir' && m.statusMaterial!=='substituir') return false;
@@ -2744,18 +2754,19 @@ function reviewList(){
 }
 function renderReviewTab(){
   renderReviewFilterOptions();
-  const all=D.materiais;
+  const all=activeMaterials();
   const stale=all.filter(isMaterialStale).length;
   const review=all.filter(needsMaterialReview).length;
   const substituir=all.filter(m=>m.statusMaterial==='substituir').length;
   const revisar=all.filter(m=>m.statusMaterial==='revisar').length;
   const incomplete=all.filter(isMaterialIncomplete).length;
   const semContexto=all.filter(m=>!materialCourse(m)).length;
+  const archived=D.materiais.filter(isArchived).length;
   document.getElementById('reviewSummary').innerHTML=[
     [review,'a revisar'],
     [stale,'desatualizados'],
     [incomplete,'cadastros incompletos'],
-    [semContexto,'sem contexto']
+    [archived,'arquivados']
   ].map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
   const list=reviewList();
   const el=document.getElementById('reviewContent');
@@ -2785,6 +2796,7 @@ function reviewCardHtml(m){
     <div class="admin-body">
       <div class="admin-title">${escH(m.titulo)}</div>
       <div class="admin-meta">
+        ${isArchived(m)?'<span class="pedagogy-pill">Arquivado</span>':''}
         <span class="pedagogy-pill ${m.statusMaterial==='substituir'?'review-pill danger':(needsMaterialReview(m)?'review-pill':'')}">${escH(reason)}</span>
         ${days!=null?`<span class="pedagogy-pill">${days} dia${days!==1?'s':''}</span>`:''}
       </div>
@@ -2794,9 +2806,10 @@ function reviewCardHtml(m){
       ${pedagogyMetaHtml(m)}
     </div>
     <div class="admin-actions wrap">
-      <button class="a-btn" onclick="openMaterialFromReview('${escJsStr(m.id)}')">Abrir</button>
-      <button class="a-btn" onclick="markMaterialReady('${escJsStr(m.id)}')">Marcar pronto</button>
+      ${isArchived(m)?'':`<button class="a-btn" onclick="openMaterialFromReview('${escJsStr(m.id)}')">Abrir</button>`}
+      ${isArchived(m)?`<button class="a-btn" onclick="restaurarMaterial('${escJsStr(m.id)}')">Restaurar</button>`:`<button class="a-btn" onclick="markMaterialReady('${escJsStr(m.id)}')">Marcar pronto</button>`}
       <button class="a-btn" onclick="openModal('${escJsStr(m.id)}')">Editar</button>
+      ${isArchived(m)?`<button class="a-btn danger" onclick="excluirMaterial('${escJsStr(m.id)}')">Excluir</button>`:''}
     </div>
   </div>`;
 }
@@ -2837,6 +2850,7 @@ function adminCardHtml(m){
       <button class="a-btn small-action" onclick="moverMaterial('${escJsStr(m.id)}',-1)" title="Subir">↑</button>
       <button class="a-btn small-action" onclick="moverMaterial('${escJsStr(m.id)}',1)" title="Descer">↓</button>
       <button class="a-btn" onclick="duplicarMaterial('${escJsStr(m.id)}')">Duplicar</button>
+      <button class="a-btn" onclick="arquivarMaterial('${escJsStr(m.id)}')">Arquivar</button>
       <button class="a-btn" onclick="openModal('${escJsStr(m.id)}')">Editar</button>
       <button class="a-btn danger" onclick="excluirMaterial('${escJsStr(m.id)}')">Excluir</button>
     </div>
@@ -2862,7 +2876,7 @@ function planFilteredMaterials(){
   const course=document.getElementById('planCourse')?.value||'';
   const discId=document.getElementById('planDisc')?.value||'';
   const status=document.getElementById('planStatus')?.value||'';
-  return filterMats(D.materiais.filter(m=>{
+  return filterMats(activeMaterials().filter(m=>{
     if(course && !courseMatches(m,course)) return false;
     if(discId && m.disciplinaId!==discId) return false;
     return true;
@@ -3150,7 +3164,7 @@ function salvarMaterial(options={}){
   const now=isoNow();
   const createdAt=existing?.createdAt || now;
   const updatedAt=now;
-  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,reviewTags,checklist,ordem,fixado};
+  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,reviewTags,checklist,ordem,fixado,archived:!!existing?.archived,archivedAt:existing?.archivedAt||''};
   const wasEditing=Boolean(editingMaterialId);
   if(editingMaterialId){
     const idx=D.materiais.findIndex(x=>x.id===editingMaterialId);
@@ -3176,6 +3190,31 @@ function excluirMaterial(id){
   if(!confirm(`Excluir "${m.titulo}"?`)) return;
   D.materiais=D.materiais.filter(x=>x.id!==id); salvar(); renderAdminDisc(); renderAdminHome(); if(document.getElementById('tabPlanejamento')?.style.display !== 'none') renderPlanTab(); if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab(); showToast('Material excluído.');
 }
+function arquivarMaterial(id){
+  const m=D.materiais.find(x=>x.id===id); if(!m) return;
+  if(!confirm(`Arquivar "${m.titulo}"?\n\nEle sairá do acervo ativo e da versão professor, mas poderá ser restaurado depois.`)) return;
+  m.archived=true;
+  m.archivedAt=isoNow();
+  m.updatedAt=isoNow();
+  salvar();
+  if(currentAdminDiscId) renderAdminDisc();
+  renderAdminHome();
+  if(document.getElementById('tabPlanejamento')?.style.display !== 'none') renderPlanTab();
+  if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
+  showToast('Material arquivado.');
+}
+function restaurarMaterial(id){
+  const m=D.materiais.find(x=>x.id===id); if(!m) return;
+  m.archived=false;
+  m.archivedAt='';
+  m.updatedAt=isoNow();
+  salvar();
+  renderAdminHome();
+  if(currentAdminDiscId) renderAdminDisc();
+  if(document.getElementById('tabPlanejamento')?.style.display !== 'none') renderPlanTab();
+  renderReviewTab();
+  showToast('Material restaurado.');
+}
 function duplicarMaterial(id){
   const m=D.materiais.find(x=>x.id===id); if(!m) return;
   const now=isoNow();
@@ -3184,7 +3223,7 @@ function duplicarMaterial(id){
 }
 function moverMaterial(id,dir){
   const m=D.materiais.find(x=>x.id===id); if(!m) return;
-  const siblings=sortMats(D.materiais.filter(x=>x.disciplinaId===m.disciplinaId && (x.temaId||'')===(m.temaId||'') && x.tipoId===m.tipoId));
+  const siblings=sortMats(activeMaterials().filter(x=>x.disciplinaId===m.disciplinaId && (x.temaId||'')===(m.temaId||'') && x.tipoId===m.tipoId));
   const i=siblings.findIndex(x=>x.id===id), j=i+dir;
   if(i<0||j<0||j>=siblings.length) return;
   const a=siblings[i], b=siblings[j];
@@ -3502,6 +3541,7 @@ function exportarAcervoPlanilha(){
       'Tem gabarito':chk.gabarito?'sim':'não',
       'Revisado presencial':chk.presencial?'sim':'não',
       'Revisado EaD':chk.ead?'sim':'não',
+      Arquivado:m.archived?'sim':'não',
       'Criado em':formatDateTime(m.createdAt),
       'Atualizado em':formatDateTime(m.updatedAt),
       Links:links.map((l,i)=>`${tituloLink(l,i)}: ${l.link}`).join('\n'),
@@ -3511,7 +3551,7 @@ function exportarAcervoPlanilha(){
   if(window.XLSX){
     const wb=XLSX.utils.book_new();
     const ws=XLSX.utils.json_to_sheet(rows);
-    ws['!cols']=[22,22,16,34,28,24,18,34,30,18,16,28,34,12,12,12,12,18,16,18,18,60,50].map(wch=>({wch}));
+    ws['!cols']=[22,22,16,34,28,24,18,34,30,18,16,28,34,12,12,12,12,18,16,12,18,18,60,50].map(wch=>({wch}));
     XLSX.utils.book_append_sheet(wb,ws,'Acervo');
     XLSX.writeFile(wb,'acervo_biblioteca_senai.xlsx');
   } else {
@@ -3753,6 +3793,7 @@ function importarPlanilhaMateriais(input){
         const createdAt=normalizeDateValue(valorLinha(row, header, ['data_de_criacao','data_criacao','criado_em','data_cadastro'])) || now;
         const updatedAt=normalizeDateValue(valorLinha(row, header, ['ultimo_upload','último_upload','data_upload','data_atualizacao','data_atualização'])) || createdAt;
         const fixado=boolPlanilha(valorLinha(row, header, ['fixado','destaque','principal']));
+        const archived=boolPlanilha(valorLinha(row, header, ['arquivado','archived','inativo']));
         const checklist={
           objetivo:boolPlanilha(valorLinha(row, header, ['tem_objetivo','objetivo','objetivo_de_aprendizagem'])),
           atividade:boolPlanilha(valorLinha(row, header, ['tem_atividade','atividade','atividade_pratica','atividade_avaliativa'])),
@@ -3773,7 +3814,7 @@ function importarPlanilhaMateriais(input){
         else if(titleDup) duplicateReason='Mesmo título na mesma disciplina/tema';
         novos.push({
           id:uid('mat'),titulo,link:principal.link,origem:principal.origem||'',links,
-          disciplinaId,temaId,tipoId,descricao,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,reviewTags,checklist,fixado,
+          disciplinaId,temaId,tipoId,descricao,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,reviewTags,checklist,fixado,archived,archivedAt:archived?now:'',
           _importRow:headerRowIndex+rowIdx+2,
           _duplicate:Boolean(duplicateReason),
           _duplicateReason:duplicateReason,
@@ -4430,7 +4471,8 @@ function disc(id){return id===GERAL_ID?{id:GERAL_ID,nome:DATA.nomeGeral||'Materi
 function tipo(id){return DATA.tipos.find(t=>t.id===id)||{nome:'Outro',icone:'📎',cor:'#888888'}}
 function tema(id){return DATA.temas.find(t=>t.id===id)}
 function themes(id){return DATA.temas.filter(t=>t.disciplinaId===id).sort((a,b)=>(a.ordem||0)-(b.ordem||0)||a.nome.localeCompare(b.nome,'pt-BR'))}
-function mats(id){return DATA.materiais.filter(m=>m.disciplinaId===id)}
+function activeMats(){return DATA.materiais.filter(m=>!m.archived)}
+function mats(id){return activeMats().filter(m=>m.disciplinaId===id)}
 function matCourse(m){return String(m?.cursoTurma||'').trim()}
 function courseMatches(m,c){return !c||matCourse(m)===c}
 function sortM(list){return [...list].sort((a,b)=>Number(!!b.fixado)-Number(!!a.fixado)||(Number(a.ordem)||999999)-(Number(b.ordem)||999999)||(a.titulo||'').localeCompare(b.titulo||'','pt-BR'))}
@@ -4582,7 +4624,7 @@ function cardDisc(id){
   +'</button>';
 }
 function searchCards(s){
-  const list=sortM(DATA.materiais.filter(m=>searchable(m).includes(s)));
+  const list=sortM(activeMats().filter(m=>searchable(m).includes(s)));
   const el=document.getElementById('professorHomeContent');
   if(!list.length){el.innerHTML='<div class="empty"><h3>Nenhum material encontrado.</h3><p>Tente outra palavra.</p></div>';return}
   el.innerHTML='<div class="search-results-title">Resultados da busca</div><div class="prof-card-grid">'+list.map(cardMat).join('')+'</div>';
