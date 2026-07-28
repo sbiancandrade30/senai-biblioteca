@@ -213,11 +213,12 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 #tabPlanejamento>.summary-row,#tabRevisao>.summary-row{background:rgba(255,255,255,.72);border:1px solid var(--border);border-radius:22px;padding:14px;box-shadow:0 1px 0 rgba(21,24,33,.02)}
 #tabPlanejamento>.inner-filters,#tabRevisao>.inner-filters{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:12px;margin-bottom:20px;box-shadow:0 1px 0 rgba(21,24,33,.02)}
 #planContent,#reviewContent{background:rgba(255,255,255,.72);border:1px solid var(--border);border-radius:22px;padding:16px;box-shadow:0 1px 0 rgba(21,24,33,.02)}
-#planContent>.theme-section{background:linear-gradient(180deg,#fff,#fbfcff);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:18px;box-shadow:0 8px 24px rgba(21,24,33,.04);margin-bottom:30px;padding:14px}
+#planContent>.theme-section{background:linear-gradient(180deg,#fff,#fbfcff);border:1px solid var(--border);border-radius:18px;box-shadow:0 8px 24px rgba(21,24,33,.04);margin-bottom:34px;padding:0;overflow:hidden}
 #reviewContent>.theme-section{background:transparent;border:none;border-radius:0;box-shadow:none;margin-bottom:0}
-#planContent>.theme-section>.theme-head{background:transparent;padding:2px 0 14px;margin-bottom:14px;border-bottom:1px solid var(--border)}
+#planContent>.theme-section>.theme-head{background:#f4f6fa;padding:14px 18px;margin-bottom:16px;border-bottom:1px solid var(--border)}
 #reviewContent>.theme-section>.theme-head{background:transparent;padding:4px 2px 14px}
-#planContent>.theme-section>.theme-body,#reviewContent>.theme-section>.theme-body{padding:0}
+#planContent>.theme-section>.theme-body{padding:0 18px 18px}
+#reviewContent>.theme-section>.theme-body{padding:0}
 #tabConfiguracoes{display:block;column-count:3;column-gap:16px}
 #tabConfiguracoes .settings-intro{column-span:all;background:rgba(255,255,255,.72);border:1px solid var(--border);border-radius:22px;padding:18px;box-shadow:0 1px 0 rgba(21,24,33,.02);margin-bottom:16px}
 #tabConfiguracoes .settings-intro .library-top{margin-bottom:0}
@@ -278,6 +279,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .theme-head{background:linear-gradient(90deg,#f7f9fc,#fff);border-bottom:1px solid var(--border);padding:14px 17px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .theme-name{font-size:14px;font-weight:600;color:var(--text)}
 .theme-meta{font-size:11px;color:var(--text3);margin-top:3px}
+#planContent .theme-name{font-size:15px;font-weight:800;letter-spacing:-.01em}
+#planContent .theme-meta{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-top:4px}
 .theme-actions{display:flex;gap:6px;flex-wrap:wrap}
 .theme-body{padding:14px 16px}
 .theme-empty{border:1px dashed var(--border2);border-radius:var(--radius);padding:16px;font-size:12px;color:var(--text3);background:var(--surface2)}
