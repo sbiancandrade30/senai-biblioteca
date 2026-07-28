@@ -339,6 +339,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .check-grid .check-line{margin-top:0;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px}
 .admin-card{padding:9px 11px;border-radius:12px;gap:10px;margin-bottom:6px;align-items:flex-start}
 .admin-card:hover{transform:none;box-shadow:0 4px 16px rgba(21,24,33,.05)}
+.admin-card.card-clickable{cursor:pointer}
+.admin-card.card-clickable:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(37,87,214,.1)}
 .admin-card .mat-icon{width:30px;height:30px;border-radius:8px;font-size:15px}
 .admin-title{font-size:12.5px;margin-bottom:2px;line-height:1.25}
 .admin-meta{gap:7px 8px;margin-bottom:4px;align-items:flex-start}
@@ -2916,7 +2918,7 @@ function renderRecentHomeSection(materials){
 function recentCardHtml(m){
   const tipo=getTipo(m.tipoId);
   const date=formatDateTime(m.updatedAt||m.createdAt);
-  return `<button class="recent-card" onclick="openModal('${escJsStr(m.id)}')">
+  return `<button class="recent-card" onclick="showMaterialDetail('${escJsStr(m.id)}')">
     <div class="recent-icon" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.icone||'📎')}</div>
     <div class="recent-body">
       <div class="recent-title">${escH(m.titulo)}</div>
@@ -3113,7 +3115,7 @@ function reviewCardHtml(m){
   const tipo=getTipo(m.tipoId);
   const reason=materialReviewReason(m);
   const context=[labelDisc(m.disciplinaId),m.temaId?labelTema(m.temaId):'',tipo.nome].filter(Boolean).join(' - ');
-  return `<div class="admin-card${needsMaterialReview(m)?' pinned':''}">
+  return `<div class="admin-card card-clickable${needsMaterialReview(m)?' pinned':''}" ${materialCardAttrs(m.id)}>
     <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'')}</div>
     <div class="admin-body">
       <div class="admin-title">${escH(m.titulo)}</div>
@@ -3123,13 +3125,11 @@ function reviewCardHtml(m){
         <span class="mat-source-badge">${escH(context)}</span>
       </div>
     </div>
-    <div class="admin-actions wrap">
-      ${isArchived(m)?'':`<button class="a-btn" onclick="openMaterialFromReview('${escJsStr(m.id)}')">Abrir</button>`}
-      <button class="a-btn" onclick="openModal('${escJsStr(m.id)}')">Editar</button>
-      ${isArchived(m)?`<button class="a-btn" onclick="restaurarMaterial('${escJsStr(m.id)}')">Restaurar</button>`:`<button class="a-btn" onclick="markMaterialReady('${escJsStr(m.id)}')">Revisado</button>`}
-      ${isArchived(m)?`<button class="a-btn danger" onclick="excluirMaterial('${escJsStr(m.id)}')">Excluir</button>`:''}
-    </div>
   </div>`;
+}
+function materialCardAttrs(id){
+  const safe=escJsStr(id);
+  return `onclick="showMaterialDetail('${safe}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showMaterialDetail('${safe}')}"`;
 }
 function materialDetailLine(label,value){
   const text=String(value||'').trim();
@@ -3201,8 +3201,10 @@ function showMaterialDetail(id){
   document.getElementById('materialDetailBody').innerHTML=materialDetailHtml(m);
   document.getElementById('materialDetailFoot').innerHTML=`
     <button class="btn btn-outline" onclick="closeMaterialDetailModal()">Fechar</button>
-    ${needsMaterialReview(m)?`<button class="btn btn-outline" onclick="markMaterialReady('${escJsStr(m.id)}'); showMaterialDetail('${escJsStr(m.id)}')">Marcar como revisado</button>`:''}
-    <button class="btn btn-primary" onclick="closeMaterialDetailModal(); openModal('${escJsStr(m.id)}')">Editar</button>
+    ${isArchived(m)?`<button class="btn btn-outline" onclick="restaurarMaterial('${escJsStr(m.id)}'); closeMaterialDetailModal()">Restaurar</button>`:''}
+    ${!isArchived(m) && needsMaterialReview(m)?`<button class="btn btn-outline" onclick="markMaterialReady('${escJsStr(m.id)}'); showMaterialDetail('${escJsStr(m.id)}')">Marcar como revisado</button>`:''}
+    ${isArchived(m)?`<button class="btn btn-outline" style="color:var(--red);border-color:var(--red)" onclick="excluirMaterial('${escJsStr(m.id)}'); closeMaterialDetailModal()">Excluir</button>`:''}
+    ${!isArchived(m)?`<button class="btn btn-primary" onclick="closeMaterialDetailModal(); openModal('${escJsStr(m.id)}')">Editar</button>`:''}
   `;
   document.getElementById('materialDetailModalOverlay').classList.add('open');
 }
@@ -3224,11 +3226,11 @@ function markMaterialReady(id){
 }
 function adminCardHtml(m){
   const tipo=getTipo(m.tipoId);
-  const linkPills=materialLinks(m).map((l,idx)=>`<a class="admin-link-pill" href="${escH(l.link)}" target="_blank" rel="noopener">↗ ${escH(tituloLink(l,idx))}</a>`).join('');
-  return `<div class="admin-card${m.fixado?' pinned':''}">
+  const linkPills=materialLinks(m).map((l,idx)=>`<a class="admin-link-pill" href="${escH(l.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ ${escH(tituloLink(l,idx))}</a>`).join('');
+  return `<div class="admin-card card-clickable${m.fixado?' pinned':''}" ${materialCardAttrs(m.id)}>
     <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'📎')}</div>
     <div class="admin-body">
-      <div class="admin-title">${m.fixado?'<span class="mat-pin">📌 Fixado</span> ':''}${escH(m.titulo)}</div>
+      <div class="admin-title">${m.fixado?'<span class="mat-pin">Fixado</span> ':''}${escH(m.titulo)}</div>
       <div class="admin-meta">
         <span class="mat-tipo-badge" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.nome)}</span>
         ${m.hiddenProfessor?'<span class="pedagogy-pill">Somente admin</span>':''}
@@ -3239,22 +3241,8 @@ function adminCardHtml(m){
       ${m.internalNotes?`<div class="admin-desc"><strong>Nota interna:</strong> ${escH(m.internalNotes)}</div>`:''}
       ${pedagogyMetaHtml(m)}
     </div>
-    <div class="admin-actions wrap">
-      <button class="a-btn primary-soft" onclick="openModal('${escJsStr(m.id)}')">Editar</button>
-      <details class="card-more">
-        <summary class="a-btn">Mais</summary>
-        <div class="card-more-menu">
-          <button class="a-btn small-action" onclick="moverMaterial('${escJsStr(m.id)}',-1)" title="Subir">↑</button>
-          <button class="a-btn small-action" onclick="moverMaterial('${escJsStr(m.id)}',1)" title="Descer">↓</button>
-          <button class="a-btn" onclick="duplicarMaterial('${escJsStr(m.id)}')">Duplicar</button>
-          <button class="a-btn" onclick="arquivarMaterial('${escJsStr(m.id)}')">Arquivar</button>
-          <button class="a-btn danger" onclick="excluirMaterial('${escJsStr(m.id)}')">Excluir</button>
-        </div>
-      </details>
-    </div>
   </div>`;
 }
-
 // ════════════════════════════════════════════════════════
 // MATERIAIS
 // ════════════════════════════════════════════════════════
@@ -3357,7 +3345,7 @@ function planSectionHtml(discId,mats){
 function planCardHtml(m){
   const tipo=getTipo(m.tipoId);
   const links=materialLinks(m);
-  return `<div class="admin-card${needsMaterialReview(m)?' pinned':''}">
+  return `<div class="admin-card card-clickable${needsMaterialReview(m)?' pinned':''}" ${materialCardAttrs(m.id)}>
     <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'📎')}</div>
     <div class="admin-body">
       <div class="admin-title">${escH(m.titulo)}</div>
@@ -3369,11 +3357,6 @@ function planCardHtml(m){
       ${m.descricao?`<div class="admin-desc">${escH(m.descricao)}</div>`:''}
       ${m.internalNotes?`<div class="admin-desc"><strong>Nota interna:</strong> ${escH(m.internalNotes)}</div>`:''}
       ${pedagogyMetaHtml(m)}
-    </div>
-    <div class="admin-actions wrap">
-      <button class="a-btn" onclick="openMaterialFromPlan('${escJsStr(m.id)}')">Abrir</button>
-      <button class="a-btn" onclick="openModal('${escJsStr(m.id)}')">Editar</button>
-      ${needsMaterialReview(m)?`<button class="a-btn" onclick="markMaterialReadyFromPlan('${escJsStr(m.id)}')">Revisado</button>`:''}
     </div>
   </div>`;
 }
