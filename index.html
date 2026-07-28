@@ -351,15 +351,15 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .theme-section{border-radius:14px;margin-bottom:24px}
 .theme-head{padding:10px 12px}
 .theme-body{padding:10px 12px}
-.material-group{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px;margin-bottom:26px;align-items:start}
+.material-group{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 12px;margin-bottom:30px;align-items:start}
 .material-group:last-child{margin-bottom:4px}
 .material-group-title{grid-column:1/-1;font-size:10px;margin:0 0 4px;padding:8px 0 2px;border-top:1px dashed var(--border);color:var(--text2)}
 .material-group:first-child .material-group-title{border-top:0;padding-top:0}
-.material-group.assessment-group{background:#fffaf2;border:1px solid rgba(154,98,0,.16);border-radius:14px;padding:12px;margin-bottom:24px}
-.material-group.assessment-group .material-group-title{border-top:0;padding-top:0;color:var(--amber)}
-.material-group.assessment-group .admin-card{border-color:rgba(154,98,0,.18)}
+.material-group.assessment-group{background:transparent;border:0;border-radius:0;padding:0;margin-bottom:4px}
+.material-group.assessment-group .material-group-title{color:var(--red)}
+.material-group.assessment-group .admin-card{border-color:var(--border)}
 .material-group>.admin-card{margin-bottom:0;min-height:0}
-.shelf-grid{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:start}
+.shelf-grid{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:start}
 .shelf-grid .admin-card{flex-direction:row;min-height:0;border-top:0;margin-bottom:0}
 .shelf-grid .admin-card .mat-icon{width:30px;height:30px}
 .shelf-grid .admin-card .admin-actions{width:auto;justify-content:flex-end;margin-top:0}
@@ -371,6 +371,9 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .material-group .admin-actions.wrap,.shelf-grid .admin-actions.wrap{margin-left:auto}
 #planContent,#reviewContent{padding:10px}
 #reviewContent>.theme-section>.theme-head{padding:6px 2px 16px;margin-bottom:6px;border-bottom:1px solid var(--border)}
+#reviewContent>.theme-section>.theme-body{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 12px}
+#reviewContent .admin-card{margin-bottom:0}
+#reviewContent .admin-card.pinned{background:var(--surface);border-color:var(--border)}
 .shelf-overview{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px}
 .shelf-stat{padding:7px 9px;border-radius:12px}
 .shelf-stat-icon{width:26px;height:32px;font-size:14px}
@@ -422,6 +425,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 
 @media(max-width:1200px){
   .material-group,.shelf-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #reviewContent>.theme-section>.theme-body{grid-template-columns:repeat(2,minmax(0,1fr))}
   #tabConfiguracoes{column-count:2}
 }
 
@@ -432,6 +436,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   .summary-row{grid-template-columns:repeat(2,minmax(0,1fr))}
   .recent-grid{grid-template-columns:1fr}
   .material-group,.shelf-grid{grid-template-columns:1fr}
+  #reviewContent>.theme-section>.theme-body{grid-template-columns:1fr}
   #tabConfiguracoes{column-count:1}
   #tabPlanejamento>.library-top,#tabRevisao>.library-top,#tabPlanejamento>.summary-row,#tabRevisao>.summary-row,#planContent,#reviewContent,#tabConfiguracoes .settings-intro{border-radius:18px;padding:14px}
   .form-row,.form-row.three{grid-template-columns:1fr}
@@ -478,6 +483,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   </div>
 </div>
 <input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
+<input type="file" id="faviconFileInput" accept="image/*" style="display:none" onchange="handleFaviconUpload(this)">
 <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importarDados(this)">
 <input type="file" id="bulkSheetInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarPlanilhaMateriais(this)">
 
@@ -553,17 +559,17 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div id="adminHome">
       <div class="library-top">
         <div>
-          <h2>Visao geral do acervo</h2>
-          <p>Acompanhe o tamanho da biblioteca e entre em uma disciplina/area para ver materiais, temas e detalhes. A Biblioteca continua independente de turmas especificas.</p>
+          <h2>Visão geral do acervo</h2>
+          <p>Acompanhe o tamanho da biblioteca e entre em uma disciplina/área para ver materiais, temas e detalhes. A Biblioteca continua independente de turmas específicas.</p>
         </div>
         <div class="inner-actions">
-          <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rapido</button>
+          <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rápido</button>
           <button class="btn btn-primary" onclick="openModal()">+ Novo material</button>
         </div>
       </div>
       <div class="summary-row" id="adminSummary"></div>
       <div class="disc-search">
-        <input class="search-input" type="text" id="adminDiscSearch" placeholder="Buscar disciplina/area..." oninput="renderAdminHome()">
+        <input class="search-input" type="text" id="adminDiscSearch" placeholder="Buscar disciplina/área..." oninput="renderAdminHome()">
       </div>
       <div id="adminHomeContent"></div>
     </div>
@@ -579,7 +585,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           <button class="btn btn-outline" onclick="openThemeModal()">+ Novo tema</button>
           <button class="btn btn-outline" onclick="baixarModeloPlanilhaMateriais(currentAdminDiscId)">Baixar modelo</button>
           <button class="btn btn-outline" onclick="bulkSheetInput.click()">Importar planilha</button>
-          <button class="btn btn-outline" onclick="openQuickMaterialModal(currentAdminDiscId)">+ Cadastro rapido</button>
+          <button class="btn btn-outline" onclick="openQuickMaterialModal(currentAdminDiscId)">+ Cadastro rápido</button>
           <button class="btn btn-primary" onclick="openModal(null, currentAdminDiscId)">+ Novo material</button>
         </div>
       </div>
@@ -603,10 +609,10 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div class="library-top">
       <div>
         <h2>Banco de materiais</h2>
-        <p>Consulte todo o acervo por uso, disciplina, tema, tipo e status. A organizacao aqui e reutilizavel e nao depende de uma turma ou aula especifica.</p>
+        <p>Consulte todo o acervo por disciplina, tema, tipo e status. A organização aqui é reutilizável e não depende de uma turma ou aula específica.</p>
       </div>
       <div class="inner-actions">
-        <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rapido</button>
+        <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rápido</button>
         <button class="btn btn-primary" onclick="openModal()">+ Novo material</button>
       </div>
     </div>
@@ -625,13 +631,13 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   <div id="tabRevisao" style="display:none">
     <div class="library-top">
       <div>
-        <h2>Revisao de materiais</h2>
-        <p>Confira materiais marcados para revisar, substituir ou sem atualizacao recente. Use esta area para manter a biblioteca confiavel antes de compartilhar com outras turmas.</p>
+        <h2>Revisão de materiais</h2>
+        <p>Confira materiais marcados para revisar, substituir ou sem atualização recente. Use esta área para manter a biblioteca confiável antes de compartilhar com outras turmas.</p>
       </div>
     </div>
     <div class="summary-row" id="reviewSummary"></div>
     <div class="inner-filters">
-      <input class="search-input" type="text" id="reviewSearch" placeholder="Buscar por titulo, disciplina, uso, status..." oninput="renderReviewTab()">
+      <input class="search-input" type="text" id="reviewSearch" placeholder="Buscar por título, disciplina ou status..." oninput="renderReviewTab()">
       <select class="filter-sel" id="reviewFilter" onchange="renderReviewTab()">
         <option value="review">A revisar</option>
         <option value="stale">Desatualizados</option>
@@ -639,7 +645,6 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <option value="revisar">Marcados como revisar</option>
         <option value="incomplete">Cadastros incompletos</option>
         <option value="semDescricao">Sem descrição</option>
-        <option value="semContexto">Sem uso indicado</option>
         <option value="semTema">Sem tema</option>
         <option value="semChecklist">Checklist vazio</option>
         <option value="archived">Arquivados</option>
@@ -654,21 +659,20 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div class="settings-intro">
       <div class="library-top">
         <div>
-          <div class="section-kicker">Administracao</div>
-          <h2>Configuracoes</h2>
-          <p>Ajuste identidade, disciplinas, tipos, revisao, compartilhamento e sincronizacao da Biblioteca.</p>
+          <h2>Configurações</h2>
+          <p>Ajuste identidade, disciplinas, tipos, revisão, compartilhamento e sincronização da Biblioteca.</p>
         </div>
       </div>
     </div>
 
     <div class="cfg-section">
-      <div class="cfg-head">Nome do curso / turma</div>
+      <div class="cfg-head">Título da página</div>
       <div class="cfg-body">
         <div>
-          <label class="form-label">Texto exibido na tela de login</label>
+          <label class="form-label">Título exibido no cabeçalho, na aba do navegador e no login</label>
           <input type="text" class="form-input" id="cfgNomeCurso">
         </div>
-        <button class="btn btn-primary" style="align-self:flex-start" onclick="salvarNome()">Salvar nome</button>
+        <button class="btn btn-primary" style="align-self:flex-start" onclick="salvarNome()">Salvar título</button>
       </div>
     </div>
 
@@ -694,14 +698,20 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
 
     <div class="cfg-section">
-      <div class="cfg-head">Logo</div>
+      <div class="cfg-head">Logo e favicon</div>
       <div class="cfg-body">
         <div id="logoPreview"></div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-outline" onclick="triggerLogoUpload()">📁 Selecionar logo</button>
+          <button class="btn btn-outline" onclick="triggerLogoUpload()">Selecionar logo</button>
           <button class="btn btn-outline" style="color:var(--red);border-color:var(--red)" onclick="removerLogo()">Remover</button>
         </div>
         <div style="font-size:11px;color:var(--text3)">Aparece na tela de login e no cabeçalho. PNG com fundo transparente fica melhor.</div>
+        <div id="faviconPreview"></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline" onclick="triggerFaviconUpload()">Selecionar favicon</button>
+          <button class="btn btn-outline" style="color:var(--red);border-color:var(--red)" onclick="removerFavicon()">Remover</button>
+        </div>
+        <div style="font-size:11px;color:var(--text3)">O favicon é o ícone pequeno que aparece na aba do navegador. Se não escolher um, a página usa a logo.</div>
       </div>
     </div>
 
@@ -720,7 +730,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
 
     <div class="cfg-section" style="display:none">
-      <div class="cfg-head">Aplicavel em</div>
+      <div class="cfg-head">Aplicável em</div>
       <div class="cfg-body">
         <div style="font-size:12px;color:var(--text2)">Use esta lista para indicar onde um material pode ser reaproveitado: curso, modalidade, laboratorio, presencial, EaD ou outro uso.</div>
         <div class="cfg-list" id="contextosConfigList"></div>
@@ -872,11 +882,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <button type="button" class="btn btn-outline add-link-btn" onclick="showNewTipoInput()">+ Criar novo tipo</button>
         <div id="mNewTipoBox" style="display:none;margin-top:8px">
           <input type="text" class="form-input" id="mNewTipo" placeholder="Nome do novo tipo. Ex: Roteiro, Checklist, Plano de aula">
-          <div style="font-size:11px;color:var(--text3);margin-top:6px">O tipo criado fica salvo para os proximos materiais. Depois voce pode ajustar icone e cor em Configuracoes.</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:6px">O tipo criado fica salvo para os próximos materiais. Depois você pode ajustar ícone e cor em Configurações.</div>
         </div>
       </div>
       <details class="pedagogy-box" id="quickDetailsBox">
-        <summary class="pedagogy-summary">Mais opcoes</summary>
+        <summary class="pedagogy-summary">Mais opções</summary>
         <div class="pedagogy-content">
           <div class="form-row">
             <div class="form-group">
@@ -902,7 +912,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Etiquetas de revisao</label>
+            <label class="form-label">Etiquetas de revisão</label>
             <div class="check-grid" id="mReviewTagsList"></div>
           </div>
         </div>
@@ -937,17 +947,17 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 <div class="modal-overlay" id="quickMaterialModalOverlay">
   <div class="modal" style="width:540px">
     <div class="modal-head">
-      <h2>Cadastro rapido</h2>
+      <h2>Cadastro rápido</h2>
       <button class="close-btn" onclick="closeQuickMaterialModal()">x</button>
     </div>
     <div class="modal-body">
       <div class="quick-note">
-        Cole um ou varios links, um por linha. A Biblioteca cria um material separado para cada link. Depois de cadastrar, voce pode continuar na mesma disciplina e tema.
+        Cole um ou vários links, um por linha. A Biblioteca cria um material separado para cada link. Depois de cadastrar, você pode continuar na mesma disciplina e tema.
       </div>
       <div class="form-group">
         <label class="form-label">Titulo opcional</label>
         <input type="text" class="form-input" id="quickTitle" placeholder="ex: Aula 01 - Introducao ao tema">
-        <div style="font-size:11px;color:var(--text3);margin-top:6px">Se colar varios links, este titulo vira a base: Aula 01 - Material 1, Aula 01 - Material 2...</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px">Se colar vários links, este título vira a base: Aula 01 - Material 1, Aula 01 - Material 2...</div>
       </div>
       <div class="form-group">
         <label class="form-label">Links *</label>
@@ -1135,6 +1145,7 @@ function defaults() {
     reviewStaleDays: 180,
     reviewTags: ['Revisar cadastro','Precisa adaptar','Aguardando gabarito','Link para conferir'],
     logo: '',
+    favicon: '',
     tipos: [
       {id:'tipo_aula', nome:'Aula', icone:'📖', cor:'#2d5be3', ordem:1},
       {id:'tipo_atividade', nome:'Atividade', icone:'✏️', cor:'#2a7d4f', ordem:2},
@@ -1396,7 +1407,7 @@ function defaults() {
           },
           {
                 "id": "mat_008",
-                "titulo": "Formulário de revisao — Multímetro",
+                "titulo": "Formulário de revisão — Multímetro",
                 "link": "https://docs.google.com/forms/d/e/1FAIpQLSdMultimetro/viewform",
                 "origem": "Google Forms",
                 "disciplinaId": "disc_eletromecanica",
@@ -2020,6 +2031,7 @@ function coerceData(raw) {
   const src = raw && typeof raw === 'object' ? raw : {};
   const out = {...base, ...src};
   out.nomeGeral = src.nomeGeral || base.nomeGeral;
+  out.favicon = String(src.favicon || '').trim();
   out.tipos = Array.isArray(src.tipos) ? src.tipos : base.tipos;
   out.disciplinas = Array.isArray(src.disciplinas) ? src.disciplinas : base.disciplinas;
   out.contextosUso = Array.isArray(src.contextosUso) ? src.contextosUso : ['Moldador de Plástico','Cursos técnicos','EaD','Presencial','Laboratório'];
@@ -2501,10 +2513,7 @@ function checkLogin(){
 function abrirApp(){
   document.getElementById('loginWrap').style.display='none';
   document.getElementById('appHeader').style.display='';
-  applyLogo();
-  const hTitle=document.getElementById('hTitle');
-  hTitle.textContent='Materiais — '+(D.nomeCurso||'SENAI');
-  document.title='Materiais — '+(D.nomeCurso||'SENAI');
+  applyBranding();
 
   document.getElementById('hBadge').style.display='';
   document.getElementById('hBadge').textContent='Admin';
@@ -2547,9 +2556,7 @@ function visualizarComoProfessor(){
 function abrirProfessorOnline(){
   document.getElementById('loginWrap').style.display='none';
   document.getElementById('appHeader').style.display='';
-  applyLogo();
-  document.getElementById('hTitle').textContent='Materiais — '+(D.nomeCurso||'SENAI');
-  document.title='Materiais — '+(D.nomeCurso||'SENAI');
+  applyBranding();
   document.getElementById('hBadge').style.display='';
   document.getElementById('hBadge').textContent='Professor';
   document.getElementById('hBtnVoltarAdmin').style.display='none';
@@ -2592,11 +2599,24 @@ function voltarDaPreviaProfessor(){
 // ════════════════════════════════════════════════════════
 // LOGO
 // ════════════════════════════════════════════════════════
+function pageTitle(){
+  return String(D.nomeCurso || '').trim() || 'Biblioteca de materiais SENAI';
+}
+function applyBranding(){
+  applyLogo();
+  applyFavicon();
+  const title=pageTitle();
+  const hTitle=document.getElementById('hTitle');
+  const loginSub=document.getElementById('loginSub');
+  if(hTitle) hTitle.textContent=title;
+  if(loginSub) loginSub.textContent=title;
+  document.title=title;
+}
 function triggerLogoUpload(){ if(sessionStorage.getItem('mat_mode')==='admin') document.getElementById('logoFileInput').click(); }
 function handleLogoUpload(input){
   const file=input.files[0]; if(!file) return;
   const reader=new FileReader();
-  reader.onload=e=>{ D.logo=e.target.result; salvar(); applyLogo(); renderConfigTab(); showToast('Logo atualizada!'); };
+  reader.onload=e=>{ D.logo=e.target.result; salvar(); applyBranding(); renderConfigTab(); showToast('Logo atualizada!'); };
   reader.readAsDataURL(file); input.value='';
 }
 function applyLogo(){
@@ -2608,7 +2628,32 @@ function applyLogo(){
 }
 function removerLogo(){
   if(!confirm('Remover a logo?')) return;
-  D.logo=''; salvar(); applyLogo(); renderConfigTab(); showToast('Logo removida.');
+  D.logo=''; salvar(); applyBranding(); renderConfigTab(); showToast('Logo removida.');
+}
+function triggerFaviconUpload(){ if(sessionStorage.getItem('mat_mode')==='admin') document.getElementById('faviconFileInput').click(); }
+function handleFaviconUpload(input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{ D.favicon=e.target.result; salvar(); applyBranding(); renderConfigTab(); showToast('Favicon atualizado!'); };
+  reader.readAsDataURL(file); input.value='';
+}
+function applyFavicon(){
+  const href=String(D.favicon || D.logo || '').trim();
+  let link=document.querySelector('link[rel="icon"]');
+  if(!href){
+    if(link) link.remove();
+    return;
+  }
+  if(!link){
+    link=document.createElement('link');
+    link.rel='icon';
+    document.head.appendChild(link);
+  }
+  link.href=href;
+}
+function removerFavicon(){
+  if(!confirm('Remover o favicon?')) return;
+  D.favicon=''; salvar(); applyBranding(); renderConfigTab(); showToast('Favicon removido.');
 }
 
 // ════════════════════════════════════════════════════════
@@ -2800,7 +2845,7 @@ function renderAdminHome(){
   const scopedMaterials=activeMaterials();
   const totalM=scopedMaterials.length, totalD=D.disciplinas.length, totalT=D.temas.length, totalF=scopedMaterials.filter(m=>m.fixado).length, totalR=scopedMaterials.filter(needsMaterialReview).length, totalA=D.materiais.filter(isArchived).length;
   const summaryItems=[
-    [totalD,'disciplinas/areas'],
+    [totalD,'disciplinas/áreas'],
     [totalT,'temas'],
     [totalM,'materiais'],
     [totalF,'fixados'],
@@ -2819,10 +2864,10 @@ function renderAdminHome(){
   const blocks=[
     renderRecentHomeSection(scopedMaterials),
     geral?renderDiscGroupHtml('Materiais gerais', geral, 1, false):'',
-    renderDiscGroupHtml('Disciplinas/areas presenciais', pres, presList.length, true),
-    renderDiscGroupHtml('Disciplinas/areas EaD', ead, eadList.length, true)
+    renderDiscGroupHtml('Disciplinas/áreas presenciais', pres, presList.length, true),
+    renderDiscGroupHtml('Disciplinas/áreas EaD', ead, eadList.length, true)
   ].filter(Boolean).join('');
-  document.getElementById('adminHomeContent').innerHTML = blocks || `<div class="empty"><h3>Nenhuma disciplina/area encontrada.</h3></div>`;
+  document.getElementById('adminHomeContent').innerHTML = blocks || `<div class="empty"><h3>Nenhuma disciplina/área encontrada.</h3></div>`;
 }
 function renderRecentHomeSection(materials){
   const recent=[...materials]
@@ -3146,7 +3191,7 @@ function renderPlanTab(){
   const review=list.filter(needsMaterialReview).length;
   document.getElementById('planSummary').innerHTML=[
     [list.length,'materiais'],
-    [discs.length,'disciplinas/areas'],
+    [discs.length,'disciplinas/áreas'],
     [temas.length,'temas'],
     [review,'a revisar']
   ].map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
@@ -3184,7 +3229,7 @@ function planSectionHtml(discId,mats){
   });
   const assessmentsBlock=assessments.length?`
     <div class="material-group assessment-group">
-      <div class="material-group-title"><div class="tipo-dot" style="background:var(--amber)"></div>Avaliacoes e trabalhos gerais</div>
+      <div class="material-group-title"><div class="tipo-dot" style="background:var(--red)"></div>Avaliações e trabalhos gerais</div>
       ${assessments.map(planCardHtml).join('')}
     </div>
   `:'';
@@ -3194,7 +3239,7 @@ function planSectionHtml(discId,mats){
       ${items.map(planCardHtml).join('')}
     </div>
   `).join('');
-  const body=assessmentsBlock+themeBlocks;
+  const body=themeBlocks+assessmentsBlock;
   const review=mats.filter(needsMaterialReview).length;
   return `<section class="theme-section">
     <div class="theme-head">
@@ -3313,7 +3358,7 @@ function guessTitleForContext(link, disciplinaId, temaId){
   const label=origem && origem!=='Link externo' ? origem : 'Material';
   const temaName=temaId ? labelTema(temaId) : '';
   const discName=disciplinaId ? labelDisc(disciplinaId) : '';
-  return [label,temaName||discName].filter(Boolean).join(' - ') || 'Material sem titulo';
+  return [label,temaName||discName].filter(Boolean).join(' - ') || 'Material sem título';
 }
 function suggestThemeIdForText(text, disciplinaId){
   const hay=normalizar(text);
@@ -3782,6 +3827,13 @@ function renderConfigTab(){
   lp.innerHTML=D.logo
     ? `<img src="${D.logo}" style="max-height:48px;max-width:200px;object-fit:contain;border:1px solid var(--border);border-radius:4px;margin-bottom:8px">`
     : `<div style="font-size:12px;color:var(--text3);font-style:italic;margin-bottom:8px">Nenhuma logo.</div>`;
+  const fp=document.getElementById('faviconPreview');
+  if(fp){
+    const fav=String(D.favicon || '').trim();
+    fp.innerHTML=fav
+      ? `<div style="display:flex;align-items:center;gap:8px;margin-top:10px"><img src="${fav}" style="width:28px;height:28px;object-fit:contain;border:1px solid var(--border);border-radius:6px"><span style="font-size:12px;color:var(--text2)">Favicon personalizado salvo.</span></div>`
+      : `<div style="font-size:12px;color:var(--text3);font-style:italic;margin-top:10px">Nenhum favicon personalizado.</div>`;
+  }
 
   document.getElementById('tiposConfigList').innerHTML=tiposOrdenados().map((t,i,arr)=>`
     <div class="cfg-row">
@@ -3850,8 +3902,10 @@ function setupConfigExpandableLists(){
   });
 }
 function salvarNome(){
-  D.nomeCurso=document.getElementById('cfgNomeCurso').value.trim()||D.nomeCurso;
-  salvar(); document.getElementById('hTitle').textContent='Materiais — '+D.nomeCurso; document.title='Materiais — '+D.nomeCurso; showToast('Nome salvo!');
+  const titulo=document.getElementById('cfgNomeCurso').value.trim();
+  if(!titulo){ showToast('Preencha o título da página.',true); return; }
+  D.nomeCurso=titulo;
+  salvar(); applyBranding(); renderConfigTab(); showToast('Título salvo!');
 }
 function salvarNomeGeral(){
   const v=document.getElementById('cfgNomeGeral').value.trim();
@@ -4058,7 +4112,7 @@ function exportarAcervoPlanilha(){
       Modalidade:modalidadeMaterialLabel(m.modalidadeMaterial)||modalidadeLabel(modalidadeDisciplina(getDisc(m.disciplinaId)||{})),
       Status:statusMaterialLabel(m.statusMaterial)||'',
       Prontidão:readinessLabel(m.readiness)||'',
-      'Etiquetas de revisao':materialReviewTags(m).join(', '),
+      'Etiquetas de revisão':materialReviewTags(m).join(', '),
       Checklist:checklistLabels(m).join(', '),
       'Tem objetivo':chk.objetivo?'sim':'não',
       'Tem atividade':chk.atividade?'sim':'não',
@@ -4177,7 +4231,7 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
   const modalidade=disc && disciplinaId ? modalidadeLabel(modalidadeDisciplina(disc)) : 'Presencial';
   const headers=[
     'Disciplina','Modalidade','Tema','Tipo','Título','Aplicável em','Unidade curricular','referencia',
-    'Capacidade/competência','Conhecimento','Modalidade do material','Status','Prontidão','Etiquetas de revisao','Data de criação','Último upload',
+    'Capacidade/competência','Conhecimento','Modalidade do material','Status','Prontidão','Etiquetas de revisão','Data de criação','Último upload',
     'Tem objetivo','Tem atividade','Tem avaliação','Tem gabarito','Revisado presencial','Revisado EaD',
     'Link','Origem','Título do link',
     'Link 2','Origem 2','Título do link 2','Descrição','Nota interna','Somente admin','Fixado'
@@ -4696,9 +4750,7 @@ async function syncToCloud(manual=false){
   }
 }
 function renderAfterCloudLoad(){
-  applyLogo();
-  document.getElementById('hTitle').textContent='Materiais — '+(D.nomeCurso||'');
-  document.title='Materiais — '+(D.nomeCurso||'');
+  applyBranding();
   const mode=sessionStorage.getItem('mat_mode');
   const professorVisible=document.getElementById('viewProfessor')?.style.display !== 'none';
   const adminVisible=document.getElementById('viewAdmin')?.style.display !== 'none';
@@ -4892,7 +4944,8 @@ async function gerarVersaoProfessor(){
     const publicMeta = {
       nomeCurso: D.nomeCurso || 'SENAI',
       reviewStaleDays: reviewStaleDays(),
-      logo: D.logo || ''
+      logo: D.logo || '',
+      favicon: D.favicon || D.logo || ''
     };
 
     const css=document.querySelector('style').outerHTML;
@@ -4914,7 +4967,8 @@ async function gerarVersaoProfessor(){
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Materiais — ${escH(publicMeta.nomeCurso)}</title>
+<title>${escH(publicMeta.nomeCurso)}</title>
+${publicMeta.favicon ? `<link rel="icon" href="${publicMeta.favicon}">` : ''}
 ${fonts}
 ${css}
 <style>
@@ -4960,7 +5014,7 @@ ${css}
     ${logoHeaderHtml}
     <span class="h-brand" id="hBrandText" style="${brandHeaderStyle}">SENAI</span>
     <div class="h-divider"></div>
-    <span class="h-title">Materiais — ${escH(publicMeta.nomeCurso)}</span>
+    <span class="h-title">${escH(publicMeta.nomeCurso)}</span>
   </div>
   <div class="h-right"><button class="h-btn" onclick="logoutProfessor()">Sair</button></div>
 </header>
@@ -5246,7 +5300,7 @@ function showToast(msg, err){
 // ════════════════════════════════════════════════════════
 carregar();
 applySharedCloudConfigFromUrl();
-applyLogo();
+applyBranding();
 checkLogin();
 </script>
 </body>
