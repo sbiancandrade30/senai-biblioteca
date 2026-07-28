@@ -374,6 +374,22 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 #reviewContent>.theme-section>.theme-body{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 12px}
 #reviewContent .admin-card{margin-bottom:0}
 #reviewContent .admin-card.pinned{background:var(--surface);border-color:var(--border)}
+#reviewContent .admin-actions.wrap{flex-direction:column;align-items:stretch;gap:4px;max-width:74px}
+#reviewContent .admin-actions.wrap .a-btn{padding:5px 8px;text-align:center}
+.material-detail-head{display:flex;align-items:flex-start;gap:12px}
+.material-detail-title{font-size:17px;font-weight:800;color:var(--text);line-height:1.25;margin-bottom:6px}
+.material-detail-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.material-detail-section{border-top:1px solid var(--border);padding-top:14px;margin-top:14px}
+.material-detail-section:first-child{border-top:0;padding-top:0;margin-top:0}
+.material-detail-section h3{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);margin-bottom:8px}
+.material-detail-text{font-size:13px;color:var(--text2);line-height:1.55;white-space:pre-wrap}
+.material-detail-links{display:flex;flex-direction:column;gap:8px}
+.material-detail-link{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);padding:10px 12px;text-decoration:none;color:inherit}
+.material-detail-link:hover{border-color:var(--accent);background:var(--accent-bg)}
+.material-detail-link-main{min-width:0}
+.material-detail-link-title{font-size:13px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.material-detail-link-url{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.material-detail-link-action{font-size:11px;font-weight:800;color:var(--accent);white-space:nowrap}
 .shelf-overview{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:10px}
 .shelf-stat{padding:7px 9px;border-radius:12px}
 .shelf-stat-icon{width:26px;height:32px;font-size:14px}
@@ -940,6 +956,18 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       <button class="btn btn-outline" onclick="salvarMaterial({keepOpen:true})">Salvar e continuar</button>
       <button class="btn btn-primary" onclick="salvarMaterial()">Salvar rápido</button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL DETALHE DO MATERIAL -->
+<div class="modal-overlay" id="materialDetailModalOverlay">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <h2>Detalhes do material</h2>
+      <button class="close-btn" onclick="closeMaterialDetailModal()">x</button>
+    </div>
+    <div class="modal-body" id="materialDetailBody"></div>
+    <div class="modal-foot" id="materialDetailFoot"></div>
   </div>
 </div>
 
@@ -3096,18 +3124,92 @@ function reviewCardHtml(m){
     </div>
     <div class="admin-actions wrap">
       ${isArchived(m)?'':`<button class="a-btn" onclick="openMaterialFromReview('${escJsStr(m.id)}')">Abrir</button>`}
-      ${isArchived(m)?`<button class="a-btn" onclick="restaurarMaterial('${escJsStr(m.id)}')">Restaurar</button>`:`<button class="a-btn" onclick="markMaterialReady('${escJsStr(m.id)}')">Revisado</button>`}
       <button class="a-btn" onclick="openModal('${escJsStr(m.id)}')">Editar</button>
+      ${isArchived(m)?`<button class="a-btn" onclick="restaurarMaterial('${escJsStr(m.id)}')">Restaurar</button>`:`<button class="a-btn" onclick="markMaterialReady('${escJsStr(m.id)}')">Revisado</button>`}
       ${isArchived(m)?`<button class="a-btn danger" onclick="excluirMaterial('${escJsStr(m.id)}')">Excluir</button>`:''}
     </div>
   </div>`;
-}function openMaterialFromReview(id){
+}
+function materialDetailLine(label,value){
+  const text=String(value||'').trim();
+  return text?`<div class="pedagogy-line"><strong>${escH(label)}:</strong> ${escH(text)}</div>`:'';
+}
+function materialDetailHtml(m){
+  const tipo=getTipo(m.tipoId);
+  const links=materialLinks(m);
+  const review=needsMaterialReview(m);
+  const dates=[
+    m.createdAt?`Criado: ${formatDateTime(m.createdAt)}`:'',
+    m.updatedAt?`Atualizado: ${formatDateTime(m.updatedAt)}`:''
+  ].filter(Boolean);
+  const tags=materialReviewTags(m);
+  const checklist=checklistLabels(m);
+  const status=statusMaterialLabel(m.statusMaterial);
+  const readiness=readinessLabel(m.readiness);
+  const modalidade=modalidadeMaterialLabel(m.modalidadeMaterial);
+  const detailLines=[
+    materialDetailLine('Disciplina/área', labelDisc(m.disciplinaId)),
+    materialDetailLine('Tema', m.temaId?labelTema(m.temaId):''),
+    materialDetailLine('Unidade curricular/curso', m.unidadeCurricular || m.cursoTurma),
+    materialDetailLine('Tipo', tipo.nome),
+    materialDetailLine('Modalidade', modalidade),
+    materialDetailLine('Status', status),
+    materialDetailLine('Prontidão', readiness),
+    materialDetailLine('Checklist', checklist.join(', ')),
+    materialDetailLine('Etiquetas de revisão', tags.join(', ')),
+    materialDetailLine('Somente admin', m.hiddenProfessor?'Sim':''),
+    materialDetailLine('Fixado', m.fixado?'Sim':''),
+    materialDetailLine('Datas', dates.join(' | '))
+  ].filter(Boolean).join('');
+  const linksHtml=links.length?links.map((l,idx)=>`
+    <a class="material-detail-link" href="${escH(l.link)}" target="_blank" rel="noopener">
+      <div class="material-detail-link-main">
+        <div class="material-detail-link-title">${escH(tituloLink(l,idx))}</div>
+        <div class="material-detail-link-url">${escH(origemLink(l))} · ${escH(l.link)}</div>
+      </div>
+      <span class="material-detail-link-action">Abrir</span>
+    </a>
+  `).join(''):'<div class="empty" style="padding:14px"><h3>Nenhum link cadastrado.</h3></div>';
+  return `
+    <div class="material-detail-section">
+      <div class="material-detail-head">
+        <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'📎')}</div>
+        <div>
+          <div class="material-detail-title">${escH(m.titulo)}</div>
+          <div class="material-detail-meta">
+            <span class="mat-tipo-badge" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.nome)}</span>
+            ${m.temaId?`<span class="mat-source-badge">${escH(labelTema(m.temaId))}</span>`:''}
+            ${review?`<span class="pedagogy-pill review-pill">${escH(materialReviewReason(m))}</span>`:''}
+            ${m.hiddenProfessor?'<span class="pedagogy-pill">Somente admin</span>':''}
+            ${m.fixado?'<span class="pedagogy-pill">Fixado</span>':''}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="material-detail-section">
+      <h3>Arquivos e links</h3>
+      <div class="material-detail-links">${linksHtml}</div>
+    </div>
+    ${m.descricao?`<div class="material-detail-section"><h3>Descrição</h3><div class="material-detail-text">${escH(m.descricao)}</div></div>`:''}
+    ${m.internalNotes?`<div class="material-detail-section"><h3>Nota interna</h3><div class="material-detail-text">${escH(m.internalNotes)}</div></div>`:''}
+    ${detailLines?`<div class="material-detail-section"><h3>Informações</h3>${detailLines}</div>`:''}
+  `;
+}
+function showMaterialDetail(id){
   const m=D.materiais.find(x=>x.id===id); if(!m) return;
-  const tabBtn=[...document.querySelectorAll('.tab-btn')].find(b=>b.getAttribute('onclick')?.includes("'materiais'")) || document.querySelector('.tab-btn');
-  setTab('materiais',tabBtn);
-  abrirAdminDisc(m.disciplinaId||GERAL_ID);
-  document.getElementById('adminMatSearch').value=m.titulo||'';
-  renderAdminDisc();
+  document.getElementById('materialDetailBody').innerHTML=materialDetailHtml(m);
+  document.getElementById('materialDetailFoot').innerHTML=`
+    <button class="btn btn-outline" onclick="closeMaterialDetailModal()">Fechar</button>
+    ${needsMaterialReview(m)?`<button class="btn btn-outline" onclick="markMaterialReady('${escJsStr(m.id)}'); showMaterialDetail('${escJsStr(m.id)}')">Marcar como revisado</button>`:''}
+    <button class="btn btn-primary" onclick="closeMaterialDetailModal(); openModal('${escJsStr(m.id)}')">Editar</button>
+  `;
+  document.getElementById('materialDetailModalOverlay').classList.add('open');
+}
+function closeMaterialDetailModal(){
+  document.getElementById('materialDetailModalOverlay').classList.remove('open');
+}
+function openMaterialFromReview(id){
+  showMaterialDetail(id);
 }
 function markMaterialReady(id){
   const m=D.materiais.find(x=>x.id===id); if(!m) return;
