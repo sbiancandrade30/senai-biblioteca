@@ -335,6 +335,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .pedagogy-line{font-size:11px;color:var(--text3);line-height:1.45;margin-top:6px}
 .review-pill{background:var(--amber-bg)!important;color:var(--amber)!important;border-color:rgba(154,98,0,.22)!important}
 .review-pill.danger{background:var(--red-bg)!important;color:var(--red)!important;border-color:rgba(185,50,50,.25)!important}
+.review-mini-badge{display:inline-flex;align-items:center;gap:5px;background:var(--amber-bg);color:var(--amber);border:1px solid rgba(154,98,0,.24);border-radius:999px;padding:2px 7px;font-size:9.5px;font-weight:800;line-height:1.35}
+.review-mini-badge::before{content:'!';display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:var(--amber);color:#fff;font-size:9px;font-weight:900;line-height:1}
 .check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;margin-bottom:14px}
 .check-grid .check-line{margin-top:0;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px}
 .admin-card{padding:9px 11px;border-radius:12px;gap:10px;margin-bottom:6px;align-items:flex-start}
@@ -2923,6 +2925,7 @@ function recentCardHtml(m){
     <div class="recent-body">
       <div class="recent-title">${escH(m.titulo)}</div>
       <div class="recent-meta">${escH(labelDisc(m.disciplinaId))}${m.temaId?' · '+escH(labelTema(m.temaId)):''}</div>
+      ${needsMaterialReview(m)?reviewMiniBadgeHtml():''}
       ${date?`<div class="recent-date">Atualizado: ${escH(date)}</div>`:''}
     </div>
   </button>`;
@@ -3127,6 +3130,9 @@ function reviewCardHtml(m){
     </div>
   </div>`;
 }
+function reviewMiniBadgeHtml(){
+  return '<span class="review-mini-badge">Revisar</span>';
+}
 function materialCardAttrs(id){
   const safe=escJsStr(id);
   return `onclick="showMaterialDetail('${safe}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showMaterialDetail('${safe}')}"`;
@@ -3233,6 +3239,7 @@ function adminCardHtml(m){
       <div class="admin-title">${m.fixado?'<span class="mat-pin">Fixado</span> ':''}${escH(m.titulo)}</div>
       <div class="admin-meta">
         <span class="mat-tipo-badge" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.nome)}</span>
+        ${needsMaterialReview(m)?reviewMiniBadgeHtml():''}
         ${m.hiddenProfessor?'<span class="pedagogy-pill">Somente admin</span>':''}
         ${sourceBadgesHtml(m)}
       </div>
@@ -3351,6 +3358,7 @@ function planCardHtml(m){
       <div class="admin-title">${escH(m.titulo)}</div>
       <div class="admin-meta">
         <span class="mat-tipo-badge" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.nome)}</span>
+        ${needsMaterialReview(m)?reviewMiniBadgeHtml():''}
         ${m.temaId?`<span class="mat-source-badge">${escH(labelTema(m.temaId))}</span>`:''}
         ${links.length?`<span class="mat-source-badge">${links.length} link${links.length!==1?'s':''}</span>`:''}
       </div>
