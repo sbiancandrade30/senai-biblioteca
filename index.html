@@ -355,6 +355,9 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .material-group:last-child{margin-bottom:4px}
 .material-group-title{grid-column:1/-1;font-size:10px;margin:0 0 4px;padding:8px 0 2px;border-top:1px dashed var(--border);color:var(--text2)}
 .material-group:first-child .material-group-title{border-top:0;padding-top:0}
+.material-group.assessment-group{background:#fffaf2;border:1px solid rgba(154,98,0,.16);border-radius:14px;padding:12px;margin-bottom:24px}
+.material-group.assessment-group .material-group-title{border-top:0;padding-top:0;color:var(--amber)}
+.material-group.assessment-group .admin-card{border-color:rgba(154,98,0,.18)}
 .material-group>.admin-card{margin-bottom:0;min-height:0}
 .shelf-grid{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:start}
 .shelf-grid .admin-card{flex-direction:row;min-height:0;border-top:0;margin-bottom:0}
@@ -3164,19 +3167,34 @@ function renderPlanTab(){
 function materialCountLabel(n){
   return `${n} ${n===1?'material':'materiais'}`;
 }
+function isGeneralAssessmentMaterial(m){
+  const tipo=normalizar(labelTipo(m.tipoId));
+  const titulo=normalizar(m.titulo||'');
+  const text=`${tipo} ${titulo}`;
+  return /\b(prova|trabalho|gabarito|avaliacao|avaliativo|avaliativa)\b/.test(text);
+}
 function planSectionHtml(discId,mats){
+  const assessments=mats.filter(isGeneralAssessmentMaterial);
+  const regular=mats.filter(m=>!isGeneralAssessmentMaterial(m));
   const byTema=new Map();
-  mats.forEach(m=>{
+  regular.forEach(m=>{
     const key=m.temaId||'';
     if(!byTema.has(key)) byTema.set(key,[]);
     byTema.get(key).push(m);
   });
-  const body=[...byTema.entries()].sort((a,b)=>labelTema(a[0]).localeCompare(labelTema(b[0]),'pt-BR')).map(([temaId,items])=>`
+  const assessmentsBlock=assessments.length?`
+    <div class="material-group assessment-group">
+      <div class="material-group-title"><div class="tipo-dot" style="background:var(--amber)"></div>Avaliacoes e trabalhos gerais</div>
+      ${assessments.map(planCardHtml).join('')}
+    </div>
+  `:'';
+  const themeBlocks=[...byTema.entries()].sort((a,b)=>labelTema(a[0]).localeCompare(labelTema(b[0]),'pt-BR')).map(([temaId,items])=>`
     <div class="material-group">
       <div class="material-group-title"><div class="tipo-dot" style="background:var(--accent)"></div>${escH(temaId?labelTema(temaId):'Sem tema')}</div>
       ${items.map(planCardHtml).join('')}
     </div>
   `).join('');
+  const body=assessmentsBlock+themeBlocks;
   const review=mats.filter(needsMaterialReview).length;
   return `<section class="theme-section">
     <div class="theme-head">
