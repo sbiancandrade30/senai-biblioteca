@@ -341,7 +341,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .admin-card:hover{transform:none;box-shadow:0 4px 16px rgba(21,24,33,.05)}
 .admin-card .mat-icon{width:30px;height:30px;border-radius:8px;font-size:15px}
 .admin-title{font-size:12.5px;margin-bottom:2px;line-height:1.25}
-.admin-meta{gap:5px;margin-bottom:2px}
+.admin-meta{gap:7px 8px;margin-bottom:4px;align-items:flex-start}
 .admin-desc{font-size:11.5px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 .admin-link-list{margin-top:4px}
 .admin-link-pill,.mat-source-badge,.mat-tipo-badge,.pedagogy-pill{font-size:9.5px;padding:2px 7px}
@@ -368,14 +368,14 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .material-group .admin-desc,.material-group .pedagogy-meta,.material-group .pedagogy-line,.material-group .admin-link-list,.material-group .mat-source-list,
 .shelf-grid .admin-desc,.shelf-grid .pedagogy-meta,.shelf-grid .pedagogy-line,.shelf-grid .admin-link-list,.shelf-grid .mat-source-list{display:none}
 .material-group .admin-meta,.shelf-grid .admin-meta{margin-bottom:0}
-.material-group .admin-actions.wrap,.shelf-grid .admin-actions.wrap{margin-left:auto}
+.material-group .mat-source-badge,.shelf-grid .mat-source-badge,#reviewContent .mat-source-badge{max-width:100%;white-space:normal;line-height:1.35}
+.material-group .admin-actions.wrap,.shelf-grid .admin-actions.wrap,#reviewContent .admin-actions.wrap{flex-direction:column;align-items:stretch;gap:4px;width:72px;flex:0 0 72px;margin-left:8px}
+.material-group .admin-actions.wrap .a-btn,.shelf-grid .admin-actions.wrap .a-btn,#reviewContent .admin-actions.wrap .a-btn{padding:5px 8px;text-align:center}
 #planContent,#reviewContent{padding:10px}
 #reviewContent>.theme-section>.theme-head{padding:6px 2px 16px;margin-bottom:6px;border-bottom:1px solid var(--border)}
 #reviewContent>.theme-section>.theme-body{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 12px}
 #reviewContent .admin-card{margin-bottom:0}
 #reviewContent .admin-card.pinned{background:var(--surface);border-color:var(--border)}
-#reviewContent .admin-actions.wrap{flex-direction:column;align-items:stretch;gap:4px;max-width:74px}
-#reviewContent .admin-actions.wrap .a-btn{padding:5px 8px;text-align:center}
 .material-detail-head{display:flex;align-items:flex-start;gap:12px}
 .material-detail-title{font-size:17px;font-weight:800;color:var(--text);line-height:1.25;margin-bottom:6px}
 .material-detail-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -951,6 +951,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <input type="checkbox" id="mChkPresencial">
         <input type="checkbox" id="mChkEad">
       </div>
+    </div>
     <div class="modal-foot">
       <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
       <button class="btn btn-outline" onclick="salvarMaterial({keepOpen:true})">Salvar e continuar</button>
