@@ -233,6 +233,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .disc-search .search-input{width:100%;min-width:100%;font-size:14px;padding-top:13px;padding-bottom:13px}
 .disc-group-block{margin-bottom:28px}
 .disc-group-block:last-child{margin-bottom:0}
+.disc-group-block.general-block{margin-bottom:34px}
 .disc-group-head{display:flex;align-items:center;gap:10px;margin:0 0 12px}
 .disc-group-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text2)}
 .disc-group-count{font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:999px;padding:2px 8px}
@@ -241,10 +242,14 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .disc-config-type.presencial{background:var(--accent-bg);color:var(--accent)}
 .disc-config-type.ead{background:var(--purple-bg);color:var(--purple)}
 .disc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.disc-group-block.general-block .disc-grid{grid-template-columns:1fr}
+.disc-group-block.general-block .disc-card{min-height:88px;display:grid;grid-template-columns:minmax(220px,1.1fr) minmax(260px,1.4fr) auto;align-items:center;gap:16px;padding:16px 18px}
+.disc-group-block.general-block .disc-card-sub{min-height:0;margin-bottom:0}
+.disc-group-block.general-block .disc-card-metrics{justify-content:flex-end}
 .disc-card{background:linear-gradient(180deg,#fff,#fbfcff);border:1px solid var(--border);border-radius:18px;padding:17px;cursor:pointer;transition:all .15s;text-align:left;color:inherit;font-family:'DM Sans',sans-serif;min-height:138px;box-shadow:0 1px 0 rgba(21,24,33,.02);position:relative;overflow:hidden}
 .disc-card::before,.disc-card::after{display:none}
 .disc-card:hover{border-color:var(--accent);box-shadow:var(--shadow-soft);transform:translateY(-2px)}
-.disc-card.general{border-style:dashed}
+.disc-card.general{border-style:solid}
 .disc-card-title{font-size:14px;font-weight:800;line-height:1.4;margin:0 0 5px}
 .disc-card-sub{font-size:12px;color:var(--text2);line-height:1.45;margin-bottom:12px;min-height:34px}
 .disc-card-metrics{display:flex;flex-wrap:wrap;gap:5px}
@@ -254,7 +259,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .recent-strip-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px}
 .recent-strip-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2)}
 .recent-strip-sub{font-size:11px;color:var(--text3)}
-.recent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.recent-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:12px}
 .recent-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px;display:flex;gap:10px;align-items:flex-start;text-align:left;color:inherit;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;min-height:98px;box-shadow:0 1px 0 rgba(21,24,33,.02)}
 .recent-card:hover{border-color:var(--accent);box-shadow:var(--shadow-soft);transform:translateY(-2px)}
 .recent-icon{width:36px;height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
@@ -462,6 +467,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   #tabPlanejamento>.library-top,#tabRevisao>.library-top,#tabPlanejamento>.summary-row,#tabRevisao>.summary-row,#planContent,#reviewContent,#tabConfiguracoes .settings-intro{border-radius:18px;padding:14px}
   .form-row,.form-row.three{grid-template-columns:1fr}
   .disc-grid{grid-template-columns:1fr}
+  .disc-group-block.general-block .disc-card{grid-template-columns:1fr;align-items:flex-start}
+  .disc-group-block.general-block .disc-card-metrics{justify-content:flex-start}
   .admin-card{flex-direction:row;align-items:flex-start}
   .admin-card .mat-icon{width:30px;height:30px}
   .admin-actions.wrap{max-width:none;justify-content:flex-start;flex-wrap:wrap}
@@ -2742,7 +2749,7 @@ function renderProfessorHome(){
 }
 
 function renderDiscGroupHtml(titulo,cardsHtml,total,mostrarContador=true){
-  return `<section class="disc-group-block">
+  return `<section class="disc-group-block${mostrarContador?'':' general-block'}">
     <div class="disc-group-head">
       <div class="disc-group-title">${escH(titulo)}</div>
       ${mostrarContador?`<div class="disc-group-count">${total} ${total===1?'disciplina':'disciplinas'}</div>`:''}
@@ -2906,7 +2913,7 @@ function renderAdminHome(){
 function renderRecentHomeSection(materials){
   const recent=[...materials]
     .sort((a,b)=>Date.parse(b.updatedAt||b.createdAt||'')-Date.parse(a.updatedAt||a.createdAt||''))
-    .slice(0,6);
+    .slice(0,7);
   if(!recent.length) return '';
   return `<section class="recent-strip">
     <div class="recent-strip-head">
@@ -5303,7 +5310,7 @@ function renderHomeProfessorOnly(){
   document.getElementById('professorHomeContent').innerHTML=blocks;
 }
 function groupBlockProfessorOnly(title,cards,total,showCount=true){
-  return '<section class="disc-group-block"><div class="disc-group-head"><div class="disc-group-title">'+escH(title)+'</div>'+(showCount?'<div class="disc-group-count">'+total+' '+(total===1?'disciplina':'disciplinas')+'</div>':'')+'</div>'+(cards?'<div class="disc-grid">'+cards+'</div>':'<div class="disc-group-empty">Nenhuma disciplina nesta seção.</div>')+'</section>';
+  return '<section class="disc-group-block'+(showCount?'':' general-block')+'"><div class="disc-group-head"><div class="disc-group-title">'+escH(title)+'</div>'+(showCount?'<div class="disc-group-count">'+total+' '+(total===1?'disciplina':'disciplinas')+'</div>':'')+'</div>'+(cards?'<div class="disc-grid">'+cards+'</div>':'<div class="disc-group-empty">Nenhuma disciplina nesta seção.</div>')+'</section>';
 }
 function totalByTypeProfessorOnly(id){
   const counts={};
