@@ -610,7 +610,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div class="summary-row" id="planSummary"></div>
     <div class="inner-filters">
       <input class="search-input" type="text" id="planSearch" placeholder="Buscar no banco de materiais..." oninput="renderPlanTab()">
-      <select class="filter-sel" id="planCourse" onchange="renderPlanTab()"><option value="">Todos os usos</option></select>
+      <select class="filter-sel" id="planCourse" onchange="renderPlanTab()" style="display:none"><option value="">Todos os usos</option></select>
       <select class="filter-sel" id="planDisc" onchange="renderPlanTab()"><option value="">Todas as disciplinas</option></select>
       <select class="filter-sel" id="planTipo" onchange="renderPlanTab()"><option value="">Todos os tipos</option></select>
       <select class="filter-sel" id="planStatus" onchange="renderPlanTab()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="ready">Prontos</option></select>
@@ -716,7 +716,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       </div>
     </div>
 
-    <div class="cfg-section">
+    <div class="cfg-section" style="display:none">
       <div class="cfg-head">Aplicavel em</div>
       <div class="cfg-body">
         <div style="font-size:12px;color:var(--text2)">Use esta lista para indicar onde um material pode ser reaproveitado: curso, modalidade, laboratorio, presencial, EaD ou outro uso.</div>
@@ -873,125 +873,55 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         </div>
       </div>
       <details class="pedagogy-box" id="quickDetailsBox">
-        <summary class="pedagogy-summary">Detalhes opcionais</summary>
+        <summary class="pedagogy-summary">Mais opcoes</summary>
         <div class="pedagogy-content">
-          <div class="form-group">
-            <label class="form-label">Descrição <span style="font-weight:400;color:var(--text3)">(opcional)</span> <span class="help-tip" tabindex="0" data-tip="Escreva uma observação curta sobre como usar o material, para que serve ou o que precisa revisar.">?</span></label>
-            <textarea class="form-input" id="mDesc" placeholder="ex: Slides com exercícios de fixação sobre auto-retenção..."></textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Nota interna <span style="font-weight:400;color:var(--text3)">(somente admin)</span> <span class="help-tip" tabindex="0" data-tip="Use para lembretes seus, como ajustes a fazer, observações da turma ou restrições de uso. Não aparece para professor.">?</span></label>
-            <textarea class="form-input" id="mInternalNotes" placeholder="ex: Revisar exemplos antes de compartilhar com outra turma."></textarea>
-          </div>
-          <div class="form-row three">
-            <div class="form-group">
-              <label class="form-label">Ordem <span class="help-tip" tabindex="0" data-tip="Número usado para ordenar os materiais dentro do tema. Pode deixar vazio para a Biblioteca preencher automaticamente.">?</span></label>
-              <input type="number" class="form-input" id="mOrdem" min="1" placeholder="ex: 1">
-            </div>
-            <div class="form-group" style="display:flex;align-items:flex-end">
-              <label class="check-line"><input type="checkbox" id="mFixado"> Fixar no topo <span class="help-tip" tabindex="0" data-tip="Use para materiais que você consulta sempre, como plano base, slide principal ou atividade essencial.">?</span></label>
-            </div>
-            <div class="form-group" style="display:flex;align-items:flex-end">
-              <label class="check-line"><input type="checkbox" id="mHiddenProfessor"> Somente admin <span class="help-tip" tabindex="0" data-tip="Mantém o material no seu acervo, mas oculta no acesso e na versão gerada para professor.">?</span></label>
-            </div>
-          </div>
-        </div>
-      </details>
-      <details class="pedagogy-box" id="advancedPedagogyDetails">
-        <summary class="pedagogy-summary">Organização pedagógica opcional</summary>
-        <div class="pedagogy-content">
-          <div style="font-size:12px;color:var(--text3);line-height:1.45;margin-bottom:12px">
-            Para cadastrar rápido, você pode deixar esta parte em branco. Use estes campos quando quiser revisar o acervo, preparar a versão do professor ou localizar materiais por plano de curso.
-          </div>
-          <div class="quick-actions" style="margin-bottom:14px">
-            <button type="button" class="btn btn-outline" onclick="aplicarModeloPedagogico('pronto')">Marcar como pronto</button>
-            <button type="button" class="btn btn-outline" onclick="aplicarModeloPedagogico('revisar')">Marcar para revisar</button>
-            <button type="button" class="btn btn-outline" onclick="aplicarModeloPedagogico('limpar')">Limpar organização</button>
-          </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Aplicável em <span class="help-tip" tabindex="0" data-tip="Indique onde este material pode ser reaproveitado. Exemplos: Moldador de Plástico, laboratório, EaD, presencial, cursos técnicos.">?</span></label>
-              <input type="text" class="form-input" id="mCursoTurma" list="contextosUsoList" placeholder="ex: Moldador de Plástico, cursos técnicos, EaD, laboratório">
+              <label class="form-label">Curso <span style="font-weight:400;color:var(--text3)">(opcional)</span></label>
+              <input type="text" class="form-input" id="mCursoTurma" list="contextosUsoList" placeholder="ex: Moldador de Plastico">
               <datalist id="contextosUsoList"></datalist>
             </div>
             <div class="form-group">
-              <label class="form-label">Unidade curricular <span class="help-tip" tabindex="0" data-tip="Preencha se quiser aproximar o material de um plano de curso. Pode deixar vazio no cadastro rápido.">?</span></label>
+              <label class="form-label">Unidade curricular <span style="font-weight:400;color:var(--text3)">(opcional)</span></label>
               <input type="text" class="form-input" id="mUnidadeCurricular" placeholder="ex: Ensaios">
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Referencia opcional <span class="help-tip" tabindex="0" data-tip="Use se quiser registrar uma referencia livre, como modulo, encontro, unidade ou etapa. A Biblioteca nao depende disso.">?</span></label>
-              <input type="text" class="form-input" id="mAulaModulo" placeholder="ex: M?dulo 2, Unidade 3, Etapa de revisao">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Modalidade do material <span class="help-tip" tabindex="0" data-tip="Escolha se o material foi pensado para presencial, EaD ou ambos. Se deixar vazio, vale a modalidade da disciplina.">?</span></label>
-              <select class="form-input" id="mModalidadeMaterial">
-                <option value="">Usar a modalidade da disciplina</option>
-                <option value="presencial">Presencial</option>
-                <option value="ead">EaD</option>
-                <option value="ambos">Presencial e EaD</option>
-              </select>
-            </div>
+          <div class="form-group">
+            <label class="form-label">Nota interna <span style="font-weight:400;color:var(--text3)">(somente admin)</span></label>
+            <textarea class="form-input" id="mInternalNotes" placeholder="ex: Conferir link, adaptar antes de usar, atualizar gabarito..."></textarea>
           </div>
           <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Criado na biblioteca</label>
-              <input type="text" class="form-input" id="mCreatedAtInfo" readonly value="Será definido ao salvar">
+            <div class="form-group" style="display:flex;align-items:flex-end">
+              <label class="check-line"><input type="checkbox" id="mFixado"> Fixar no topo</label>
             </div>
-            <div class="form-group">
-              <label class="form-label">Último upload / atualização</label>
-              <input type="text" class="form-input" id="mUpdatedAtInfo" readonly value="Será definido ao salvar">
+            <div class="form-group" style="display:flex;align-items:flex-end">
+              <label class="check-line"><input type="checkbox" id="mHiddenProfessor"> Somente admin</label>
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Capacidade / competência <span class="help-tip" tabindex="0" data-tip="Campo para copiar ou resumir a capacidade do plano de curso relacionada ao material.">?</span></label>
-            <textarea class="form-input" id="mCapacidade" placeholder="ex: Interpretar resultados de ensaios mecânicos..."></textarea>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Conhecimento relacionado <span class="help-tip" tabindex="0" data-tip="Liste palavras-chave do conteúdo. Isso ajuda a encontrar materiais mesmo quando você não lembra o título.">?</span></label>
-              <input type="text" class="form-input" id="mConhecimento" placeholder="ex: Ensaio de tração, propriedades mecânicas">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Status do material <span class="help-tip" tabindex="0" data-tip="Use para controlar revisao: pronto, revisar, substituir depois ou em produção.">?</span></label>
-              <select class="form-input" id="mStatusMaterial">
-                <option value="">Sem status</option>
-                <option value="pronto">Pronto para usar</option>
-                <option value="revisar">Revisar</option>
-                <option value="substituir">Substituir depois</option>
-                <option value="producao">Em produção</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Prontidão <span class="help-tip" tabindex="0" data-tip="Indica o grau de maturidade do material no seu acervo, separado do status de revisao.">?</span></label>
-              <select class="form-input" id="mReadiness">
-                <option value="">Sem nível</option>
-                <option value="rascunho">Rascunho</option>
-                <option value="em_uso">Em uso</option>
-                <option value="validado">Validado</option>
-                <option value="modelo">Modelo</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Checklist pedagógico <span class="help-tip" tabindex="0" data-tip="Marque só quando quiser conferir se o material já tem objetivo, atividade, avaliação, gabarito e revisao por modalidade.">?</span></label>
-            <div class="check-grid">
-              <label class="check-line"><input type="checkbox" id="mChkObjetivo"> Tem objetivo de aprendizagem</label>
-              <label class="check-line"><input type="checkbox" id="mChkAtividade"> Tem atividade prática/avaliativa</label>
-              <label class="check-line"><input type="checkbox" id="mChkAvaliacao"> Tem avaliação vinculada</label>
-              <label class="check-line"><input type="checkbox" id="mChkGabarito"> Tem gabarito/roteiro de correção</label>
-              <label class="check-line"><input type="checkbox" id="mChkPresencial"> Revisado para presencial</label>
-              <label class="check-line"><input type="checkbox" id="mChkEad"> Revisado para EaD</label>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Etiquetas de revisao <span class="help-tip" tabindex="0" data-tip="Use etiquetas criadas por você para filtrar materiais depois na aba Revisão.">?</span></label>
+            <label class="form-label">Etiquetas de revisao</label>
             <div class="check-grid" id="mReviewTagsList"></div>
           </div>
         </div>
       </details>
-    </div>
+      <div style="display:none">
+        <textarea id="mDesc"></textarea>
+        <input type="number" id="mOrdem">
+        <input type="text" id="mAulaModulo">
+        <select id="mModalidadeMaterial"><option value=""></option><option value="presencial"></option><option value="ead"></option><option value="ambos"></option></select>
+        <input type="text" id="mCreatedAtInfo">
+        <input type="text" id="mUpdatedAtInfo">
+        <textarea id="mCapacidade"></textarea>
+        <input type="text" id="mConhecimento">
+        <select id="mStatusMaterial"><option value=""></option><option value="pronto"></option><option value="revisar"></option><option value="substituir"></option><option value="producao"></option></select>
+        <select id="mReadiness"><option value=""></option><option value="rascunho"></option><option value="em_uso"></option><option value="validado"></option><option value="modelo"></option></select>
+        <input type="checkbox" id="mChkObjetivo">
+        <input type="checkbox" id="mChkAtividade">
+        <input type="checkbox" id="mChkAvaliacao">
+        <input type="checkbox" id="mChkGabarito">
+        <input type="checkbox" id="mChkPresencial">
+        <input type="checkbox" id="mChkEad">
+      </div>
     <div class="modal-foot">
       <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
       <button class="btn btn-outline" onclick="salvarMaterial({keepOpen:true})">Salvar e continuar</button>
@@ -3580,15 +3510,7 @@ function openModal(id=null, preferredDiscId=null){
   document.getElementById('mUpdatedAtInfo').value=formatDateTime(m?.updatedAt)||'Será definido ao salvar';
   const quick=document.getElementById('quickDetailsBox');
   if(quick){
-    quick.open=Boolean(m && (m.descricao || m.internalNotes || m.ordem || m.fixado || m.hiddenProfessor));
-  }
-  const advanced=document.getElementById('advancedPedagogyDetails');
-  if(advanced){
-    const hasAdvanced=Boolean(m && (
-      m.cursoTurma || m.unidadeCurricular || m.aulaModulo || m.capacidadeCompetencia || m.conhecimento ||
-      m.modalidadeMaterial || m.statusMaterial || m.readiness || Object.values(chk).some(Boolean) || materialReviewTags(m).length
-    ));
-    advanced.open=hasAdvanced;
+    quick.open=Boolean(m && (m.cursoTurma || m.unidadeCurricular || m.internalNotes || m.fixado || m.hiddenProfessor || materialReviewTags(m).length));
   }
   const linksWrap=document.getElementById('mLinksList');
   linksWrap.innerHTML='';
