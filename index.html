@@ -199,8 +199,9 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 
 /* ── BIBLIOTECA V6: NAVEGAÇÃO POR DISCIPLINAS/TEMAS ───── */
 .library-top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:20px;flex-wrap:wrap}
+.library-top>div:first-child{flex:1;min-width:320px}
 .library-top h2{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:6px}
-.library-top p{font-size:13px;color:var(--text2);line-height:1.5;max-width:720px}
+.library-top p{font-size:13px;color:var(--text2);line-height:1.5;max-width:none}
 .page-panel{background:rgba(255,255,255,.72);border:1px solid var(--border);border-radius:22px;padding:18px;box-shadow:0 1px 0 rgba(21,24,33,.02);margin-bottom:20px}
 .page-panel .summary-row:last-child,.page-panel .inner-filters:last-child{margin-bottom:0}
 .content-panel{background:rgba(255,255,255,.72);border:1px solid var(--border);border-radius:22px;padding:16px;box-shadow:0 1px 0 rgba(21,24,33,.02)}
@@ -599,7 +600,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div class="library-top">
       <div>
         <h2>Banco de materiais</h2>
-        <p>Consulte todo o acervo por contexto, disciplina, tema, tipo e status. A organizacao aqui e reutilizavel e nao depende de uma turma ou aula especifica.</p>
+        <p>Consulte todo o acervo por uso, disciplina, tema, tipo e status. A organizacao aqui e reutilizavel e nao depende de uma turma ou aula especifica.</p>
       </div>
       <div class="inner-actions">
         <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rapido</button>
@@ -609,7 +610,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div class="summary-row" id="planSummary"></div>
     <div class="inner-filters">
       <input class="search-input" type="text" id="planSearch" placeholder="Buscar no banco de materiais..." oninput="renderPlanTab()">
-      <select class="filter-sel" id="planCourse" onchange="renderPlanTab()"><option value="">Todos os contextos</option></select>
+      <select class="filter-sel" id="planCourse" onchange="renderPlanTab()"><option value="">Todos os usos</option></select>
       <select class="filter-sel" id="planDisc" onchange="renderPlanTab()"><option value="">Todas as disciplinas</option></select>
       <select class="filter-sel" id="planTipo" onchange="renderPlanTab()"><option value="">Todos os tipos</option></select>
       <select class="filter-sel" id="planStatus" onchange="renderPlanTab()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="ready">Prontos</option></select>
@@ -627,7 +628,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
     <div class="summary-row" id="reviewSummary"></div>
     <div class="inner-filters">
-      <input class="search-input" type="text" id="reviewSearch" placeholder="Buscar por titulo, disciplina, contexto, status..." oninput="renderReviewTab()">
+      <input class="search-input" type="text" id="reviewSearch" placeholder="Buscar por titulo, disciplina, uso, status..." oninput="renderReviewTab()">
       <select class="filter-sel" id="reviewFilter" onchange="renderReviewTab()">
         <option value="review">A revisar</option>
         <option value="stale">Desatualizados</option>
@@ -635,7 +636,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <option value="revisar">Marcados como revisar</option>
         <option value="incomplete">Cadastros incompletos</option>
         <option value="semDescricao">Sem descrição</option>
-        <option value="semContexto">Sem contexto de uso</option>
+        <option value="semContexto">Sem uso indicado</option>
         <option value="semTema">Sem tema</option>
         <option value="semChecklist">Checklist vazio</option>
         <option value="archived">Arquivados</option>
@@ -716,13 +717,13 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
 
     <div class="cfg-section">
-      <div class="cfg-head">Contextos de uso</div>
+      <div class="cfg-head">Aplicavel em</div>
       <div class="cfg-body">
-        <div style="font-size:12px;color:var(--text2)">Use contextos para indicar onde um material pode ser reaproveitado, sem prender o acervo a uma turma específica.</div>
+        <div style="font-size:12px;color:var(--text2)">Use esta lista para indicar onde um material pode ser reaproveitado: curso, modalidade, laboratorio, presencial, EaD ou outro uso.</div>
         <div class="cfg-list" id="contextosConfigList"></div>
         <div class="cfg-addline">
           <input type="text" class="form-input" id="novoContextoUso" placeholder="ex: Moldador de Plástico, cursos técnicos, laboratório" style="flex:1;min-width:260px">
-          <button class="btn btn-outline" onclick="adicionarContextoUso()">+ Adicionar contexto</button>
+          <button class="btn btn-outline" onclick="adicionarContextoUso()">+ Adicionar uso</button>
         </div>
       </div>
     </div>
@@ -909,7 +910,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Aplicável em <span class="help-tip" tabindex="0" data-tip="Indique em quais cursos, modalidades ou contextos este material pode servir. Exemplo: Moldador de Plástico, laboratório, EaD.">?</span></label>
+              <label class="form-label">Aplicável em <span class="help-tip" tabindex="0" data-tip="Indique onde este material pode ser reaproveitado. Exemplos: Moldador de Plástico, laboratório, EaD, presencial, cursos técnicos.">?</span></label>
               <input type="text" class="form-input" id="mCursoTurma" list="contextosUsoList" placeholder="ex: Moldador de Plástico, cursos técnicos, EaD, laboratório">
               <datalist id="contextosUsoList"></datalist>
             </div>
@@ -3020,7 +3021,7 @@ function materialReviewReason(m){
 function materialQualityIssues(m){
   const issues=[];
   if(!String(m.descricao||'').trim()) issues.push('sem descrição');
-  if(!materialCourse(m)) issues.push('sem contexto');
+  if(!materialCourse(m)) issues.push('sem uso indicado');
   if((m.disciplinaId||GERAL_ID)!==GERAL_ID && !String(m.temaId||'').trim()) issues.push('sem tema');
   if(!String(m.modalidadeMaterial||'').trim()) issues.push('sem modalidade');
   if(!checklistLabels(m).length) issues.push('checklist vazio');
@@ -3038,7 +3039,7 @@ function renderReviewFilterOptions(){
     ['revisar','Marcados como revisar'],
     ['incomplete','Cadastros incompletos'],
     ['semDescricao','Sem descrição'],
-    ['semContexto','Sem contexto de uso'],
+    ['semContexto','Sem uso indicado'],
     ['semTema','Sem tema'],
     ['semChecklist','Checklist vazio'],
     ['archived','Arquivados'],
@@ -3117,7 +3118,7 @@ function reviewCardHtml(m){
     </div>
     <div class="admin-actions wrap">
       ${isArchived(m)?'':`<button class="a-btn" onclick="openMaterialFromReview('${escJsStr(m.id)}')">Abrir</button>`}
-      ${isArchived(m)?`<button class="a-btn" onclick="restaurarMaterial('${escJsStr(m.id)}')">Restaurar</button>`:`<button class="a-btn" onclick="markMaterialReady('${escJsStr(m.id)}')">Pronto</button>`}
+      ${isArchived(m)?`<button class="a-btn" onclick="restaurarMaterial('${escJsStr(m.id)}')">Restaurar</button>`:`<button class="a-btn" onclick="markMaterialReady('${escJsStr(m.id)}')">Revisado</button>`}
       <button class="a-btn" onclick="openModal('${escJsStr(m.id)}')">Editar</button>
       ${isArchived(m)?`<button class="a-btn danger" onclick="excluirMaterial('${escJsStr(m.id)}')">Excluir</button>`:''}
     </div>
@@ -3185,7 +3186,7 @@ function renderPlanSelectors(){
   const oldDisc=discSel.value;
   const oldTipo=tipoSel?.value||'';
   const base=activeMaterials();
-  courseSel.innerHTML='<option value="">Todos os contextos</option>'+cursosOrdenados().map(c=>`<option value="${escH(c)}">${escH(c)}</option>`).join('');
+  courseSel.innerHTML='<option value="">Todos os usos</option>'+cursosOrdenados().map(c=>`<option value="${escH(c)}">${escH(c)}</option>`).join('');
   discSel.innerHTML='<option value="">Todas as disciplinas</option>'+[getDisc(GERAL_ID),...discsOrdenadas()].map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`).join('');
   if(tipoSel) tipoSel.innerHTML='<option value="">Todos os tipos</option>'+tiposOrdenados().filter(t=>base.some(m=>m.tipoId===t.id)).map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
   if(oldCourse) courseSel.value=oldCourse;
@@ -3230,6 +3231,9 @@ function renderPlanTab(){
   const sections=[...grouped.entries()].sort((a,b)=>labelDisc(a[0]).localeCompare(labelDisc(b[0]),'pt-BR'));
   el.innerHTML=sections.map(([discId,mats])=>planSectionHtml(discId,mats)).join('');
 }
+function materialCountLabel(n){
+  return `${n} ${n===1?'material':'materiais'}`;
+}
 function planSectionHtml(discId,mats){
   const byTema=new Map();
   mats.forEach(m=>{
@@ -3248,7 +3252,7 @@ function planSectionHtml(discId,mats){
     <div class="theme-head">
       <div>
         <div class="theme-name">${escH(labelDisc(discId))}</div>
-        <div class="theme-meta">${mats.length} material${mats.length!==1?'is':''}${review?` ? ${review} a revisar`:''}</div>
+        <div class="theme-meta">${materialCountLabel(mats.length)}${review?` - ${review} a revisar`:''}</div>
       </div>
     </div>
     <div class="theme-body">${body}</div>
@@ -3273,7 +3277,7 @@ function planCardHtml(m){
     <div class="admin-actions wrap">
       <button class="a-btn" onclick="openMaterialFromPlan('${escJsStr(m.id)}')">Abrir</button>
       <button class="a-btn" onclick="openModal('${escJsStr(m.id)}')">Editar</button>
-      ${needsMaterialReview(m)?`<button class="a-btn" onclick="markMaterialReadyFromPlan('${escJsStr(m.id)}')">Marcar pronto</button>`:''}
+      ${needsMaterialReview(m)?`<button class="a-btn" onclick="markMaterialReadyFromPlan('${escJsStr(m.id)}')">Revisado</button>`:''}
     </div>
   </div>`;
 }
@@ -3880,7 +3884,7 @@ function renderConfigTab(){
 }
 function setupConfigExpandableLists(){
   [
-    ['contextosConfigList','contextos'],
+    ['contextosConfigList','usos'],
     ['reviewTagsConfigList','etiquetas'],
     ['tiposConfigList','tipos'],
     ['discsConfigList','disciplinas']
@@ -3989,20 +3993,20 @@ function renderContextosConfig(){
         <button class="a-btn danger" onclick="removerContextoUso('${escJsStr(c)}')">Remover</button>
       </div>
     </div>`;
-  }).join(''):'<div class="cfg-row"><div class="cfg-row-sub">Nenhum contexto cadastrado.</div></div>';
+  }).join(''):'<div class="cfg-row"><div class="cfg-row-sub">Nenhum uso cadastrado.</div></div>';
 }
 function adicionarContextoUso(){
   const input=document.getElementById('novoContextoUso');
   const values=String(input?.value||'').split(',').map(v=>v.trim()).filter(Boolean);
-  if(!values.length){ showToast('Digite ao menos um contexto.',true); return; }
+  if(!values.length){ showToast('Digite ao menos um uso.',true); return; }
   D.contextosUso=[...new Set([...(D.contextosUso||[]),...values])].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   if(input) input.value='';
   salvar(); renderConfigTab(); showToast('Contexto adicionado.');
 }
 function removerContextoUso(nome){
-  if(!confirm(`Remover o contexto "${nome}" da lista?\n\nOs materiais que já usam esse texto não serão alterados.`)) return;
+  if(!confirm(`Remover "${nome}" da lista?\n\nOs materiais que já usam esse texto não serão alterados.`)) return;
   D.contextosUso=(D.contextosUso||[]).filter(c=>c!==nome);
-  salvar(); renderConfigTab(); showToast('Contexto removido da lista.');
+  salvar(); renderConfigTab(); showToast('Uso removido da lista.');
 }
 function trocarSenha(){
   const nova=document.getElementById('cfgSenhaNova').value.trim();
