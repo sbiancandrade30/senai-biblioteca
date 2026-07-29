@@ -272,6 +272,10 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .inner-actions{display:flex;gap:8px;flex-wrap:wrap}
 .inner-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
 .inner-filters .search-input{min-width:260px}
+.quick-filter-row{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 14px}
+.quick-filter-btn{border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:999px;padding:7px 11px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .12s}
+.quick-filter-btn:hover{border-color:var(--accent);color:var(--accent)}
+.quick-filter-btn.active{background:var(--accent-bg);border-color:rgba(37,87,214,.28);color:var(--accent)}
 .course-filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
 .course-chip{border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:999px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s}
 .course-chip:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
@@ -661,6 +665,14 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       </div>
     </div>
     <div class="summary-row" id="planSummary"></div>
+    <div class="quick-filter-row" id="planQuickFilters">
+      <button class="quick-filter-btn active" type="button" onclick="setPlanQuickFilter('')">Todos</button>
+      <button class="quick-filter-btn" type="button" onclick="setPlanQuickFilter('fixados')">Fixados</button>
+      <button class="quick-filter-btn" type="button" onclick="setPlanQuickFilter('avaliacoes')">Avaliações</button>
+      <button class="quick-filter-btn" type="button" onclick="setPlanQuickFilter('revisar')">A revisar</button>
+      <button class="quick-filter-btn" type="button" onclick="setPlanQuickFilter('sem-tema')">Sem tema</button>
+      <button class="quick-filter-btn" type="button" onclick="setPlanQuickFilter('admin')">Somente admin</button>
+    </div>
     <div class="inner-filters">
       <input class="search-input" type="text" id="planSearch" placeholder="Buscar no banco de materiais..." oninput="renderPlanTab()">
       <select class="filter-sel" id="planCourse" onchange="renderPlanTab()" style="display:none"><option value="">Todos os usos</option></select>
@@ -3289,6 +3301,24 @@ function adminCardHtml(m){
 // MATERIAIS
 // ════════════════════════════════════════════════════════
 // PLANEJAMENTO POR AULA
+let planQuickFilter = '';
+function setPlanQuickFilter(value){
+  planQuickFilter = value || '';
+  renderPlanTab();
+}
+function updatePlanQuickFilterButtons(){
+  document.querySelectorAll('#planQuickFilters .quick-filter-btn').forEach(btn=>{
+    const text=normalizar(btn.textContent);
+    const active =
+      (!planQuickFilter && text==='todos') ||
+      (planQuickFilter==='fixados' && text==='fixados') ||
+      (planQuickFilter==='avaliacoes' && text==='avaliacoes') ||
+      (planQuickFilter==='revisar' && text==='a revisar') ||
+      (planQuickFilter==='sem-tema' && text==='sem tema') ||
+      (planQuickFilter==='admin' && text==='somente admin');
+    btn.classList.toggle('active', active);
+  });
+}
 function renderPlanSelectors(){
   const courseSel=document.getElementById('planCourse');
   const discSel=document.getElementById('planDisc');
@@ -3313,11 +3343,17 @@ function planFilteredMaterials(){
   return filterMats(activeMaterials().filter(m=>{
     if(course && !courseMatches(m,course)) return false;
     if(discId && m.disciplinaId!==discId) return false;
+    if(planQuickFilter==='fixados' && !m.fixado) return false;
+    if(planQuickFilter==='avaliacoes' && !isGeneralAssessmentMaterial(m)) return false;
+    if(planQuickFilter==='revisar' && !needsMaterialReview(m)) return false;
+    if(planQuickFilter==='sem-tema' && m.temaId) return false;
+    if(planQuickFilter==='admin' && !m.hiddenProfessor) return false;
     return true;
   }),{search,tipoId,revisao:status,includeInternal:true});
 }
 function renderPlanTab(){
   renderPlanSelectors();
+  updatePlanQuickFilterButtons();
   const list=planFilteredMaterials();
   const discs=[...new Set(list.map(m=>m.disciplinaId||GERAL_ID))];
   const temas=[...new Set(list.map(m=>m.temaId||''))];
