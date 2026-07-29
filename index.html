@@ -12,6 +12,7 @@
   --border:#e6e8ee; --border2:#cfd5df;
   --text:#151821; --text2:#626978; --text3:#9aa3b2;
   --accent:#2557d6; --accent-bg:#eef3ff;
+  --orange:#f25a38; --orange-bg:#fff1ed;
   --green:#2a7d4f; --green-bg:#e8f5ee;
   --amber:#9a6200; --amber-bg:#fef3dc;
   --red:#b93232; --red-bg:#fdeaea;
@@ -147,9 +148,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 
 /* ── TABS ──────────────────────────────── */
 .tabs{position:fixed;left:24px;top:86px;width:176px;display:flex;flex-direction:column;gap:6px;border:1px solid var(--border);background:rgba(255,255,255,.86);backdrop-filter:blur(14px);border-radius:18px;padding:8px;margin-bottom:0;box-shadow:var(--shadow-soft);z-index:80}
-.tab-btn{background:none;border:none;border-radius:12px;padding:10px 13px;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s;margin-bottom:0;text-align:left}
+.tab-btn{background:none;border:none;border-radius:12px;padding:10px 13px;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s;margin-bottom:0;text-align:left;position:relative;outline:none}
 .tab-btn:hover{color:var(--text)}
-.tab-btn.active{color:var(--accent);background:var(--surface);box-shadow:0 3px 12px rgba(21,24,33,.08)}
+.tab-btn.active{color:var(--accent);background:var(--surface);box-shadow:0 3px 12px rgba(21,24,33,.08);padding-left:28px}
+.tab-btn.active::before{content:'';position:absolute;left:12px;top:50%;width:8px;height:8px;border-radius:50%;background:var(--orange);transform:translateY(-50%)}
+.tab-btn:focus-visible{box-shadow:0 0 0 3px rgba(242,90,56,.18)}
 
 /* ── MODAL ─────────────────────────────── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;align-items:center;justify-content:center}
@@ -559,7 +562,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <button class="h-btn" id="hBtnPreview" onclick="visualizarComoProfessor()" style="display:none">👁 Visualizar como professor</button>
     <button class="h-btn" id="hBtnExport" onclick="exportarDados()" style="display:none">↓ Exportar</button>
     <button class="h-btn" id="hBtnImport" onclick="importFileInput.click()" style="display:none">↑ Importar</button>
-    <button class="h-btn" id="hBtnGerar" onclick="gerarVersaoProfessor()" style="display:none;background:rgba(42,125,79,.5);border-color:rgba(42,125,79,.7)">📦 Gerar versão para professor</button>
+    <button class="h-btn" id="hBtnGerar" onclick="gerarVersaoProfessor()" style="display:none;background:#edf8f2;border-color:#b9dfca;color:#2a6f49">📦 Gerar versão para professor</button>
     <button class="h-btn" onclick="doLogout()">Sair</button>
   </div>
 </header>
@@ -616,8 +619,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div id="adminHome">
       <div class="library-top">
         <div>
-          <h2>Biblioteca de Materiais</h2>
-          <p>Acompanhe o tamanho da biblioteca e entre em uma disciplina/área para ver materiais, temas e detalhes. A Biblioteca continua independente de turmas específicas.</p>
+          <h2 id="pageTitleMateriais">Biblioteca de Materiais</h2>
+          <p id="pageSubMateriais">Acompanhe o tamanho da biblioteca e entre em uma disciplina/área para ver materiais, temas e detalhes. A Biblioteca continua independente de turmas específicas.</p>
         </div>
         <div class="inner-actions">
           <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rápido</button>
@@ -666,8 +669,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   <div id="tabPlanejamento" style="display:none">
     <div class="library-top">
       <div>
-        <h2>Banco de materiais</h2>
-        <p>Consulte todo o acervo por disciplina, tema, tipo e status. A organização aqui é reutilizável e não depende de uma turma ou aula específica.</p>
+        <h2 id="pageTitleAcervo">Banco de materiais</h2>
+        <p id="pageSubAcervo">Consulte todo o acervo por disciplina, tema, tipo e status. A organização aqui é reutilizável e não depende de uma turma ou aula específica.</p>
       </div>
       <div class="inner-actions">
         <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rápido</button>
@@ -698,8 +701,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   <div id="tabRevisao" style="display:none">
     <div class="library-top">
       <div>
-        <h2>Revisão de materiais</h2>
-        <p>Confira materiais marcados para revisar, substituir ou sem atualização recente. Use esta área para manter a biblioteca confiável antes de compartilhar com outras turmas.</p>
+        <h2 id="pageTitleRevisao">Revisão de materiais</h2>
+        <p id="pageSubRevisao">Confira materiais marcados para revisar, substituir ou sem atualização recente. Use esta área para manter a biblioteca confiável antes de compartilhar com outras turmas.</p>
       </div>
     </div>
     <div class="summary-row" id="reviewSummary"></div>
@@ -726,8 +729,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div class="settings-intro">
       <div class="library-top">
         <div>
-          <h2>Configurações</h2>
-          <p>Ajuste identidade, disciplinas, tipos, revisão, compartilhamento e sincronização da Biblioteca.</p>
+          <h2 id="pageTitleConfig">Configurações</h2>
+          <p id="pageSubConfig">Ajuste identidade, disciplinas, tipos, revisão, compartilhamento e sincronização da Biblioteca.</p>
         </div>
       </div>
     </div>
@@ -740,6 +743,34 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           <input type="text" class="form-input" id="cfgNomeCurso">
         </div>
         <button class="btn btn-primary" style="align-self:flex-start" onclick="salvarNome()">Salvar título</button>
+      </div>
+    </div>
+
+    <div class="cfg-section">
+      <div class="cfg-head">Textos das páginas</div>
+      <div class="cfg-body">
+        <div style="font-size:12px;color:var(--text2);line-height:1.5">Personalize o título e o subtítulo que aparecem no topo de cada aba da Biblioteca.</div>
+        <div>
+          <label class="form-label">Materiais</label>
+          <input type="text" class="form-input page-title-input" data-page="materiais" data-field="title">
+          <textarea class="form-input page-subtitle-input" data-page="materiais" data-field="subtitle" rows="2" style="margin-top:8px"></textarea>
+        </div>
+        <div>
+          <label class="form-label">Acervo</label>
+          <input type="text" class="form-input page-title-input" data-page="acervo" data-field="title">
+          <textarea class="form-input page-subtitle-input" data-page="acervo" data-field="subtitle" rows="2" style="margin-top:8px"></textarea>
+        </div>
+        <div>
+          <label class="form-label">Revisão</label>
+          <input type="text" class="form-input page-title-input" data-page="revisao" data-field="title">
+          <textarea class="form-input page-subtitle-input" data-page="revisao" data-field="subtitle" rows="2" style="margin-top:8px"></textarea>
+        </div>
+        <div>
+          <label class="form-label">Configurações</label>
+          <input type="text" class="form-input page-title-input" data-page="configuracoes" data-field="title">
+          <textarea class="form-input page-subtitle-input" data-page="configuracoes" data-field="subtitle" rows="2" style="margin-top:8px"></textarea>
+        </div>
+        <button class="btn btn-primary" style="align-self:flex-start" onclick="salvarTextosPaginas()">Salvar textos</button>
       </div>
     </div>
 
@@ -858,7 +889,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <div class="summary-row" id="professorPublishPreview"></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-outline" onclick="renderProfessorPublishPreview()">Atualizar prévia</button>
-          <button class="btn btn-primary" style="background:var(--green);border-color:var(--green)" onclick="gerarVersaoProfessor()">📦 Gerar versão para professor</button>
+          <button class="btn btn-outline" style="background:#edf8f2;border-color:#b9dfca;color:#2a6f49" onclick="gerarVersaoProfessor()">📦 Gerar versão para professor</button>
           <button class="btn btn-outline" onclick="copiarLinkProfessorOnline()">Copiar link do professor online</button>
         </div>
         <hr style="border:none;border-top:1px solid var(--border)">
@@ -1226,6 +1257,24 @@ function defaults() {
     contextosUso: ['Moldador de Plástico','Cursos técnicos','EaD','Presencial','Laboratório'],
     reviewStaleDays: 180,
     reviewTags: ['Revisar cadastro','Precisa adaptar','Aguardando gabarito','Link para conferir'],
+    pageTexts: {
+      materiais: {
+        title: 'Biblioteca de Materiais',
+        subtitle: 'Acompanhe o tamanho da biblioteca e entre em uma disciplina/área para ver materiais, temas e detalhes. A Biblioteca continua independente de turmas específicas.'
+      },
+      acervo: {
+        title: 'Banco de materiais',
+        subtitle: 'Consulte todo o acervo por disciplina, tema, tipo e status. A organização aqui é reutilizável e não depende de uma turma ou aula específica.'
+      },
+      revisao: {
+        title: 'Revisão de materiais',
+        subtitle: 'Confira materiais marcados para revisar, substituir ou sem atualização recente. Use esta área para manter a biblioteca confiável antes de compartilhar com outras turmas.'
+      },
+      configuracoes: {
+        title: 'Configurações',
+        subtitle: 'Ajuste identidade, disciplinas, tipos, revisão, compartilhamento e sincronização da Biblioteca.'
+      }
+    },
     logo: '',
     favicon: '',
     tipos: [
@@ -2113,6 +2162,10 @@ function coerceData(raw) {
   const src = raw && typeof raw === 'object' ? raw : {};
   const out = {...base, ...src};
   out.nomeGeral = src.nomeGeral || base.nomeGeral;
+  out.pageTexts = {...base.pageTexts, ...(src.pageTexts && typeof src.pageTexts === 'object' ? src.pageTexts : {})};
+  Object.keys(base.pageTexts).forEach(k=>{
+    out.pageTexts[k] = {...base.pageTexts[k], ...(out.pageTexts[k] && typeof out.pageTexts[k] === 'object' ? out.pageTexts[k] : {})};
+  });
   out.favicon = String(src.favicon || '').trim();
   out.tipos = Array.isArray(src.tipos) ? src.tipos : base.tipos;
   out.disciplinas = Array.isArray(src.disciplinas) ? src.disciplinas : base.disciplinas;
@@ -2684,9 +2737,28 @@ function voltarDaPreviaProfessor(){
 function pageTitle(){
   return String(D.nomeCurso || '').trim() || 'Biblioteca de materiais SENAI';
 }
+function pageText(key, field){
+  const base=defaults().pageTexts[key] || {};
+  const saved=D.pageTexts && D.pageTexts[key] && typeof D.pageTexts[key] === 'object' ? D.pageTexts[key] : {};
+  return String(saved[field] || base[field] || '').trim();
+}
+function applyPageTexts(){
+  [
+    ['materiais','pageTitleMateriais','pageSubMateriais'],
+    ['acervo','pageTitleAcervo','pageSubAcervo'],
+    ['revisao','pageTitleRevisao','pageSubRevisao'],
+    ['configuracoes','pageTitleConfig','pageSubConfig']
+  ].forEach(([key,titleId,subId])=>{
+    const t=document.getElementById(titleId);
+    const s=document.getElementById(subId);
+    if(t) t.textContent=pageText(key,'title');
+    if(s) s.textContent=pageText(key,'subtitle');
+  });
+}
 function applyBranding(){
   applyLogo();
   applyFavicon();
+  applyPageTexts();
   const title=pageTitle();
   const hTitle=document.getElementById('hTitle');
   const loginSub=document.getElementById('loginSub');
@@ -4043,6 +4115,11 @@ function excluirTema(id){
 // ════════════════════════════════════════════════════════
 function renderConfigTab(){
   document.getElementById('cfgNomeCurso').value=D.nomeCurso||'';
+  document.querySelectorAll('.page-title-input,.page-subtitle-input').forEach(input=>{
+    const page=input.dataset.page;
+    const field=input.dataset.field;
+    input.value=pageText(page, field);
+  });
   document.getElementById('cfgSenhaAtual').value=D.senhaProfessor||'';
   document.getElementById('cfgNomeGeral').value=D.nomeGeral||'Materiais gerais';
   const reviewDaysInput=document.getElementById('cfgReviewStaleDays');
@@ -4134,6 +4211,25 @@ function salvarNome(){
   if(!titulo){ showToast('Preencha o título da página.',true); return; }
   D.nomeCurso=titulo;
   salvar(); applyBranding(); renderConfigTab(); showToast('Título salvo!');
+}
+function salvarTextosPaginas(){
+  const base=defaults().pageTexts;
+  D.pageTexts = D.pageTexts && typeof D.pageTexts === 'object' ? D.pageTexts : {};
+  document.querySelectorAll('.page-title-input,.page-subtitle-input').forEach(input=>{
+    const page=input.dataset.page;
+    const field=input.dataset.field;
+    if(!page || !field) return;
+    D.pageTexts[page] = D.pageTexts[page] && typeof D.pageTexts[page] === 'object' ? D.pageTexts[page] : {...(base[page]||{})};
+    const value=input.value.trim();
+    D.pageTexts[page][field] = value || (base[page]?.[field] || '');
+  });
+  salvar();
+  applyPageTexts();
+  renderConfigTab();
+  renderAdminHome();
+  if(document.getElementById('tabPlanejamento')?.style.display !== 'none') renderPlanTab();
+  if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
+  showToast('Textos das páginas salvos!');
 }
 function salvarNomeGeral(){
   const v=document.getElementById('cfgNomeGeral').value.trim();
