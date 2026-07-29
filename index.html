@@ -232,6 +232,9 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .summary-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;font-weight:800}
 .disc-search{margin-bottom:18px;max-width:520px}
 .disc-search .search-input{width:100%;min-width:100%;font-size:14px;padding-top:13px;padding-bottom:13px}
+.section-jump-row{display:flex;gap:8px;flex-wrap:wrap;margin:-6px 0 18px}
+.section-jump-btn{border:1px solid var(--border);background:var(--surface);border-radius:999px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;padding:8px 12px;cursor:pointer;transition:all .12s}
+.section-jump-btn:hover{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
 .disc-group-block{margin-bottom:28px}
 .disc-group-block:last-child{margin-bottom:0}
 .disc-group-head{display:flex;align-items:center;gap:10px;margin:0 0 12px}
@@ -613,7 +616,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div id="adminHome">
       <div class="library-top">
         <div>
-          <h2>Visão geral do acervo</h2>
+          <h2>Biblioteca de Materiais</h2>
           <p>Acompanhe o tamanho da biblioteca e entre em uma disciplina/área para ver materiais, temas e detalhes. A Biblioteca continua independente de turmas específicas.</p>
         </div>
         <div class="inner-actions">
@@ -622,6 +625,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         </div>
       </div>
       <div class="summary-row" id="adminSummary"></div>
+      <div class="section-jump-row" id="adminSectionJumps"></div>
       <div class="disc-search">
         <input class="search-input" type="text" id="adminDiscSearch" placeholder="Buscar disciplina/área..." oninput="renderAdminHome()">
       </div>
@@ -2794,8 +2798,8 @@ function renderProfessorHome(){
   ].filter(Boolean).join('');
 }
 
-function renderDiscGroupHtml(titulo,cardsHtml,total,mostrarContador=true){
-  return `<section class="disc-group-block${mostrarContador?'':' general-block'}">
+function renderDiscGroupHtml(titulo,cardsHtml,total,mostrarContador=true,anchorId=''){
+  return `<section class="disc-group-block${mostrarContador?'':' general-block'}" ${anchorId?`id="${escH(anchorId)}"`:''}>
     <div class="disc-group-head">
       <div class="disc-group-title">${escH(titulo)}</div>
       ${mostrarContador?`<div class="disc-group-count">${total} ${total===1?'disciplina':'disciplinas'}</div>`:''}
@@ -2924,18 +2928,25 @@ function isThemeCollapsedAdmin(themeId){ return collapsedAdminThemes.has(themeCo
 function toggleThemeAdmin(themeId){ const k=themeCollapseKey('admin', currentAdminDiscId, themeId); collapsedAdminThemes.has(k)?collapsedAdminThemes.delete(k):collapsedAdminThemes.add(k); renderAdminDisc(); }
 function recolherTemasAdmin(){ [...temasDaDisc(currentAdminDiscId),{id:''}].forEach(t=>collapsedAdminThemes.add(themeCollapseKey('admin', currentAdminDiscId, t.id||''))); renderAdminDisc(); }
 function expandirTemasAdmin(){ [...temasDaDisc(currentAdminDiscId),{id:''}].forEach(t=>collapsedAdminThemes.delete(themeCollapseKey('admin', currentAdminDiscId, t.id||''))); renderAdminDisc(); }
+function scrollToHomeSection(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  const header=document.getElementById('appHeader');
+  const offset=(header?.getBoundingClientRect().height||0)+14;
+  const top=el.getBoundingClientRect().top+window.scrollY-offset;
+  window.scrollTo({top,behavior:'smooth'});
+}
 
 function renderAdminHome(){
   currentAdminDiscId=null;
   document.getElementById('adminHome').style.display='';
   document.getElementById('adminDiscView').style.display='none';
   const scopedMaterials=activeMaterials();
-  const totalM=scopedMaterials.length, totalD=D.disciplinas.length, totalT=D.temas.length, totalF=scopedMaterials.filter(m=>m.fixado).length, totalR=scopedMaterials.filter(needsMaterialReview).length, totalA=D.materiais.filter(isArchived).length;
+  const totalM=scopedMaterials.length, totalD=D.disciplinas.length, totalT=D.temas.length, totalR=scopedMaterials.filter(needsMaterialReview).length, totalA=D.materiais.filter(isArchived).length;
   const summaryItems=[
     [totalD,'disciplinas/áreas'],
     [totalT,'temas'],
     [totalM,'materiais'],
-    [totalF,'fixados'],
     [totalR,'a revisar']
   ];
   if(totalA) summaryItems.push([totalA,'arquivados']);
@@ -2948,11 +2959,19 @@ function renderAdminHome(){
   const eadList=discsPorModalidade('ead').filter(passa);
   const pres=presList.map(d=>discCardHtml(d,false)).join('');
   const ead=eadList.map(d=>discCardHtml(d,false)).join('');
+  const jumpEl=document.getElementById('adminSectionJumps');
+  if(jumpEl){
+    jumpEl.innerHTML=[
+      geral?['admin-sec-geral','Materiais gerais']:'',
+      presList.length?['admin-sec-presenciais','Presenciais']:'',
+      eadList.length?['admin-sec-ead','EaD']:''
+    ].filter(Boolean).map(([id,label])=>`<button class="section-jump-btn" type="button" onclick="scrollToHomeSection('${escJsStr(id)}')">${escH(label)}</button>`).join('');
+  }
   const blocks=[
     renderRecentHomeSection(scopedMaterials),
-    geral?renderDiscGroupHtml('Materiais gerais', geral, 1, false):'',
-    renderDiscGroupHtml('Disciplinas/áreas presenciais', pres, presList.length, true),
-    renderDiscGroupHtml('Disciplinas/áreas EaD', ead, eadList.length, true)
+    geral?renderDiscGroupHtml('Materiais gerais', geral, 1, false, 'admin-sec-geral'):'',
+    renderDiscGroupHtml('Disciplinas/áreas presenciais', pres, presList.length, true, 'admin-sec-presenciais'),
+    renderDiscGroupHtml('Disciplinas/áreas EaD', ead, eadList.length, true, 'admin-sec-ead')
   ].filter(Boolean).join('');
   document.getElementById('adminHomeContent').innerHTML = blocks || `<div class="empty"><h3>Nenhuma disciplina/área encontrada.</h3></div>`;
 }
