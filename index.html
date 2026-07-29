@@ -560,8 +560,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   <div class="h-right">
     <button class="h-btn" id="hBtnVoltarAdmin" onclick="voltarDaPreviaProfessor()" style="display:none">← Voltar ao administrador</button>
     <button class="h-btn" id="hBtnPreview" onclick="visualizarComoProfessor()" style="display:none">👁 Visualizar como professor</button>
-    <button class="h-btn" id="hBtnExport" onclick="exportarDados()" style="display:none">↓ Exportar</button>
-    <button class="h-btn" id="hBtnImport" onclick="importFileInput.click()" style="display:none">↑ Importar</button>
+    <button class="h-btn header-backup-btn" id="hBtnExport" onclick="exportarDados()" style="display:none">↓ Exportar</button>
+    <button class="h-btn header-backup-btn" id="hBtnImport" onclick="importFileInput.click()" style="display:none">↑ Importar</button>
     <button class="h-btn" id="hBtnGerar" onclick="gerarVersaoProfessor()" style="display:none;background:#edf8f2;border-color:#b9dfca;color:#2a6f49">📦 Gerar versão para professor</button>
     <button class="h-btn" onclick="doLogout()">Sair</button>
   </div>
@@ -2653,8 +2653,8 @@ function abrirApp(){
   document.getElementById('hBadge').style.display='';
   document.getElementById('hBadge').textContent='Admin';
   document.getElementById('hBtnPreview').style.display='';
-  document.getElementById('hBtnExport').style.display='';
-  document.getElementById('hBtnImport').style.display='';
+  document.getElementById('hBtnExport').style.display='none';
+  document.getElementById('hBtnImport').style.display='none';
   document.getElementById('hBtnGerar').style.display='';
   document.getElementById('hBtnVoltarAdmin').style.display='none';
 
@@ -2723,8 +2723,8 @@ function voltarDaPreviaProfessor(){
   document.getElementById('hBadge').textContent='Admin';
   document.getElementById('hBtnVoltarAdmin').style.display='none';
   document.getElementById('hBtnPreview').style.display='';
-  document.getElementById('hBtnExport').style.display='';
-  document.getElementById('hBtnImport').style.display='';
+  document.getElementById('hBtnExport').style.display='none';
+  document.getElementById('hBtnImport').style.display='none';
   document.getElementById('hBtnGerar').style.display='';
 
   renderAdminHome();
