@@ -30,7 +30,7 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 .login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:0 18px 54px rgba(21,24,33,.12);width:380px;overflow:hidden}
 .login-top{background:#fff;padding:28px 32px 24px;display:flex;flex-direction:column;align-items:center;gap:9px;position:relative;border-bottom:1px solid var(--border)}
 .login-top::after{content:'';position:absolute;left:32px;right:32px;bottom:-1px;height:3px;border-radius:999px;background:linear-gradient(90deg,#164194 0 72%,#f25a38 72% 100%)}
-.login-logo-img{max-height:112px;max-width:280px;object-fit:contain;opacity:1;cursor:pointer}
+.login-logo-img{max-height:112px;max-width:280px;object-fit:contain;opacity:1}
 .login-brand{font-size:24px;font-weight:800;font-style:italic;color:#164194;letter-spacing:-.04em}
 .login-curso{font-size:15px;font-weight:800;color:var(--text);text-align:center;line-height:1.25;max-width:300px}
 .login-sub{font-size:11px;color:var(--text2);text-align:center;line-height:1.4;max-width:300px}
@@ -524,7 +524,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 <div class="login-wrap" id="loginWrap">
   <div class="login-card">
     <div class="login-top">
-      <img id="loginLogoImg" class="login-logo-img" src="" alt="Logo" style="display:none" onclick="triggerLogoUpload()">
+      <img id="loginLogoImg" class="login-logo-img" src="" alt="Logo" style="display:none">
       <span class="login-brand" id="loginBrandText">SENAI</span>
       <div class="login-curso" id="loginCurso">Materiais de Aula</div>
       <div class="login-sub" id="loginSub">Aprendizagem Industrial em Moldador de Plástico por Compressão</div>
@@ -550,7 +550,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 <!-- HEADER -->
 <header class="app-header" id="appHeader" style="display:none">
   <div class="h-left">
-    <img id="hLogoImg" class="h-logo" src="" alt="Logo" style="display:none" onclick="triggerLogoUpload()" title="Trocar logo">
+    <img id="hLogoImg" class="h-logo" src="" alt="Logo" style="display:none" onclick="goHome()" title="Ir para a página inicial">
     <span class="h-brand" id="hBrandText" style="display:none">SENAI</span>
     <div class="h-divider" id="hDivider"></div>
     <span class="h-title" id="hTitle">Materiais de Aula</span>
@@ -2822,6 +2822,21 @@ function removerFavicon(){
 // ════════════════════════════════════════════════════════
 // ABAS
 // ════════════════════════════════════════════════════════
+function goHome(){
+  const mode=sessionStorage.getItem('mat_mode');
+  if(mode==='professor'){
+    voltarProfessorHome();
+    return;
+  }
+  if(document.getElementById('viewProfessor')?.style.display !== 'none'){
+    voltarDaPreviaProfessor();
+    return;
+  }
+  const firstTab=document.querySelector('.tab-btn');
+  if(firstTab) setTab('materiais', firstTab);
+  else renderAdminHome();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
 function setTab(tab, btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
@@ -5283,7 +5298,7 @@ async function gerarVersaoProfessor(){
       : `<img id="loginLogoImg" class="login-logo-img" src="" alt="Logo" style="display:none">`;
     const brandLoginStyle = publicMeta.logo ? 'display:none' : '';
     const logoHeaderHtml = publicMeta.logo
-      ? `<img id="hLogoImg" class="h-logo" src="${publicMeta.logo}" alt="Logo">`
+      ? `<img id="hLogoImg" class="h-logo" src="${publicMeta.logo}" alt="Logo" onclick="voltarHomeProfessorOnly()" title="Ir para a página inicial">`
       : `<img id="hLogoImg" class="h-logo" src="" alt="Logo" style="display:none">`;
     const brandHeaderStyle = publicMeta.logo ? 'display:none' : '';
 
