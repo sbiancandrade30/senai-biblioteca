@@ -276,6 +276,10 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .quick-filter-btn{border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:999px;padding:7px 11px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .12s}
 .quick-filter-btn:hover{border-color:var(--accent);color:var(--accent)}
 .quick-filter-btn.active{background:var(--accent-bg);border-color:rgba(37,87,214,.28);color:var(--accent)}
+.filter-status{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:10px 12px;margin:-6px 0 16px;color:var(--text2);font-size:12px}
+.filter-status strong{color:var(--text);font-weight:800}
+.filter-clear-btn{border:1px solid var(--border);background:var(--surface);border-radius:999px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.filter-clear-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
 .course-filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
 .course-chip{border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:999px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s}
 .course-chip:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
@@ -480,6 +484,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   .admin-actions.wrap{max-width:none;justify-content:flex-start;flex-wrap:wrap}
   .inner-filters .search-input{min-width:100%}
   .filter-sel{width:100%}
+  .filter-status{align-items:flex-start;flex-direction:column}
+  .filter-status .filter-clear-btn{width:100%}
   .modal{width:calc(100vw - 24px)}
   .modal-head{padding:14px 18px}
   .modal-body{padding:16px 18px}
@@ -680,6 +686,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       <select class="filter-sel" id="planTipo" onchange="renderPlanTab()"><option value="">Todos os tipos</option></select>
       <select class="filter-sel" id="planStatus" onchange="renderPlanTab()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="ready">Prontos</option></select>
     </div>
+    <div id="planFilterStatus"></div>
     <div id="planContent"></div>
   </div>
 
@@ -3319,6 +3326,50 @@ function updatePlanQuickFilterButtons(){
     btn.classList.toggle('active', active);
   });
 }
+function getPlanFilterState(){
+  return {
+    search:document.getElementById('planSearch')?.value||'',
+    course:document.getElementById('planCourse')?.value||'',
+    discId:document.getElementById('planDisc')?.value||'',
+    tipoId:document.getElementById('planTipo')?.value||'',
+    status:document.getElementById('planStatus')?.value||'',
+    quick:planQuickFilter
+  };
+}
+function isPlanFilterActive(state=getPlanFilterState()){
+  return Boolean(state.search || state.course || state.discId || state.tipoId || state.status || state.quick);
+}
+function planFilterLabel(state=getPlanFilterState()){
+  const labels=[];
+  if(state.search) labels.push(`busca: "${state.search.trim()}"`);
+  if(state.discId) labels.push(labelDisc(state.discId));
+  if(state.tipoId) labels.push(labelTipo(state.tipoId));
+  if(state.status==='review') labels.push('a revisar');
+  if(state.status==='ready') labels.push('prontos');
+  if(state.quick==='fixados') labels.push('fixados');
+  if(state.quick==='avaliacoes') labels.push('avaliações');
+  if(state.quick==='revisar') labels.push('a revisar');
+  if(state.quick==='sem-tema') labels.push('sem tema');
+  if(state.quick==='admin') labels.push('somente admin');
+  return labels.join(' · ');
+}
+function clearPlanFilters(){
+  planQuickFilter='';
+  const ids=['planSearch','planCourse','planDisc','planTipo','planStatus'];
+  ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  renderPlanTab();
+}
+function renderPlanFilterStatus(total){
+  const el=document.getElementById('planFilterStatus');
+  if(!el) return;
+  const state=getPlanFilterState();
+  if(!isPlanFilterActive(state)){
+    el.innerHTML='';
+    return;
+  }
+  const label=planFilterLabel(state);
+  el.innerHTML=`<div class="filter-status"><span><strong>${total}</strong> resultado${total!==1?'s':''}${label?` para ${escH(label)}`:''}</span><button class="filter-clear-btn" type="button" onclick="clearPlanFilters()">Limpar</button></div>`;
+}
 function renderPlanSelectors(){
   const courseSel=document.getElementById('planCourse');
   const discSel=document.getElementById('planDisc');
@@ -3335,11 +3386,7 @@ function renderPlanSelectors(){
   if(tipoSel && oldTipo) tipoSel.value=oldTipo;
 }
 function planFilteredMaterials(){
-  const search=document.getElementById('planSearch')?.value||'';
-  const course=document.getElementById('planCourse')?.value||'';
-  const discId=document.getElementById('planDisc')?.value||'';
-  const tipoId=document.getElementById('planTipo')?.value||'';
-  const status=document.getElementById('planStatus')?.value||'';
+  const {search,course,discId,tipoId,status}=getPlanFilterState();
   return filterMats(activeMaterials().filter(m=>{
     if(course && !courseMatches(m,course)) return false;
     if(discId && m.disciplinaId!==discId) return false;
@@ -3355,6 +3402,7 @@ function renderPlanTab(){
   renderPlanSelectors();
   updatePlanQuickFilterButtons();
   const list=planFilteredMaterials();
+  renderPlanFilterStatus(list.length);
   const discs=[...new Set(list.map(m=>m.disciplinaId||GERAL_ID))];
   const temas=[...new Set(list.map(m=>m.temaId||''))];
   const review=list.filter(needsMaterialReview).length;
