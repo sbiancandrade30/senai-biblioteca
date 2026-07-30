@@ -545,8 +545,13 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   .modal{width:calc(100vw - 24px)}
   .modal-head{padding:14px 18px}
   .modal-body{padding:16px 18px}
-  .modal-foot{padding:12px 18px}
-  .modal-foot .btn{padding:10px 12px;font-size:12px}
+  .modal-foot{padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .modal-foot .btn{width:100%;justify-content:center;padding:10px 12px;font-size:12px}
+  .tipo-grid{grid-template-columns:repeat(3,1fr);gap:6px}
+  .tipo-opt{padding:7px 5px;font-size:10.5px}
+  .tipo-opt-icon{font-size:16px}
+  .material-link-row{padding:10px;border-radius:14px}
+  .quick-textarea{min-height:120px}
 }
 
 @media(max-width:460px){
@@ -3453,6 +3458,7 @@ function showMaterialDetail(id){
   document.getElementById('materialDetailBody').innerHTML=materialDetailHtml(m);
   document.getElementById('materialDetailFoot').innerHTML=`
     <button class="btn btn-outline" onclick="closeMaterialDetailModal()">Fechar</button>
+    <button class="btn btn-outline" onclick="compartilharMaterial('${escJsStr(m.id)}')">Compartilhar</button>
     ${isArchived(m)?`<button class="btn btn-outline" onclick="restaurarMaterial('${escJsStr(m.id)}'); closeMaterialDetailModal()">Restaurar</button>`:''}
     ${!isArchived(m) && needsMaterialReview(m)?`<button class="btn btn-outline" onclick="markMaterialReady('${escJsStr(m.id)}'); showMaterialDetail('${escJsStr(m.id)}')">Marcar como revisado</button>`:''}
     ${isArchived(m)?`<button class="btn btn-outline" style="color:var(--red);border-color:var(--red)" onclick="excluirMaterial('${escJsStr(m.id)}'); closeMaterialDetailModal()">Excluir</button>`:''}
@@ -3462,6 +3468,38 @@ function showMaterialDetail(id){
 }
 function closeMaterialDetailModal(){
   document.getElementById('materialDetailModalOverlay').classList.remove('open');
+}
+function materialSharePayload(m){
+  const first=materialLinks(m)[0];
+  const url=String(first?.link||'').trim();
+  const where=[labelDisc(m.disciplinaId),m.temaId?labelTema(m.temaId):'',getTipo(m.tipoId).nome].filter(Boolean).join(' - ');
+  const text=[
+    m.titulo,
+    where,
+    m.descricao||'',
+    url
+  ].map(v=>String(v||'').trim()).filter(Boolean).join('\n');
+  return {title:m.titulo||'Material da biblioteca',text,url};
+}
+async function compartilharMaterial(id){
+  const m=D.materiais.find(x=>x.id===id);
+  if(!m) return;
+  const payload=materialSharePayload(m);
+  try{
+    if(navigator.share && payload.url){
+      await navigator.share({title:payload.title,text:payload.text,url:payload.url});
+      return;
+    }
+    await navigator.clipboard.writeText(payload.text);
+    showToast('Material copiado para compartilhar.');
+  }catch(err){
+    try{
+      await navigator.clipboard.writeText(payload.text);
+      showToast('Material copiado para compartilhar.');
+    }catch(e){
+      showToast('Não consegui compartilhar este material agora.',true);
+    }
+  }
 }
 function openMaterialFromReview(id){
   showMaterialDetail(id);
