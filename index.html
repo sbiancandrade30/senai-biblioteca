@@ -286,6 +286,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .quick-filter-btn{border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:999px;padding:7px 11px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .12s}
 .quick-filter-btn:hover{border-color:var(--accent);color:var(--accent)}
 .quick-filter-btn.active{background:var(--accent-bg);border-color:rgba(37,87,214,.28);color:var(--accent)}
+.mobile-filter-toggle{display:none}
 .filter-status{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:10px 12px;margin:-6px 0 16px;color:var(--text2);font-size:12px}
 .filter-status strong{color:var(--text);font-weight:800}
 .filter-clear-btn{border:1px solid var(--border);background:var(--surface);border-radius:999px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;padding:6px 10px;cursor:pointer;white-space:nowrap}
@@ -519,6 +520,17 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   #reviewContent>.theme-section>.theme-body{grid-template-columns:1fr}
   #tabConfiguracoes{column-count:1}
   #tabPlanejamento>.library-top,#tabRevisao>.library-top,#tabPlanejamento>.summary-row,#tabRevisao>.summary-row,#planContent,#reviewContent,#tabConfiguracoes .settings-intro{border-radius:18px;padding:14px}
+  #tabPlanejamento>.library-top{padding:12px 14px;margin-bottom:10px}
+  #tabPlanejamento>.library-top p{display:none}
+  #tabPlanejamento>.summary-row{display:none}
+  #tabPlanejamento .quick-filter-row{flex-wrap:nowrap;overflow-x:auto;margin:0 0 10px;padding-bottom:2px;scrollbar-width:none}
+  #tabPlanejamento .quick-filter-row::-webkit-scrollbar{display:none}
+  #tabPlanejamento .quick-filter-btn{flex:0 0 auto}
+  #tabPlanejamento .mobile-filter-toggle{display:flex;width:100%;align-items:center;justify-content:center;border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:999px;padding:10px 12px;font-size:12px;font-weight:800;font-family:'DM Sans',sans-serif;margin:-2px 0 10px}
+  #tabPlanejamento.filters-open .mobile-filter-toggle{border-color:rgba(246,88,54,.32);color:var(--orange);background:#fff8f5}
+  #tabPlanejamento>.inner-filters{padding:10px;margin-bottom:10px}
+  #tabPlanejamento>.inner-filters .filter-sel{display:none}
+  #tabPlanejamento.filters-open>.inner-filters .filter-sel{display:block}
   .form-row,.form-row.three{grid-template-columns:1fr}
   .disc-grid{grid-template-columns:1fr}
   .disc-group-block{margin-bottom:22px}
@@ -760,6 +772,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       <button class="quick-filter-btn" type="button" onclick="setPlanQuickFilter('sem-tema')">Sem tema</button>
       <button class="quick-filter-btn" type="button" onclick="setPlanQuickFilter('admin')">Somente admin</button>
     </div>
+    <button class="mobile-filter-toggle" type="button" onclick="togglePlanMobileFilters()">Filtros avanÃ§ados</button>
     <div class="inner-filters">
       <input class="search-input" type="text" id="planSearch" placeholder="Buscar no banco de materiais..." oninput="renderPlanTab()">
       <select class="filter-sel" id="planCourse" onchange="renderPlanTab()" style="display:none"><option value="">Todos os usos</option></select>
@@ -3548,6 +3561,9 @@ function adminCardHtml(m){
 // ════════════════════════════════════════════════════════
 // PLANEJAMENTO POR AULA
 let planQuickFilter = '';
+function togglePlanMobileFilters(){
+  document.getElementById('tabPlanejamento')?.classList.toggle('filters-open');
+}
 function setPlanQuickFilter(value){
   planQuickFilter = value || '';
   renderPlanTab();
