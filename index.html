@@ -475,6 +475,40 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   #tabConfiguracoes{column-count:2}
 }
 
+@media(min-width:761px) and (max-width:1100px){
+  .app-header{padding:8px 18px;gap:10px}
+  .h-logo{height:34px;max-width:124px}
+  .h-title{font-size:13px;line-height:1.25}
+  .app-body,#viewAdmin.app-body{padding-top:22px;padding-right:22px;padding-bottom:84px}
+  .library-top{gap:12px;margin-bottom:16px}
+  .library-top h2{font-size:22px}
+  .library-top p{max-width:760px}
+  .summary-row{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:18px}
+  .summary-card{padding:13px 14px}
+  .disc-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .recent-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .inner-filters .search-input{min-width:320px}
+  #planContent,#reviewContent{padding:14px}
+  #tabConfiguracoes{column-count:1}
+  .settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(min-width:761px) and (max-width:900px){
+  #viewAdmin.app-body,.app-body{padding:18px 18px calc(88px + env(safe-area-inset-bottom,0px))}
+  .tabs{position:fixed;left:18px;right:18px;bottom:calc(10px + env(safe-area-inset-bottom,0px));top:auto;width:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-radius:20px;padding:6px;gap:5px;z-index:220;background:rgba(255,255,255,.94);box-shadow:0 10px 34px rgba(21,24,33,.14);backdrop-filter:blur(14px)}
+  .tab-btn{text-align:center;padding:10px 8px;font-size:12px;border-radius:14px}
+  .tab-full{display:inline}
+  .tab-short{display:none}
+  .summary-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .recent-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .settings-grid{grid-template-columns:1fr}
+}
+
+@media(min-width:901px) and (max-width:1100px){
+  #viewAdmin.app-body{padding-left:214px}
+  .tabs{left:18px;top:76px;width:170px}
+}
+
 @media(max-width:760px){
   .app-header{padding:8px 12px;gap:7px;display:grid;grid-template-columns:minmax(0,1fr);align-items:center}
   .h-left{grid-column:1/-1;width:100%;display:grid;grid-template-columns:auto 1px minmax(0,1fr);align-items:center;gap:8px}
