@@ -91,16 +91,16 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 .tipo-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
 /* ── CARDS PROFESSOR ───────────────────── */
-.mat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:8px}
-.mat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;transition:all .15s;text-decoration:none;color:inherit;min-height:64px}
+.mat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:8px;align-items:start}
+.mat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;align-items:stretch;gap:6px;transition:all .15s;text-decoration:none;color:inherit;min-height:0}
 .mat-card:hover{border-color:var(--accent);box-shadow:0 3px 14px rgba(45,91,227,.12);transform:translateY(-1px)}
-.mat-card-top{display:flex;align-items:flex-start;gap:9px;min-width:0}
+.mat-card-top{display:flex;align-items:flex-start;gap:9px;min-width:0;width:100%}
 .mat-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .mat-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.4}
 .mat-desc{font-size:11px;color:var(--text2);line-height:1.35;margin-top:1px}
-.mat-context-path{font-size:11px;color:var(--text2);line-height:1.35;margin-top:2px}
+.mat-context-path{font-size:11px;color:#27344d;line-height:1.35;margin-top:2px;font-weight:700}
 .mat-badges{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:5px}
-.mat-footer{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:0}
+.mat-footer{display:flex;align-items:center;justify-content:flex-start;gap:6px;min-width:0;padding-left:43px}
 .mat-tipo-badge{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:20px}
 .mat-source-badge{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);white-space:nowrap}
 .mat-open-btn{font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(45,91,227,.2);border-radius:var(--radius);padding:4px 10px;display:inline-flex;align-items:center;gap:4px;text-decoration:none;transition:all .15s;white-space:nowrap}
@@ -457,7 +457,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .link-remove-btn{width:38px;height:40px;border:1px solid rgba(185,50,50,.35);background:var(--red-bg);color:var(--red);border-radius:var(--radius);cursor:pointer;font-size:18px;line-height:1;transition:all .12s}
 .link-remove-btn:hover{background:var(--red);color:#fff}
 .add-link-btn{margin-top:2px}
-.mat-links{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.mat-links{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-start}
 .mat-access-btn{font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(45,91,227,.2);border-radius:var(--radius);padding:5px 10px;display:inline-flex;align-items:center;gap:4px;text-decoration:none;transition:all .15s;white-space:nowrap}
 .mat-access-btn:hover{background:var(--accent);color:#fff}
 .mat-access-btn.secondary{color:var(--text2);background:var(--surface2);border-color:var(--border)}
@@ -3792,6 +3792,7 @@ function clearMaterialSelection(){
 function selectMaterialsByList(list){
   setBulkSelectionMode(true);
   list.filter(m=>m && m.id).forEach(m=>selectedMaterialIds.add(m.id));
+  if(document.getElementById('tabPlanejamento')?.style.display !== 'none') renderPlanTab();
   renderBulkActionBar();
   syncSelectionClasses();
 }
@@ -5743,7 +5744,7 @@ ${fonts}
 <style>
 /* Ajustes específicos da versão gerada para professor */
 .search-results-title{font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 14px}
-.prof-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:8px;align-items:stretch}
+.prof-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:8px;align-items:start}
 .theme-toggle{width:100%;background:var(--surface2);border:none;border-bottom:1px solid var(--border);padding:13px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;color:var(--text);font-family:'DM Sans',sans-serif;transition:background .12s}
 .theme-toggle:hover{background:#ece9df}
 .theme-caret{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text2);font-size:14px;transition:transform .15s;flex-shrink:0}
