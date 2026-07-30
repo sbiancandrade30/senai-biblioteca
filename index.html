@@ -91,17 +91,18 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 .tipo-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
 /* ── CARDS PROFESSOR ───────────────────── */
-.mat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:12px}
-.mat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;display:flex;flex-direction:column;gap:8px;transition:all .15s;text-decoration:none;color:inherit}
+.mat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:8px}
+.mat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;transition:all .15s;text-decoration:none;color:inherit;min-height:64px}
 .mat-card:hover{border-color:var(--accent);box-shadow:0 3px 14px rgba(45,91,227,.12);transform:translateY(-1px)}
-.mat-card-top{display:flex;align-items:flex-start;gap:10px}
-.mat-icon{width:36px;height:36px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.mat-card-top{display:flex;align-items:flex-start;gap:9px;min-width:0}
+.mat-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .mat-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.4}
-.mat-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.mat-desc{font-size:11px;color:var(--text2);line-height:1.35;margin-top:1px}
 .mat-context-path{font-size:11px;color:var(--text2);line-height:1.35;margin-top:2px}
-.mat-footer{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.mat-tipo-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
-.mat-source-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);white-space:nowrap}
+.mat-badges{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:5px}
+.mat-footer{display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:0}
+.mat-tipo-badge{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:20px}
+.mat-source-badge{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);white-space:nowrap}
 .mat-open-btn{font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(45,91,227,.2);border-radius:var(--radius);padding:4px 10px;display:inline-flex;align-items:center;gap:4px;text-decoration:none;transition:all .15s;white-space:nowrap}
 .mat-open-btn:hover{background:var(--accent);color:#fff}
 
@@ -3239,13 +3240,13 @@ function profCardHtml(m, showContext=false){
         <div class="mat-title">${escH(m.titulo)}</div>
         ${showContext && context?`<div class="mat-context-path">${escH(context)}</div>`:''}
         ${m.descricao?`<div class="mat-desc">${escH(m.descricao)}</div>`:''}
+        <div class="mat-badges">
+          <span class="mat-tipo-badge" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.nome)}</span>
+          ${sourceBadgesHtml(m)}
+        </div>
       </div>
     </div>
     <div class="mat-footer">
-      <div style="display:flex;gap:5px;flex-wrap:wrap">
-        <span class="mat-tipo-badge" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.nome)}</span>
-        ${sourceBadgesHtml(m)}
-      </div>
       <div class="mat-links">${linkButtons || '<span class="mat-source-badge">Sem link</span>'}</div>
     </div>
   </div>`;
@@ -5710,7 +5711,7 @@ ${css}
 <style>
 /* Ajustes específicos da versão gerada para professor */
 .search-results-title{font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 14px}
-.prof-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:12px;align-items:stretch}
+.prof-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:8px;align-items:stretch}
 .theme-toggle{width:100%;background:var(--surface2);border:none;border-bottom:1px solid var(--border);padding:13px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;color:var(--text);font-family:'DM Sans',sans-serif;transition:background .12s}
 .theme-toggle:hover{background:#ece9df}
 .theme-caret{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text2);font-size:14px;transition:transform .15s;flex-shrink:0}
@@ -6060,7 +6061,7 @@ function cardMat(m){
   const t=tipo(m.tipoId), th=tema(m.temaId), dl=links(m);
   const context=[disc(m.disciplinaId)?.nome,th?.nome].filter(Boolean).join(' · ');
   const linksHtml=dl.map((l,i)=>'<a class="mat-open-btn" href="'+escH(l.link)+'" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>'+escH(tituloLink(l,i))+'</a>').join('');
-  return '<article class="mat-card"><div class="mat-card-top"><div class="mat-icon" style="background:'+bg(m.tipoId)+'">'+escH(t.icone||'📎')+'</div><div><div class="mat-title">'+escH(m.titulo)+'</div>'+(context?'<div class="mat-context-path">'+escH(context)+'</div>':'')+((m.descricao)?'<div class="mat-desc">'+escH(m.descricao)+'</div>':'')+'</div></div><div class="mat-footer"><span class="mat-tipo-badge" style="background:'+bg(m.tipoId)+';color:'+cor(m.tipoId)+'">'+escH(t.nome)+'</span>'+sourceBadges(m)+'</div>'+(linksHtml?'<div class="mat-links">'+linksHtml+'</div>':'')+'</article>';
+  return '<article class="mat-card"><div class="mat-card-top"><div class="mat-icon" style="background:'+bg(m.tipoId)+'">'+escH(t.icone||'📎')+'</div><div><div class="mat-title">'+escH(m.titulo)+'</div>'+(context?'<div class="mat-context-path">'+escH(context)+'</div>':'')+((m.descricao)?'<div class="mat-desc">'+escH(m.descricao)+'</div>':'')+'<div class="mat-badges"><span class="mat-tipo-badge" style="background:'+bg(m.tipoId)+';color:'+cor(m.tipoId)+'">'+escH(t.nome)+'</span>'+sourceBadges(m)+'</div></div></div><div class="mat-footer">'+(linksHtml?'<div class="mat-links">'+linksHtml+'</div>':'<span class="mat-source-badge">Sem link</span>')+'</div></article>';
 }
 function showToast(msg,err){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;right:24px;background:'+(err?'var(--red)':'var(--text)')+';color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)}
 applyLogoProfessorOnly();
