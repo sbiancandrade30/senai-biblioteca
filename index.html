@@ -474,14 +474,16 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 }
 
 @media(max-width:760px){
-  .app-header{padding:8px 12px;gap:7px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+  .app-header{padding:8px 12px;gap:7px;display:grid;grid-template-columns:minmax(0,1fr);align-items:center}
   .h-left{grid-column:1/-1;width:100%;display:grid;grid-template-columns:auto 1px minmax(0,1fr);align-items:center;gap:8px}
   .h-logo{height:28px;max-width:86px}
   .h-title{font-size:17px;font-weight:900;color:var(--text);line-height:1.12;white-space:normal;overflow:visible;display:block;letter-spacing:0}
   .h-badge,.sync-badge{font-size:9px;padding:3px 7px}
-  .h-status{grid-column:1/2;gap:5px;justify-content:flex-start;min-width:0}
+  .h-status{grid-column:1/-1;gap:5px;justify-content:flex-end;min-width:0}
   .sync-badge{max-width:118px;overflow:hidden;text-overflow:ellipsis}
-  .h-menu-toggle{grid-column:2/3;display:inline-flex;align-items:center;justify-content:center;justify-self:end}
+  .h-menu-toggle{display:inline-flex;align-items:center;justify-content:center;justify-self:end}
+  .h-status .h-menu-toggle{display:inline-flex}
+  .app-header>.h-menu-toggle{display:none}
   .h-right{display:none;grid-column:1/-1;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:8px;box-shadow:var(--shadow-soft);overflow:visible}
   .app-header.actions-open .h-right{display:grid;grid-template-columns:1fr;gap:7px}
   .app-header.actions-open .h-right .h-btn{width:100%;justify-content:center;padding:10px 12px;font-size:12px}
@@ -575,8 +577,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   <div class="h-status">
     <span class="h-badge" id="hBadge" style="display:none">Admin</span>
     <span class="sync-badge off" id="hSyncBadge">Nuvem off</span>
+    <button class="h-menu-toggle" id="hMenuToggle" onclick="toggleHeaderActions()" type="button" aria-expanded="false">Ações</button>
   </div>
-  <button class="h-menu-toggle" id="hMenuToggle" onclick="toggleHeaderActions()" type="button" aria-expanded="false">Ações</button>
   <div class="h-right" id="hActions">
     <button class="h-btn" id="hBtnVoltarAdmin" onclick="voltarDaPreviaProfessor()" style="display:none">← Voltar ao administrador</button>
     <button class="h-btn" id="hBtnPreview" onclick="visualizarComoProfessor()" style="display:none">👁 Visualizar como professor</button>
