@@ -3472,10 +3472,8 @@ function closeMaterialDetailModal(){
 function materialSharePayload(m){
   const first=materialLinks(m)[0];
   const url=String(first?.link||'').trim();
-  const where=[labelDisc(m.disciplinaId),m.temaId?labelTema(m.temaId):'',getTipo(m.tipoId).nome].filter(Boolean).join(' - ');
   const text=[
     m.titulo,
-    where,
     m.descricao||'',
     url
   ].map(v=>String(v||'').trim()).filter(Boolean).join('\n');
