@@ -98,6 +98,7 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 .mat-icon{width:36px;height:36px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .mat-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.4}
 .mat-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.mat-context-path{font-size:11px;color:var(--text2);line-height:1.35;margin-top:2px}
 .mat-footer{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .mat-tipo-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
 .mat-source-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);white-space:nowrap}
@@ -132,8 +133,10 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 .quick-textarea{min-height:150px;font-family:'DM Mono',monospace;font-size:12px}
 .review-explain{background:#fff8e8;border:1px solid #f3d79a;border-radius:14px;padding:12px 14px;color:#6b4b0b;font-size:12px;line-height:1.5}
 .review-explain strong{display:block;color:#4c3507;margin-bottom:6px}
-.review-explain ul{margin:0;padding-left:18px}
-.review-explain li{margin:3px 0}
+.review-checklist{display:grid;gap:7px;margin-top:8px}
+.review-checkitem{display:flex;align-items:flex-start;gap:8px}
+.review-checkitem input{width:15px;height:15px;margin-top:1px;accent-color:#d38b12;flex:0 0 auto}
+.review-check-hint{font-size:11px;color:#8a681d;margin-top:8px}
 
 /* ── ADMIN TOOLBAR ─────────────────────── */
 .admin-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
@@ -245,8 +248,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .summary-card{background:linear-gradient(180deg,#fff,#fbfcff);border:1px solid var(--border);border-radius:18px;padding:16px 17px;box-shadow:0 1px 0 rgba(21,24,33,.02)}
 .summary-num{font-size:26px;font-weight:800;line-height:1;margin-bottom:7px;letter-spacing:-.03em}
 .summary-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;font-weight:800}
-.disc-search{margin-bottom:18px;max-width:520px}
-.disc-search .search-input{width:100%;min-width:100%;font-size:14px;padding-top:13px;padding-bottom:13px}
+.disc-search{margin-bottom:18px;max-width:680px;display:flex;gap:8px;align-items:center}
+.disc-search .search-input{width:100%;min-width:0;font-size:14px;padding-top:13px;padding-bottom:13px}
 .section-jump-row{display:flex;gap:8px;flex-wrap:wrap;margin:-6px 0 18px}
 .section-jump-btn{border:1px solid var(--border);background:var(--surface);border-radius:999px;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:800;padding:8px 12px;cursor:pointer;transition:all .12s}
 .section-jump-btn:hover{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
@@ -739,6 +742,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       <select class="filter-sel" id="profHomeDisc" onchange="renderProfessorHome()"><option value="">Todas as disciplinas</option></select>
       <select class="filter-sel" id="profHomeTipo" onchange="renderProfessorHome()"><option value="">Todos os tipos</option></select>
       <select class="filter-sel" id="profHomeRevisao" onchange="renderProfessorHome()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="stale">Desatualizados</option><option value="ready">Prontos</option></select>
+      <button class="btn btn-outline" type="button" onclick="clearProfessorHomeFilters()">Limpar</button>
     </div>
     <div id="professorHomeContent"></div>
   </div>
@@ -760,6 +764,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       <select class="filter-sel" id="profDiscTipo" onchange="renderProfessorDisc()"><option value="">Todos os tipos</option></select>
       <select class="filter-sel" id="profDiscTema" onchange="renderProfessorDisc()"><option value="">Todos os temas</option></select>
       <select class="filter-sel" id="profDiscRevisao" onchange="renderProfessorDisc()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="stale">Desatualizados</option><option value="ready">Prontos</option></select>
+      <button class="btn btn-outline" type="button" onclick="clearProfessorDiscFilters()">Limpar</button>
     </div>
     <div id="professorDiscContent"></div>
   </div>
@@ -791,6 +796,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       <div class="section-jump-row" id="adminSectionJumps"></div>
       <div class="disc-search">
         <input class="search-input" type="text" id="adminDiscSearch" placeholder="Buscar disciplina/área..." oninput="renderAdminHome()">
+        <button class="btn btn-outline" type="button" onclick="clearAdminHomeSearch()">Limpar</button>
       </div>
       <div id="adminHomeContent"></div>
     </div>
@@ -820,6 +826,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <select class="filter-sel" id="adminMatTema" onchange="renderAdminDisc()"><option value="">Todos os temas</option></select>
         <select class="filter-sel" id="adminMatRevisao" onchange="renderAdminDisc()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="stale">Desatualizados</option><option value="ready">Prontos</option></select>
         <select class="filter-sel" id="adminMatVisibilidade" onchange="renderAdminDisc()"><option value="">Toda visibilidade</option><option value="professor">Visível para professor</option><option value="admin">Somente admin</option></select>
+        <button class="btn btn-outline" type="button" onclick="clearAdminDiscFilters()">Limpar</button>
       </div>
       <div id="adminDiscContent"></div>
     </div>
@@ -851,6 +858,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       <select class="filter-sel" id="planDisc" onchange="renderPlanTab()"><option value="">Todas as disciplinas</option></select>
       <select class="filter-sel" id="planTipo" onchange="renderPlanTab()"><option value="">Todos os tipos</option></select>
       <select class="filter-sel" id="planStatus" onchange="renderPlanTab()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="ready">Prontos</option></select>
+      <button class="btn btn-outline" type="button" onclick="clearPlanFilters()">Limpar</button>
     </div>
     <div id="planFilterStatus"></div>
     <div id="planContent"></div>
@@ -879,6 +887,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <option value="archived">Arquivados</option>
         <option value="all">Todos os materiais</option>
       </select>
+      <button class="btn btn-outline" type="button" onclick="clearReviewFilters()">Limpar</button>
     </div>
     <div id="reviewContent"></div>
   </div>
@@ -3085,6 +3094,14 @@ function professorHomeFilterState(){
     revisao:document.getElementById('profHomeRevisao')?.value || ''
   };
 }
+function clearProfessorHomeFilters(){
+  ['profGlobalSearch','profHomeDisc','profHomeTipo','profHomeRevisao'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  renderProfessorHome();
+}
+function clearProfessorDiscFilters(){
+  ['profDiscSearch','profDiscTipo','profDiscTema','profDiscRevisao'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  renderProfessorDisc();
+}
 
 function renderProfessorHome(){
   currentProfessorDiscId=null;
@@ -3213,13 +3230,14 @@ function renderProfessorGrouped(list, discId){
 function profCardHtml(m, showContext=false){
   const tipo=getTipo(m.tipoId);
   const links=materialLinks(m);
+  const context=[labelDisc(m.disciplinaId),m.temaId?labelTema(m.temaId):''].filter(Boolean).join(' · ');
   const linkButtons=links.map((l,idx)=>`<a class="mat-access-btn${idx>0?' secondary':''}" href="${escH(l.link)}" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>${escH(tituloLink(l,idx))}</a>`).join('');
   return `<div class="mat-card">
     <div class="mat-card-top">
       <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'📎')}</div>
       <div>
         <div class="mat-title">${escH(m.titulo)}</div>
-        ${showContext?`<div class="mat-desc">${escH(labelDisc(m.disciplinaId))}${m.temaId?' · '+escH(labelTema(m.temaId)):''}</div>`:''}
+        ${showContext && context?`<div class="mat-context-path">${escH(context)}</div>`:''}
         ${m.descricao?`<div class="mat-desc">${escH(m.descricao)}</div>`:''}
       </div>
     </div>
@@ -3249,6 +3267,11 @@ function scrollToHomeSection(id){
   const offset=(header?.getBoundingClientRect().height||0)+14;
   const top=el.getBoundingClientRect().top+window.scrollY-offset;
   window.scrollTo({top,behavior:'smooth'});
+}
+function clearAdminHomeSearch(){
+  const el=document.getElementById('adminDiscSearch');
+  if(el) el.value='';
+  renderAdminHome();
 }
 
 function renderAdminHome(){
@@ -3336,6 +3359,10 @@ function renderAdminDiscSelectors(){
   const temas=temasDaDisc(currentAdminDiscId);
   document.getElementById('adminMatTipo').innerHTML='<option value="">Todos os tipos</option>'+tipos.map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
   document.getElementById('adminMatTema').innerHTML='<option value="">Todos os temas</option>'+temas.map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('')+'<option value="__semtema__">Sem tema</option>';
+}
+function clearAdminDiscFilters(){
+  ['adminMatSearch','adminMatTipo','adminMatTema','adminMatRevisao','adminMatVisibilidade'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  renderAdminDisc();
 }
 function renderAdminDisc(){
   const disc=getDisc(currentAdminDiscId); if(!disc) return voltarAdminHome();
@@ -3436,7 +3463,11 @@ function materialReviewReasons(m){
 function materialReviewExplanationHtml(m){
   const reasons=materialReviewReasons(m);
   if(!reasons.length) return '';
-  return `<div class="material-detail-section"><div class="review-explain"><strong>Por que revisar?</strong><ul>${reasons.map(r=>`<li>${escH(r)}</li>`).join('')}</ul></div></div>`;
+  return `<div class="material-detail-section"><div class="review-explain">
+    <strong>Checklist de revisão</strong>
+    <div class="review-checklist">${reasons.map(r=>`<label class="review-checkitem"><input type="checkbox" disabled><span>${escH(r)}</span></label>`).join('')}</div>
+    <div class="review-check-hint">Depois de corrigir os pontos pendentes, use “Marcar como revisado” para remover o alerta.</div>
+  </div></div>`;
 }
 function materialQualityIssues(m){
   const issues=[];
@@ -3485,6 +3516,13 @@ function reviewList(){
     return true;
   }));
 }
+function clearReviewFilters(){
+  const search=document.getElementById('reviewSearch');
+  const filter=document.getElementById('reviewFilter');
+  if(search) search.value='';
+  if(filter) filter.value='review';
+  renderReviewTab();
+}
 function renderReviewTab(){
   renderReviewFilterOptions();
   const all=activeMaterials();
@@ -3521,7 +3559,12 @@ function reviewCardHtml(m){
   const tipo=getTipo(m.tipoId);
   const reason=materialReviewReason(m);
   const context=[labelDisc(m.disciplinaId),m.temaId?labelTema(m.temaId):'',tipo.nome].filter(Boolean).join(' - ');
-  return `<div class="admin-card card-clickable${needsMaterialReview(m)?' pinned':''}" ${materialCardAttrs(m.id)}>
+  const selected=selectedMaterialIds.has(m.id);
+  return `<div class="admin-card card-clickable${needsMaterialReview(m)?' pinned':''}${selected?' selected':''}" ${materialCardAttrs(m.id)}>
+    <label class="bulk-selector" onclick="event.stopPropagation()">
+      <input class="bulk-check" type="checkbox" ${selected?'checked':''} title="Selecionar material" onchange="toggleMaterialSelection(event,'${escJsStr(m.id)}')">
+      <span>Selecionar</span>
+    </label>
     <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'')}</div>
     <div class="admin-body">
       <div class="admin-title">${escH(m.titulo)}</div>
@@ -3658,6 +3701,7 @@ function openMaterialFromReview(id){
 function markMaterialReady(id){
   const m=D.materiais.find(x=>x.id===id); if(!m) return;
   m.statusMaterial='pronto';
+  m.reviewTags=[];
   m.updatedAt=isoNow();
   salvar();
   renderReviewTab();
@@ -3925,7 +3969,12 @@ function planSectionHtml(discId,mats){
 function planCardHtml(m){
   const tipo=getTipo(m.tipoId);
   const links=materialLinks(m);
-  return `<div class="admin-card card-clickable${needsMaterialReview(m)?' pinned':''}" ${materialCardAttrs(m.id)}>
+  const selected=selectedMaterialIds.has(m.id);
+  return `<div class="admin-card card-clickable${needsMaterialReview(m)?' pinned':''}${selected?' selected':''}" ${materialCardAttrs(m.id)}>
+    <label class="bulk-selector" onclick="event.stopPropagation()">
+      <input class="bulk-check" type="checkbox" ${selected?'checked':''} title="Selecionar material" onchange="toggleMaterialSelection(event,'${escJsStr(m.id)}')">
+      <span>Selecionar</span>
+    </label>
     <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'📎')}</div>
     <div class="admin-body">
       <div class="admin-title">${escH(m.titulo)}</div>
@@ -5722,6 +5771,7 @@ ${css}
       <select class="filter-sel" id="profHomeDisc" onchange="renderHomeProfessorOnly()"><option value="">Todas as disciplinas</option></select>
       <select class="filter-sel" id="profHomeTipo" onchange="renderHomeProfessorOnly()"><option value="">Todos os tipos</option></select>
       <select class="filter-sel" id="profHomeRevisao" onchange="renderHomeProfessorOnly()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="stale">Desatualizados</option><option value="ready">Prontos</option></select>
+      <button class="btn btn-outline" type="button" onclick="clearHomeFiltersProfessorOnly()">Limpar</button>
     </div>
     <div id="professorHomeContent"></div>
   </div>
@@ -5734,6 +5784,7 @@ ${css}
       <select class="filter-sel" id="profDiscTipo" onchange="renderDiscProfessorOnly()"><option value="">Todos os tipos</option></select>
       <select class="filter-sel" id="profDiscTema" onchange="renderDiscProfessorOnly()"><option value="">Todos os temas</option></select>
       <select class="filter-sel" id="profDiscRevisao" onchange="renderDiscProfessorOnly()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="stale">Desatualizados</option><option value="ready">Prontos</option></select>
+      <button class="btn btn-outline" type="button" onclick="clearDiscFiltersProfessorOnly()">Limpar</button>
     </div>
     <div id="professorDiscContent"></div>
   </div>
@@ -5913,6 +5964,14 @@ function homeFilterStateProfessorOnly(){
     revisao:document.getElementById('profHomeRevisao')?.value||''
   };
 }
+function clearHomeFiltersProfessorOnly(){
+  ['profGlobalSearch','profHomeDisc','profHomeTipo','profHomeRevisao'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+  renderHomeProfessorOnly();
+}
+function clearDiscFiltersProfessorOnly(){
+  ['profDiscSearch','profDiscTipo','profDiscTema','profDiscRevisao'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+  renderDiscProfessorOnly();
+}
 function renderHomeProfessorOnly(){
   renderHomeFiltersProfessorOnly();
   const state=homeFilterStateProfessorOnly();
@@ -5999,8 +6058,9 @@ function grouped(list){
 }
 function cardMat(m){
   const t=tipo(m.tipoId), th=tema(m.temaId), dl=links(m);
+  const context=[disc(m.disciplinaId)?.nome,th?.nome].filter(Boolean).join(' · ');
   const linksHtml=dl.map((l,i)=>'<a class="mat-open-btn" href="'+escH(l.link)+'" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>'+escH(tituloLink(l,i))+'</a>').join('');
-  return '<article class="mat-card"><div class="mat-card-top"><div class="mat-icon" style="background:'+bg(m.tipoId)+'">'+escH(t.icone||'📎')+'</div><div><div class="mat-title">'+escH(m.titulo)+'</div>'+((m.descricao)?'<div class="mat-desc">'+escH(m.descricao)+'</div>':'')+'</div></div><div class="mat-footer"><span class="mat-tipo-badge" style="background:'+bg(m.tipoId)+';color:'+cor(m.tipoId)+'">'+escH(t.nome)+'</span>'+sourceBadges(m)+'</div>'+((th?.nome)?'<div class="mat-context">'+escH(th.nome)+'</div>':'')+(linksHtml?'<div class="mat-links">'+linksHtml+'</div>':'')+'</article>';
+  return '<article class="mat-card"><div class="mat-card-top"><div class="mat-icon" style="background:'+bg(m.tipoId)+'">'+escH(t.icone||'📎')+'</div><div><div class="mat-title">'+escH(m.titulo)+'</div>'+(context?'<div class="mat-context-path">'+escH(context)+'</div>':'')+((m.descricao)?'<div class="mat-desc">'+escH(m.descricao)+'</div>':'')+'</div></div><div class="mat-footer"><span class="mat-tipo-badge" style="background:'+bg(m.tipoId)+';color:'+cor(m.tipoId)+'">'+escH(t.nome)+'</span>'+sourceBadges(m)+'</div>'+(linksHtml?'<div class="mat-links">'+linksHtml+'</div>':'')+'</article>';
 }
 function showToast(msg,err){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;right:24px;background:'+(err?'var(--red)':'var(--text)')+';color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)}
 applyLogoProfessorOnly();
