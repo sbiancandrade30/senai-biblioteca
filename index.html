@@ -5743,7 +5743,7 @@ ${fonts}
       <input class="login-input" type="password" id="loginInput" placeholder="Digite a senha..." onkeydown="if(event.key==='Enter')doLoginProfessor()">
       <button class="login-btn" type="button" onclick="doLoginProfessor()">Entrar</button>
       <div class="professor-version-note">
-        A biblioteca é aberta somente após validar a senha de acesso.<br>Versão professor: 2026-07-30-3
+        A biblioteca é aberta somente após validar a senha de acesso.<br>Versão professor: 2026-07-30-4
       </div>
     </div>
   </div>
@@ -5820,7 +5820,6 @@ ${professorOnlyJs()}
 
 function professorOnlyJs(){ return `
 function escH(v){if(v==null)return '';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function escJs(v){return String(v==null?'':v).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\r?\n/g,'\\n')}
 function showLoginError(msg){const err=document.getElementById('loginError');if(!err)return;err.textContent=msg;err.style.display='block'}
 function cleanPassword(v){return String(v||'').normalize('NFKC').replace(/[\u200B-\u200D\uFEFF]/g,'').trim().toLowerCase()}
 function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'})}
