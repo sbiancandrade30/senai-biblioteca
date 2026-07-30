@@ -3744,6 +3744,7 @@ function adminCardHtml(m){
 // PLANEJAMENTO POR AULA
 const selectedMaterialIds=new Set();
 let bulkSelectionMode=false;
+let lastBulkToggleKey='';
 function scrollToTop(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -3752,7 +3753,10 @@ function setBulkSelectionMode(active){
   document.body.classList.toggle('bulk-selection-mode', bulkSelectionMode);
   const btn=document.getElementById('bulkModeBtn');
   if(btn) btn.textContent=bulkSelectionMode?'Sair da seleção':'Selecionar materiais';
-  if(!bulkSelectionMode) selectedMaterialIds.clear();
+  if(!bulkSelectionMode){
+    selectedMaterialIds.clear();
+    lastBulkToggleKey='';
+  }
   renderBulkActionBar();
   syncSelectionClasses();
 }
@@ -3783,20 +3787,22 @@ function renderBulkActionBar(){
 }
 function clearMaterialSelection(){
   selectedMaterialIds.clear();
+  lastBulkToggleKey='';
   renderBulkActionBar();
   syncSelectionClasses();
 }
-function selectMaterialsByList(list){
+function selectMaterialsByList(list, toggleKey=''){
   setBulkSelectionMode(true);
   const ids=list.filter(m=>m && m.id).map(m=>m.id);
-  const allSelected=ids.length>0 && ids.every(id=>selectedMaterialIds.has(id));
-  ids.forEach(id=>allSelected?selectedMaterialIds.delete(id):selectedMaterialIds.add(id));
+  const shouldDeselect=ids.length>0 && (lastBulkToggleKey===toggleKey || ids.every(id=>selectedMaterialIds.has(id)));
+  ids.forEach(id=>shouldDeselect?selectedMaterialIds.delete(id):selectedMaterialIds.add(id));
+  lastBulkToggleKey=shouldDeselect?'':toggleKey;
   if(document.getElementById('tabPlanejamento')?.style.display !== 'none') renderPlanTab();
   renderBulkActionBar();
   syncSelectionClasses();
 }
-function selectVisibleMaterials(){ selectMaterialsByList(planFilteredMaterials()); }
-function selectDiscMaterials(discId){ selectMaterialsByList(planFilteredMaterials().filter(m=>(m.disciplinaId||GERAL_ID)===discId)); }
+function selectVisibleMaterials(){ selectMaterialsByList(planFilteredMaterials(),'all-visible'); }
+function selectDiscMaterials(discId){ selectMaterialsByList(planFilteredMaterials().filter(m=>(m.disciplinaId||GERAL_ID)===discId),'disc:'+discId); }
 function refreshMaterialViews(){
   renderAdminHome();
   if(currentAdminDiscId) renderAdminDisc();
@@ -5972,9 +5978,10 @@ async function doLoginProfessor(){
   const v=document.getElementById('loginInput').value;
   const err=document.getElementById('loginError');
   err.style.display='none';
+  err.textContent='';
   if(!window.crypto||!window.crypto.subtle){
     err.textContent='Este navegador não conseguiu abrir a biblioteca protegida. Use um navegador atualizado.';
-    err.style.display='';
+    err.style.display='block';
     return;
   }
   try{
@@ -5982,8 +5989,8 @@ async function doLoginProfessor(){
     sessionStorage.setItem('mat_prof_secure_session',JSON.stringify(DATA));
     openProfessorOnly();
   }catch(e){
-    err.textContent='Senha incorreta. Tente novamente.';
-    err.style.display='';
+    err.textContent='Senha incorreta ou versÃ£o do professor desatualizada. Confira a senha e, se continuar, gere uma nova versÃ£o para professor.';
+    err.style.display='block';
     document.getElementById('loginInput').value='';
     document.getElementById('loginInput').focus();
   }
