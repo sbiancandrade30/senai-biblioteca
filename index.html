@@ -91,7 +91,7 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 .tipo-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
 /* ── CARDS PROFESSOR ───────────────────── */
-.mat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.mat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:12px}
 .mat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;display:flex;flex-direction:column;gap:8px;transition:all .15s;text-decoration:none;color:inherit}
 .mat-card:hover{border-color:var(--accent);box-shadow:0 3px 14px rgba(45,91,227,.12);transform:translateY(-1px)}
 .mat-card-top{display:flex;align-items:flex-start;gap:10px}
@@ -108,7 +108,9 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 .admin-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;transition:all .15s;margin-bottom:8px;box-shadow:0 1px 0 rgba(21,24,33,.02)}
 .admin-card:hover{border-color:var(--border2);box-shadow:var(--shadow-soft);transform:translateY(-1px)}
 .admin-card.selected{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,87,214,.12)}
-.bulk-check{width:18px;height:18px;accent-color:var(--accent);flex:0 0 auto;margin-top:8px;cursor:pointer}
+.bulk-selector{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;margin-top:4px;padding:6px 8px;border:1px solid var(--border);border-radius:999px;background:var(--surface2);font-size:11px;font-weight:700;color:var(--text2);cursor:pointer;user-select:none}
+.bulk-selector:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.bulk-check{width:16px;height:16px;accent-color:var(--accent);flex:0 0 auto;cursor:pointer}
 .admin-body{flex:1;min-width:0}
 .admin-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
 .admin-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--text3);margin-bottom:4px}
@@ -128,6 +130,10 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 .card-more-menu{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;margin-top:6px}
 .quick-note{font-size:12px;color:var(--text2);line-height:1.5;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:14px}
 .quick-textarea{min-height:150px;font-family:'DM Mono',monospace;font-size:12px}
+.review-explain{background:#fff8e8;border:1px solid #f3d79a;border-radius:14px;padding:12px 14px;color:#6b4b0b;font-size:12px;line-height:1.5}
+.review-explain strong{display:block;color:#4c3507;margin-bottom:6px}
+.review-explain ul{margin:0;padding-left:18px}
+.review-explain li{margin:3px 0}
 
 /* ── ADMIN TOOLBAR ─────────────────────── */
 .admin-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
@@ -728,8 +734,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       </div>
     </div>
     <div class="prof-home-note">Os links podem levar a arquivos, apresentações, vídeos, formulários ou páginas externas que você tenha compartilhado.</div>
-    <div class="disc-search">
+    <div class="inner-filters professor-home-filters">
       <input class="search-input" type="text" id="profGlobalSearch" placeholder="Buscar em toda a biblioteca por título, descrição, disciplina ou tema..." oninput="renderProfessorHome()">
+      <select class="filter-sel" id="profHomeDisc" onchange="renderProfessorHome()"><option value="">Todas as disciplinas</option></select>
+      <select class="filter-sel" id="profHomeTipo" onchange="renderProfessorHome()"><option value="">Todos os tipos</option></select>
+      <select class="filter-sel" id="profHomeRevisao" onchange="renderProfessorHome()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="stale">Desatualizados</option><option value="ready">Prontos</option></select>
     </div>
     <div id="professorHomeContent"></div>
   </div>
@@ -3050,14 +3059,44 @@ function toggleThemeProfessor(themeId){ const k=themeCollapseKey('prof', current
 function recolherTemasProfessor(){ [...temasDaDisc(currentProfessorDiscId),{id:''}].forEach(t=>collapsedProfessorThemes.add(themeCollapseKey('prof', currentProfessorDiscId, t.id||''))); renderProfessorDisc(); }
 function expandirTemasProfessor(){ [...temasDaDisc(currentProfessorDiscId),{id:''}].forEach(t=>collapsedProfessorThemes.delete(themeCollapseKey('prof', currentProfessorDiscId, t.id||''))); renderProfessorDisc(); }
 
+function renderProfessorHomeFilters(){
+  const discSel=document.getElementById('profHomeDisc');
+  const tipoSel=document.getElementById('profHomeTipo');
+  if(!discSel || !tipoSel) return;
+  const oldDisc=discSel.value, oldTipo=tipoSel.value;
+  const mats=professorMaterials();
+  const discIds=new Set(mats.map(m=>m.disciplinaId||GERAL_ID));
+  discSel.innerHTML='<option value="">Todas as disciplinas</option>'+D.disciplinas
+    .filter(d=>discIds.has(d.id))
+    .map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`)
+    .join('');
+  tipoSel.innerHTML='<option value="">Todos os tipos</option>'+D.tipos
+    .filter(t=>mats.some(m=>m.tipoId===t.id))
+    .map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`)
+    .join('');
+  if(oldDisc && [...discSel.options].some(o=>o.value===oldDisc)) discSel.value=oldDisc;
+  if(oldTipo && [...tipoSel.options].some(o=>o.value===oldTipo)) tipoSel.value=oldTipo;
+}
+function professorHomeFilterState(){
+  return {
+    search:document.getElementById('profGlobalSearch')?.value || '',
+    discId:document.getElementById('profHomeDisc')?.value || '',
+    tipoId:document.getElementById('profHomeTipo')?.value || '',
+    revisao:document.getElementById('profHomeRevisao')?.value || ''
+  };
+}
+
 function renderProfessorHome(){
   currentProfessorDiscId=null;
   document.getElementById('professorHome').style.display='';
   document.getElementById('professorDiscView').style.display='none';
-  const s = normalizar(document.getElementById('profGlobalSearch')?.value || '');
+  renderProfessorHomeFilters();
+  const state=professorHomeFilterState();
+  const s = normalizar(state.search);
   const el = document.getElementById('professorHomeContent');
-  if(s){
-    const mats = filterMats(professorMaterials(),{search:s});
+  if(s || state.discId || state.tipoId || state.revisao){
+    const mats = filterMats(professorMaterials(),{search:state.search,tipoId:state.tipoId,revisao:state.revisao})
+      .filter(m=>!state.discId || (m.disciplinaId||GERAL_ID)===state.discId);
     el.innerHTML = `<div class="search-result-head">${mats.length} resultado${mats.length!==1?'s':''} encontrado${mats.length!==1?'s':''}</div>` + renderProfessorSearchResults(mats);
     return;
   }
@@ -3100,8 +3139,8 @@ function discCardHtml(d, professor=false){
     <div class="disc-card-metrics">
       <span class="mini-pill">${mats.length} material${mats.length!==1?'is':''}</span>
       <span class="mini-pill">${temas} tema${temas!==1?'s':''}</span>
-      ${fix?`<span class="mini-pill pin">📌 ${fix} fixado${fix!==1?'s':''}</span>`:''}
-      ${review?`<span class="mini-pill pin">${review} a revisar</span>`:''}
+      ${!professor && fix?`<span class="mini-pill pin">📌 ${fix} fixado${fix!==1?'s':''}</span>`:''}
+      ${!professor && review?`<span class="mini-pill pin">${review} a revisar</span>`:''}
     </div>
   </button>`;
 }
@@ -3179,10 +3218,9 @@ function profCardHtml(m, showContext=false){
     <div class="mat-card-top">
       <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'📎')}</div>
       <div>
-        <div class="mat-title">${m.fixado?'<span class="mat-pin">📌</span> ':''}${escH(m.titulo)}</div>
+        <div class="mat-title">${escH(m.titulo)}</div>
         ${showContext?`<div class="mat-desc">${escH(labelDisc(m.disciplinaId))}${m.temaId?' · '+escH(labelTema(m.temaId)):''}</div>`:''}
         ${m.descricao?`<div class="mat-desc">${escH(m.descricao)}</div>`:''}
-        ${pedagogyMetaHtml(m)}
       </div>
     </div>
     <div class="mat-footer">
@@ -3379,6 +3417,27 @@ function materialReviewReason(m){
   if(m.statusMaterial==='pronto') return 'Pronto';
   return 'Sem alerta';
 }
+function materialReviewReasons(m){
+  const reasons=[];
+  if(m.statusMaterial==='substituir') reasons.push('Foi marcado como material que precisa ser substituído.');
+  if(m.statusMaterial==='revisar') reasons.push('Foi marcado manualmente como material que precisa ser revisado.');
+  if(isMaterialStale(m)){
+    const days=daysSinceDate(m.updatedAt || m.createdAt);
+    reasons.push(`Está há ${days} dias sem atualização. O prazo atual configurado é de ${reviewStaleDays()} dias.`);
+  }
+  materialQualityIssues(m).forEach(issue=>{
+    if(issue==='sem descrição') reasons.push('Está sem descrição do conteúdo ou orientação de uso.');
+    if(issue==='sem tema') reasons.push('Está sem tema definido dentro da disciplina/área.');
+  });
+  const tags=materialReviewTags(m);
+  if(tags.length) reasons.push(`Etiqueta(s) de revisão: ${tags.join(', ')}.`);
+  return reasons;
+}
+function materialReviewExplanationHtml(m){
+  const reasons=materialReviewReasons(m);
+  if(!reasons.length) return '';
+  return `<div class="material-detail-section"><div class="review-explain"><strong>Por que revisar?</strong><ul>${reasons.map(r=>`<li>${escH(r)}</li>`).join('')}</ul></div></div>`;
+}
 function materialQualityIssues(m){
   const issues=[];
   if(!String(m.descricao||'').trim()) issues.push('sem descrição');
@@ -3537,6 +3596,7 @@ function materialDetailHtml(m){
         </div>
       </div>
     </div>
+    ${materialReviewExplanationHtml(m)}
     <div class="material-detail-section">
       <h3>Arquivos e links</h3>
       <div class="material-detail-links">${linksHtml}</div>
@@ -3610,7 +3670,10 @@ function adminCardHtml(m){
   const linkPills=materialLinks(m).map((l,idx)=>`<a class="admin-link-pill" href="${escH(l.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ ${escH(tituloLink(l,idx))}</a>`).join('');
   const selected=selectedMaterialIds.has(m.id);
   return `<div class="admin-card card-clickable${m.fixado?' pinned':''}${selected?' selected':''}" ${materialCardAttrs(m.id)}>
-    <input class="bulk-check" type="checkbox" ${selected?'checked':''} title="Selecionar material" onclick="toggleMaterialSelection(event,'${escJsStr(m.id)}')">
+    <label class="bulk-selector" onclick="event.stopPropagation()">
+      <input class="bulk-check" type="checkbox" ${selected?'checked':''} title="Selecionar material" onchange="toggleMaterialSelection(event,'${escJsStr(m.id)}')">
+      <span>Selecionar</span>
+    </label>
     <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'📎')}</div>
     <div class="admin-body">
       <div class="admin-title">${m.fixado?'<span class="mat-pin">Fixado</span> ':''}${escH(m.titulo)}</div>
@@ -3637,7 +3700,7 @@ function scrollToTop(){
 }
 function toggleMaterialSelection(event,id){
   event.stopPropagation();
-  if(event.target.checked) selectedMaterialIds.add(id);
+  if(event.currentTarget?.checked || event.target.checked) selectedMaterialIds.add(id);
   else selectedMaterialIds.delete(id);
   renderBulkActionBar();
   syncSelectionClasses();
@@ -5598,7 +5661,7 @@ ${css}
 <style>
 /* Ajustes específicos da versão gerada para professor */
 .search-results-title{font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 14px}
-.prof-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.prof-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:12px;align-items:stretch}
 .theme-toggle{width:100%;background:var(--surface2);border:none;border-bottom:1px solid var(--border);padding:13px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;color:var(--text);font-family:'DM Sans',sans-serif;transition:background .12s}
 .theme-toggle:hover{background:#ece9df}
 .theme-caret{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text2);font-size:14px;transition:transform .15s;flex-shrink:0}
@@ -5654,7 +5717,12 @@ ${css}
   <div id="professorHome">
     <div class="library-top"><div><h2>Biblioteca de materiais</h2><p>Escolha uma disciplina para consultar os arquivos organizados por tema e tipo. A busca também encontra materiais em toda a biblioteca.</p></div></div>
     <div class="prof-home-note">Os links podem abrir apresentações, arquivos, vídeos, formulários ou páginas externas compartilhadas pela professora.</div>
-    <div class="disc-search"><input class="search-input" type="text" id="profGlobalSearch" placeholder="Buscar em toda a biblioteca..." oninput="renderHomeProfessorOnly()"></div>
+    <div class="inner-filters professor-home-filters">
+      <input class="search-input" type="text" id="profGlobalSearch" placeholder="Buscar em toda a biblioteca..." oninput="renderHomeProfessorOnly()">
+      <select class="filter-sel" id="profHomeDisc" onchange="renderHomeProfessorOnly()"><option value="">Todas as disciplinas</option></select>
+      <select class="filter-sel" id="profHomeTipo" onchange="renderHomeProfessorOnly()"><option value="">Todos os tipos</option></select>
+      <select class="filter-sel" id="profHomeRevisao" onchange="renderHomeProfessorOnly()"><option value="">Todos os status</option><option value="review">A revisar</option><option value="stale">Desatualizados</option><option value="ready">Prontos</option></select>
+    </div>
     <div id="professorHomeContent"></div>
   </div>
   <div id="professorDiscView" style="display:none">
@@ -5826,9 +5894,33 @@ function openProfessorOnly(){
   applyLogoProfessorOnly();
   renderHomeProfessorOnly();
 }
+function renderHomeFiltersProfessorOnly(){
+  const discSel=document.getElementById('profHomeDisc'), tipoSel=document.getElementById('profHomeTipo');
+  if(!discSel||!tipoSel)return;
+  const oldD=discSel.value, oldT=tipoSel.value;
+  const all=activeMats();
+  const discIds=new Set(all.map(m=>m.disciplinaId||GERAL_ID));
+  discSel.innerHTML='<option value="">Todas as disciplinas</option>'+DATA.disciplinas.filter(d=>discIds.has(d.id)).map(d=>'<option value="'+escH(d.id)+'">'+escH(d.nome)+'</option>').join('');
+  tipoSel.innerHTML='<option value="">Todos os tipos</option>'+tipos().filter(t=>all.some(m=>m.tipoId===t.id)).map(t=>'<option value="'+escH(t.id)+'">'+escH(t.nome)+'</option>').join('');
+  if(oldD&&[...discSel.options].some(o=>o.value===oldD))discSel.value=oldD;
+  if(oldT&&[...tipoSel.options].some(o=>o.value===oldT))tipoSel.value=oldT;
+}
+function homeFilterStateProfessorOnly(){
+  return {
+    search:document.getElementById('profGlobalSearch')?.value||'',
+    discId:document.getElementById('profHomeDisc')?.value||'',
+    tipoId:document.getElementById('profHomeTipo')?.value||'',
+    revisao:document.getElementById('profHomeRevisao')?.value||''
+  };
+}
 function renderHomeProfessorOnly(){
-  const s=norm(document.getElementById('profGlobalSearch')?.value||'');
-  if(s){searchCards(s);return}
+  renderHomeFiltersProfessorOnly();
+  const state=homeFilterStateProfessorOnly();
+  if(state.search||state.discId||state.tipoId||state.revisao){
+    const list=filtered(activeMats(),{search:state.search,tipoId:state.tipoId,revisao:state.revisao}).filter(m=>!state.discId||(m.disciplinaId||GERAL_ID)===state.discId);
+    searchCardsList(list);
+    return;
+  }
   const geral=cardDisc(GERAL_ID);
   const presList=discsPorModalidade('presencial');
   const eadList=discsPorModalidade('ead');
@@ -5855,8 +5947,6 @@ function cardDisc(id){
   const d=disc(id);if(!d)return '';
   const list=mats(id);
   const temas=themes(id).length;
-  const fix=list.filter(m=>m.fixado).length;
-  const review=list.filter(needsMaterialReview).length;
   const tipos=totalByTypeProfessorOnly(id).slice(0,3).map(x=>escH(x.nome)+': '+x.total).join(' · ');
   const sub=id===GERAL_ID
     ? 'Documentos e referências que não precisam ficar ligados a uma disciplina.'
@@ -5870,16 +5960,16 @@ function cardDisc(id){
     +'<div class="disc-card-metrics">'
       +'<span class="mini-pill">'+list.length+' material'+(list.length!==1?'is':'')+'</span>'
       +'<span class="mini-pill">'+temas+' tema'+(temas!==1?'s':'')+'</span>'
-      +(fix?'<span class="mini-pill pin">📌 '+fix+' fixado'+(fix!==1?'s':'')+'</span>':'')
-      +(review?'<span class="mini-pill pin">'+review+' a revisar</span>':'')
     +'</div>'
   +'</button>';
 }
-function searchCards(s){
-  const list=sortM(activeMats().filter(m=>matchesSearch(m,s)));
+function searchCardsList(list){
   const el=document.getElementById('professorHomeContent');
   if(!list.length){el.innerHTML='<div class="empty"><h3>Nenhum material encontrado.</h3><p>Tente outra palavra.</p></div>';return}
-  el.innerHTML='<div class="search-results-title">Resultados da busca</div><div class="prof-card-grid">'+list.map(cardMat).join('')+'</div>';
+  el.innerHTML='<div class="search-results-title">'+list.length+' resultado'+(list.length!==1?'s':'')+' encontrado'+(list.length!==1?'s':'')+'</div><div class="prof-card-grid">'+list.map(cardMat).join('')+'</div>';
+}
+function searchCards(s){
+  searchCardsList(sortM(activeMats().filter(m=>matchesSearch(m,s))));
 }
 function openDiscProfessorOnly(id){
   currentDisc=id;document.getElementById('professorHome').style.display='none';document.getElementById('professorDiscView').style.display='';
@@ -5910,7 +6000,7 @@ function grouped(list){
 function cardMat(m){
   const t=tipo(m.tipoId), th=tema(m.temaId), dl=links(m);
   const linksHtml=dl.map((l,i)=>'<a class="mat-open-btn" href="'+escH(l.link)+'" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>'+escH(tituloLink(l,i))+'</a>').join('');
-  return '<article class="mat-card"><div class="mat-card-top"><div class="mat-icon" style="background:'+bg(m.tipoId)+'">'+escH(t.icone||'📎')+'</div><div><div class="mat-title">'+escH(m.titulo)+'</div>'+((m.descricao)?'<div class="mat-desc">'+escH(m.descricao)+'</div>':'')+pedagogyMeta(m)+'</div></div><div class="mat-footer"><span class="mat-tipo-badge" style="background:'+bg(m.tipoId)+';color:'+cor(m.tipoId)+'">'+escH(t.nome)+'</span>'+sourceBadges(m)+(m.fixado?'<span class="pin-pill">📌 Fixado</span>':'')+'</div>'+((th?.nome)?'<div class="mat-context">'+escH(th.nome)+'</div>':'')+(linksHtml?'<div class="mat-links">'+linksHtml+'</div>':'')+'</article>';
+  return '<article class="mat-card"><div class="mat-card-top"><div class="mat-icon" style="background:'+bg(m.tipoId)+'">'+escH(t.icone||'📎')+'</div><div><div class="mat-title">'+escH(m.titulo)+'</div>'+((m.descricao)?'<div class="mat-desc">'+escH(m.descricao)+'</div>':'')+'</div></div><div class="mat-footer"><span class="mat-tipo-badge" style="background:'+bg(m.tipoId)+';color:'+cor(m.tipoId)+'">'+escH(t.nome)+'</span>'+sourceBadges(m)+'</div>'+((th?.nome)?'<div class="mat-context">'+escH(th.nome)+'</div>':'')+(linksHtml?'<div class="mat-links">'+linksHtml+'</div>':'')+'</article>';
 }
 function showToast(msg,err){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;right:24px;background:'+(err?'var(--red)':'var(--text)')+';color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)}
 applyLogoProfessorOnly();
