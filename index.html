@@ -5741,7 +5741,7 @@ ${fonts}
       <div class="login-title">Entrar</div>
       <div class="login-error" id="loginError">Senha incorreta. Tente novamente.</div>
       <input class="login-input" type="password" id="loginInput" placeholder="Digite a senha..." onkeydown="if(event.key==='Enter')doLoginProfessor()">
-      <button class="login-btn" onclick="doLoginProfessor()">Entrar</button>
+      <button class="login-btn" type="button" onclick="doLoginProfessor()">Entrar</button>
       <div class="professor-version-note">
         A biblioteca é aberta somente após validar a senha de acesso.
       </div>
@@ -5921,9 +5921,14 @@ async function doLoginProfessor(){
     input.focus();
     return;
   }
-  DATA=JSON.parse(JSON.stringify(PROFESSOR_DATA));
-  sessionStorage.setItem('mat_prof_secure_session',JSON.stringify(DATA));
-  openProfessorOnly();
+  try{
+    DATA=JSON.parse(JSON.stringify(PROFESSOR_DATA));
+    sessionStorage.setItem('mat_prof_secure_session',JSON.stringify(DATA));
+    openProfessorOnly();
+  }catch(e){
+    console.error(e);
+    showLoginError('Senha aceita, mas houve erro ao abrir a biblioteca. Gere uma nova versao para professor.');
+  }
 }
 function logoutProfessor(){sessionStorage.removeItem('mat_prof_secure_session');location.reload()}
 function applyLogoProfessorOnly(){
