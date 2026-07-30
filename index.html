@@ -5843,22 +5843,6 @@ ${fonts}
   </div>
 </div>
 <script>
-window.addEventListener('error',function(){
-  var el=document.getElementById('loginError');
-  if(el){
-    el.textContent='Não foi possível abrir esta versão do professor. Gere uma nova versão na Biblioteca administrativa.';
-    el.style.display='block';
-  }
-});
-window.addEventListener('unhandledrejection',function(){
-  var el=document.getElementById('loginError');
-  if(el){
-    el.textContent='Não foi possível validar a senha. Gere uma nova versão para professor e tente novamente.';
-    el.style.display='block';
-  }
-});
-<\/script>
-<script>
 const SECURE_BUNDLE=${secureBundle};
 const PUBLIC_META=${safeMeta};
 const GERAL_ID='geral';
