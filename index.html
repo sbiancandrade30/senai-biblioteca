@@ -3791,11 +3791,11 @@ function clearMaterialSelection(){
   renderBulkActionBar();
   syncSelectionClasses();
 }
-function selectMaterialsByList(list, toggleKey=''){
+function selectMaterialsByIds(ids, toggleKey=''){
   setBulkSelectionMode(true);
-  const ids=list.filter(m=>m && m.id).map(m=>m.id);
-  const shouldDeselect=ids.length>0 && ids.every(id=>selectedMaterialIds.has(id));
-  ids.forEach(id=>{
+  const uniqueIds=[...new Set(ids.filter(Boolean))];
+  const shouldDeselect=uniqueIds.length>0 && uniqueIds.every(id=>selectedMaterialIds.has(id));
+  uniqueIds.forEach(id=>{
     if(shouldDeselect) selectedMaterialIds.delete(id);
     else selectedMaterialIds.add(id);
   });
@@ -3803,8 +3803,23 @@ function selectMaterialsByList(list, toggleKey=''){
   renderBulkActionBar();
   syncSelectionClasses();
 }
-function selectVisibleMaterials(){ selectMaterialsByList(planFilteredMaterials(),'all-visible'); }
-function selectDiscMaterials(discId){ selectMaterialsByList(planFilteredMaterials().filter(m=>(m.disciplinaId||GERAL_ID)===discId),'disc:'+discId); }
+function selectMaterialsByList(list, toggleKey=''){
+  selectMaterialsByIds(list.filter(m=>m && m.id).map(m=>m.id), toggleKey);
+}
+function visiblePlanMaterialIds(root){
+  const scope=root || document.getElementById('planContent') || document;
+  return [...scope.querySelectorAll('.admin-card[data-material-id]')]
+    .filter(card=>card.offsetParent!==null)
+    .map(card=>card.getAttribute('data-material-id'));
+}
+function selectVisibleMaterials(){ selectMaterialsByIds(visiblePlanMaterialIds(),'all-visible'); }
+function selectDiscMaterialsFromButton(btn){
+  const section=btn.closest('.theme-section');
+  selectMaterialsByIds(visiblePlanMaterialIds(section||document),'disc-visible');
+}
+function selectDiscMaterials(discId){
+  selectMaterialsByList(planFilteredMaterials().filter(m=>(m.disciplinaId||GERAL_ID)===discId),'disc:'+discId);
+}
 function refreshMaterialViews(){
   renderAdminHome();
   if(currentAdminDiscId) renderAdminDisc();
@@ -4001,7 +4016,7 @@ function planSectionHtml(discId,mats){
         <div class="theme-meta">${materialCountLabel(mats.length)}${review?` - ${review} a revisar`:''}</div>
       </div>
       <div class="bulk-head-actions" onclick="event.stopPropagation()">
-        <button class="a-btn" type="button" onclick="selectDiscMaterials('${escJsStr(discId)}')">Selecionar disciplina</button>
+        <button class="a-btn" type="button" onclick="selectDiscMaterialsFromButton(this)">Selecionar disciplina</button>
       </div>
     </div>
     <div class="theme-body">${body}</div>
