@@ -65,6 +65,8 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 .h-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .h-btn{background:var(--surface);border:1px solid var(--border);color:var(--text2);border-radius:999px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
 .h-btn:hover{background:var(--surface2);color:var(--text)}
+.h-menu-toggle{display:none;background:var(--surface);border:1px solid var(--border);color:var(--text2);border-radius:999px;padding:7px 12px;font-size:12px;font-weight:800;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;box-shadow:0 1px 0 rgba(21,24,33,.02)}
+.h-menu-toggle:hover{background:var(--surface2);color:var(--text)}
 
 /* ── BODY ──────────────────────────────── */
 .app-body{width:100%;max-width:none;margin:0;padding:28px 32px 80px}
@@ -471,6 +473,17 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 }
 
 @media(max-width:760px){
+  .app-header{padding:8px 12px;gap:8px}
+  .h-left{width:auto;flex:1;display:grid;grid-template-columns:auto 1px minmax(0,1fr);align-items:center;gap:8px}
+  .h-logo{height:32px;max-width:102px}
+  .h-title{font-size:12px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .h-badge,.sync-badge{font-size:9px;padding:3px 7px}
+  .h-badge{grid-column:3;justify-self:start}
+  .sync-badge{grid-column:3;justify-self:start}
+  .h-menu-toggle{display:inline-flex;align-items:center;justify-content:center}
+  .h-right{display:none;order:3;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:8px;box-shadow:var(--shadow-soft);overflow:visible}
+  .app-header.actions-open .h-right{display:grid;grid-template-columns:1fr;gap:7px}
+  .app-header.actions-open .h-right .h-btn{width:100%;justify-content:center;padding:10px 12px;font-size:12px}
   .app-body,#viewAdmin.app-body{padding:16px 12px 70px}
   .tabs{position:static;left:auto;top:auto;width:100%;display:flex;flex-direction:row;overflow-x:auto;border-radius:16px;margin-bottom:18px;padding:5px;gap:4px;scrollbar-width:none}
   .tabs::-webkit-scrollbar{display:none}
@@ -506,13 +519,12 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   .login-logo-img{max-height:64px;max-width:190px}
   .app-header{padding:7px 10px}
   .h-left{grid-template-columns:auto 1px minmax(0,1fr);gap:7px}
-  .h-logo{height:32px;max-width:104px}
+  .h-logo{height:30px;max-width:92px}
   .h-title{font-size:12px;line-height:1.2}
   .h-badge,.sync-badge{font-size:9px;padding:3px 7px}
-  .h-badge{grid-column:1/2}
+  .h-badge{grid-column:3/4}
   .sync-badge{grid-column:3/4;justify-self:start}
-  .h-right{display:flex;grid-template-columns:none;gap:6px}
-  .h-btn{width:auto;justify-content:center;padding:6px 10px;font-size:10px}
+  .h-menu-toggle{padding:6px 10px;font-size:11px}
   .summary-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .library-top h2{font-size:21px}
   .btn{width:100%;justify-content:center}
@@ -561,7 +573,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <span class="h-badge" id="hBadge" style="display:none">Admin</span>
     <span class="sync-badge off" id="hSyncBadge">Nuvem off</span>
   </div>
-  <div class="h-right">
+  <button class="h-menu-toggle" id="hMenuToggle" onclick="toggleHeaderActions()" type="button" aria-expanded="false">Ações</button>
+  <div class="h-right" id="hActions">
     <button class="h-btn" id="hBtnVoltarAdmin" onclick="voltarDaPreviaProfessor()" style="display:none">← Voltar ao administrador</button>
     <button class="h-btn" id="hBtnPreview" onclick="visualizarComoProfessor()" style="display:none">👁 Visualizar como professor</button>
     <button class="h-btn header-backup-btn" id="hBtnExport" onclick="exportarDados()" style="display:none">↓ Exportar</button>
@@ -2832,7 +2845,28 @@ function removerFavicon(){
 // ════════════════════════════════════════════════════════
 // ABAS
 // ════════════════════════════════════════════════════════
+function toggleHeaderActions(){
+  const header=document.getElementById('appHeader');
+  const btn=document.getElementById('hMenuToggle');
+  if(!header) return;
+  const open=!header.classList.contains('actions-open');
+  header.classList.toggle('actions-open',open);
+  if(btn){
+    btn.setAttribute('aria-expanded',open?'true':'false');
+    btn.textContent=open?'Fechar':'Ações';
+  }
+}
+function closeHeaderActions(){
+  const header=document.getElementById('appHeader');
+  const btn=document.getElementById('hMenuToggle');
+  if(header) header.classList.remove('actions-open');
+  if(btn){
+    btn.setAttribute('aria-expanded','false');
+    btn.textContent='Ações';
+  }
+}
 function goHome(){
+  closeHeaderActions();
   const mode=sessionStorage.getItem('mat_mode');
   if(mode==='professor'){
     voltarProfessorHome();
@@ -2848,6 +2882,7 @@ function goHome(){
   window.scrollTo({top:0, behavior:'smooth'});
 }
 function setTab(tab, btn){
+  closeHeaderActions();
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tabMateriais').style.display=tab==='materiais'?'':'none';
