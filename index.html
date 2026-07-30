@@ -107,6 +107,8 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 /* ── CARDS ADMIN ───────────────────────── */
 .admin-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;transition:all .15s;margin-bottom:8px;box-shadow:0 1px 0 rgba(21,24,33,.02)}
 .admin-card:hover{border-color:var(--border2);box-shadow:var(--shadow-soft);transform:translateY(-1px)}
+.admin-card.selected{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,87,214,.12)}
+.bulk-check{width:18px;height:18px;accent-color:var(--accent);flex:0 0 auto;margin-top:8px;cursor:pointer}
 .admin-body{flex:1;min-width:0}
 .admin-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
 .admin-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--text3);margin-bottom:4px}
@@ -451,6 +453,12 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .admin-link-pill:hover{background:var(--accent);color:#fff}
 .mat-source-list{display:flex;gap:5px;flex-wrap:wrap}
 .mat-card{cursor:default}
+.back-top-btn{position:fixed;right:18px;bottom:18px;width:34px;height:34px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.92);color:var(--text2);box-shadow:var(--shadow-soft);z-index:260;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;cursor:pointer;backdrop-filter:blur(12px)}
+.back-top-btn:hover{color:var(--orange);border-color:rgba(246,88,54,.32);background:#fff8f5}
+.bulk-action-bar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:none;align-items:center;gap:8px;background:rgba(255,255,255,.96);border:1px solid var(--border);border-radius:999px;padding:8px 10px;box-shadow:var(--shadow);z-index:270;backdrop-filter:blur(14px)}
+.bulk-action-bar.show{display:flex}
+.bulk-count{font-size:12px;font-weight:800;color:var(--text2);white-space:nowrap;padding:0 4px}
+.bulk-action-bar .btn{padding:7px 10px;font-size:11px}
 @media(max-width:980px){
   .app-header{align-items:center;flex-direction:row;flex-wrap:wrap;padding:8px 14px;gap:8px;min-height:0}
   .h-left{width:100%;display:grid;grid-template-columns:auto 1px minmax(0,1fr) auto auto;align-items:center;gap:8px}
@@ -623,6 +631,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   .check-grid{grid-template-columns:1fr;gap:6px}
   .material-link-row{padding:8px;border-radius:14px}
   .quick-textarea{min-height:96px}
+  .back-top-btn{bottom:calc(72px + env(safe-area-inset-bottom,0px));right:14px;width:32px;height:32px;font-size:15px}
+  .bulk-action-bar{left:12px;right:12px;bottom:calc(72px + env(safe-area-inset-bottom,0px));transform:none;border-radius:18px;flex-wrap:wrap;justify-content:center}
 }
 
 @media(max-width:460px){
@@ -700,6 +710,13 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <button class="h-btn" onclick="doLogout()">Sair</button>
   </div>
 </header>
+<button class="back-top-btn" id="backTopBtn" type="button" onclick="scrollToTop()" title="Ir para o topo" style="display:none">↑</button>
+<div class="bulk-action-bar" id="bulkActionBar">
+  <span class="bulk-count" id="bulkCount">0 selecionados</span>
+  <button class="btn btn-outline" type="button" onclick="clearMaterialSelection()">Limpar</button>
+  <button class="btn btn-outline" type="button" onclick="archiveSelectedMaterials()">Arquivar</button>
+  <button class="btn btn-outline" type="button" style="color:var(--red);border-color:var(--red)" onclick="deleteSelectedMaterials()">Excluir</button>
+</div>
 
 <!-- CORPO PROFESSOR -->
 <div class="app-body" id="viewProfessor" style="display:none">
@@ -2624,6 +2641,10 @@ function sortMats(lista){
     (a.titulo||'').localeCompare(b.titulo||'','pt-BR')
   );
 }
+function materialRecentTime(m){
+  const dates=[m?.updatedAt,m?.createdAt,m?._syncMeta?.updatedAt].map(v=>Date.parse(v||'')).filter(Number.isFinite);
+  return dates.length ? Math.max(...dates) : 0;
+}
 function nextOrderFor(disciplinaId, temaId, tipoId){
   const ords = activeMaterials().filter(m=>m.disciplinaId===disciplinaId && (m.temaId||'')===(temaId||'') && m.tipoId===tipoId).map(m=>Number(m.ordem)||0);
   return (ords.length ? Math.max(...ords) : 0) + 1;
@@ -2784,6 +2805,7 @@ function checkLogin(){
 function abrirApp(){
   document.getElementById('loginWrap').style.display='none';
   document.getElementById('appHeader').style.display='';
+  document.getElementById('backTopBtn').style.display='flex';
   applyBranding();
 
   document.getElementById('hBadge').style.display='';
@@ -2800,12 +2822,15 @@ function abrirApp(){
   renderAdminHome();
   if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
   renderConfigTab();
+  renderBulkActionBar();
   startCloudAutoSync();
 }
 
 function visualizarComoProfessor(){
+  clearMaterialSelection();
   document.getElementById('viewAdmin').style.display='none';
   document.getElementById('viewProfessor').style.display='';
+  document.getElementById('backTopBtn').style.display='flex';
 
   document.getElementById('hBadge').style.display='';
   document.getElementById('hBadge').textContent='Prévia';
@@ -2825,8 +2850,10 @@ function visualizarComoProfessor(){
 }
 
 function abrirProfessorOnline(){
+  clearMaterialSelection();
   document.getElementById('loginWrap').style.display='none';
   document.getElementById('appHeader').style.display='';
+  document.getElementById('backTopBtn').style.display='flex';
   applyBranding();
   document.getElementById('hBadge').style.display='';
   document.getElementById('hBadge').textContent='Professor';
@@ -3009,6 +3036,7 @@ function setTab(tab, btn){
   if(tab==='planejamento') renderPlanTab();
   if(tab==='revisao') renderReviewTab();
   if(tab==='configuracoes') renderConfigTab();
+  renderBulkActionBar();
 }
 
 // ════════════════════════════════════════════════════════
@@ -3225,7 +3253,7 @@ function renderAdminHome(){
 }
 function renderRecentHomeSection(materials){
   const recent=[...materials]
-    .sort((a,b)=>Date.parse(b.updatedAt||b.createdAt||'')-Date.parse(a.updatedAt||a.createdAt||''))
+    .sort((a,b)=>materialRecentTime(b)-materialRecentTime(a) || (b.titulo||'').localeCompare(a.titulo||'','pt-BR'))
     .slice(0,7);
   if(!recent.length) return '';
   return `<section class="recent-strip">
@@ -3451,7 +3479,7 @@ function reviewMiniBadgeHtml(){
 }
 function materialCardAttrs(id){
   const safe=escJsStr(id);
-  return `onclick="showMaterialDetail('${safe}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showMaterialDetail('${safe}')}"`;
+  return `data-material-id="${escH(id)}" onclick="showMaterialDetail('${safe}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showMaterialDetail('${safe}')}"`;
 }
 function materialDetailLine(label,value){
   const text=String(value||'').trim();
@@ -3580,7 +3608,9 @@ function markMaterialReady(id){
 function adminCardHtml(m){
   const tipo=getTipo(m.tipoId);
   const linkPills=materialLinks(m).map((l,idx)=>`<a class="admin-link-pill" href="${escH(l.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ ${escH(tituloLink(l,idx))}</a>`).join('');
-  return `<div class="admin-card card-clickable${m.fixado?' pinned':''}" ${materialCardAttrs(m.id)}>
+  const selected=selectedMaterialIds.has(m.id);
+  return `<div class="admin-card card-clickable${m.fixado?' pinned':''}${selected?' selected':''}" ${materialCardAttrs(m.id)}>
+    <input class="bulk-check" type="checkbox" ${selected?'checked':''} title="Selecionar material" onclick="toggleMaterialSelection(event,'${escJsStr(m.id)}')">
     <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'📎')}</div>
     <div class="admin-body">
       <div class="admin-title">${m.fixado?'<span class="mat-pin">Fixado</span> ':''}${escH(m.titulo)}</div>
@@ -3601,6 +3631,71 @@ function adminCardHtml(m){
 // MATERIAIS
 // ════════════════════════════════════════════════════════
 // PLANEJAMENTO POR AULA
+const selectedMaterialIds=new Set();
+function scrollToTop(){
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function toggleMaterialSelection(event,id){
+  event.stopPropagation();
+  if(event.target.checked) selectedMaterialIds.add(id);
+  else selectedMaterialIds.delete(id);
+  renderBulkActionBar();
+  syncSelectionClasses();
+}
+function syncSelectionClasses(){
+  document.querySelectorAll('.admin-card').forEach(card=>{
+    const id=card.getAttribute('data-material-id');
+    card.classList.toggle('selected', selectedMaterialIds.has(id));
+    const chk=card.querySelector('.bulk-check');
+    if(chk) chk.checked=selectedMaterialIds.has(id);
+  });
+}
+function renderBulkActionBar(){
+  const bar=document.getElementById('bulkActionBar');
+  const count=document.getElementById('bulkCount');
+  if(!bar || !count) return;
+  const total=selectedMaterialIds.size;
+  count.textContent=`${total} selecionado${total!==1?'s':''}`;
+  bar.classList.toggle('show', total>0 && mode==='admin');
+}
+function clearMaterialSelection(){
+  selectedMaterialIds.clear();
+  renderBulkActionBar();
+  syncSelectionClasses();
+}
+function refreshMaterialViews(){
+  renderAdminHome();
+  if(currentAdminDiscId) renderAdminDisc();
+  if(document.getElementById('tabPlanejamento')?.style.display !== 'none') renderPlanTab();
+  if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
+}
+function archiveSelectedMaterials(){
+  const ids=[...selectedMaterialIds].filter(id=>D.materiais.some(m=>m.id===id));
+  if(!ids.length) return;
+  if(!confirm(`Arquivar ${ids.length} material${ids.length!==1?'is':''} selecionado${ids.length!==1?'s':''}?`)) return;
+  const now=isoNow();
+  D.materiais.forEach(m=>{
+    if(ids.includes(m.id)){
+      m.archived=true;
+      m.archivedAt=now;
+      m.updatedAt=now;
+    }
+  });
+  salvar();
+  clearMaterialSelection();
+  refreshMaterialViews();
+  showToast(`${ids.length} material${ids.length!==1?'is':''} arquivado${ids.length!==1?'s':''}.`);
+}
+function deleteSelectedMaterials(){
+  const ids=[...selectedMaterialIds].filter(id=>D.materiais.some(m=>m.id===id));
+  if(!ids.length) return;
+  if(!confirm(`Excluir definitivamente ${ids.length} material${ids.length!==1?'is':''} selecionado${ids.length!==1?'s':''}?\n\nEsta ação não pode ser desfeita.`)) return;
+  D.materiais=D.materiais.filter(m=>!ids.includes(m.id));
+  salvar();
+  clearMaterialSelection();
+  refreshMaterialViews();
+  showToast(`${ids.length} material${ids.length!==1?'is':''} excluído${ids.length!==1?'s':''}.`);
+}
 let planQuickFilter = '';
 function togglePlanMobileFilters(){
   document.getElementById('tabPlanejamento')?.classList.toggle('filters-open');
@@ -5554,6 +5649,7 @@ ${css}
   </div>
   <div class="h-right"><button class="h-btn" onclick="logoutProfessor()">Sair</button></div>
 </header>
+<button class="back-top-btn" id="backTopBtn" type="button" onclick="scrollToTop()" title="Ir para o topo" style="display:none">↑</button>
 <div class="app-body" id="viewProfessor" style="display:none">
   <div id="professorHome">
     <div class="library-top"><div><h2>Biblioteca de materiais</h2><p>Escolha uma disciplina para consultar os arquivos organizados por tema e tipo. A busca também encontra materiais em toda a biblioteca.</p></div></div>
@@ -5598,6 +5694,7 @@ ${professorOnlyJs()}
 
 function professorOnlyJs(){ return `
 function escH(v){if(v==null)return '';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'})}
 function norm(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}
 function modalidadeDisciplinaFallback(d){
   const raw=norm(d&&d.modalidade);
@@ -5638,7 +5735,7 @@ function modalidadeMaterialLabel(v){return ({presencial:'Presencial',ead:'EaD',a
 function statusMaterialLabel(v){return ({pronto:'Pronto',revisar:'Revisar',substituir:'Substituir',producao:'Em produção'})[String(v||'').toLowerCase()]||''}
 function readinessLabel(v){return ({rascunho:'Rascunho',em_uso:'Em uso',validado:'Validado',modelo:'Modelo'})[String(v||'').toLowerCase()]||''}
 function formatDateTime(v){if(!v)return '';const d=new Date(v);return Number.isNaN(d.getTime())?'':d.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}
-const REVIEW_STALE_DAYS=Number(META.reviewStaleDays)||180;
+const REVIEW_STALE_DAYS=Number(PUBLIC_META.reviewStaleDays)||180;
 function daysSinceDate(v){if(!v)return null;const d=new Date(v);if(Number.isNaN(d.getTime()))return null;const diff=Date.now()-d.getTime();return diff<0?0:Math.floor(diff/86400000)}
 function isMaterialStale(m){const days=daysSinceDate(m.updatedAt||m.createdAt);return days!=null&&days>=REVIEW_STALE_DAYS}
 function needsMaterialReview(m){return ['revisar','substituir'].includes(String(m.statusMaterial||''))||isMaterialStale(m)}
@@ -5725,6 +5822,7 @@ function openProfessorOnly(){
   document.getElementById('loginWrap').style.display='none';
   document.getElementById('appHeader').style.display='';
   document.getElementById('viewProfessor').style.display='';
+  document.getElementById('backTopBtn').style.display='flex';
   applyLogoProfessorOnly();
   renderHomeProfessorOnly();
 }
