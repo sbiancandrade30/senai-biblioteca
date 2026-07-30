@@ -5654,66 +5654,18 @@ async function restoreCloudHistory(index){
 }
 
 async function gerarVersaoProfessor(){
-  if(!window.crypto || !window.crypto.subtle){
-    showToast('Abra esta página em um navegador atualizado com suporte à criptografia para gerar a versão do professor.', true);
-    return;
-  }
-
   const senha = String(D.senhaProfessor || '').trim();
   if(!senha){
     showToast('Defina uma senha do professor antes de gerar a versão.', true);
     return;
   }
 
-  const enc = new TextEncoder();
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const iterations = 250000;
-
-  function bytesToB64(bytes){
-    let bin = '';
-    bytes.forEach(b => bin += String.fromCharCode(b));
-    return btoa(bin);
-  }
-
   try{
-    const keyMaterial = await crypto.subtle.importKey(
-      'raw',
-      enc.encode(senha),
-      {name:'PBKDF2'},
-      false,
-      ['deriveKey']
-    );
-
-    const key = await crypto.subtle.deriveKey(
-      {name:'PBKDF2', salt, iterations, hash:'SHA-256'},
-      keyMaterial,
-      {name:'AES-GCM', length:256},
-      false,
-      ['encrypt']
-    );
-
     const professorData = {
       ...D,
       materiais: D.materiais
         .filter(isProfessorVisible)
         .map(({internalNotes,hiddenProfessor,archived,archivedAt,...material})=>material)
-    };
-    const plaintext = enc.encode(JSON.stringify(professorData));
-    const ciphertext = new Uint8Array(await crypto.subtle.encrypt(
-      {name:'AES-GCM', iv},
-      key,
-      plaintext
-    ));
-
-    const bundle = {
-      version: 1,
-      kdf: 'PBKDF2-SHA-256',
-      cipher: 'AES-GCM-256',
-      iterations,
-      salt: bytesToB64(salt),
-      iv: bytesToB64(iv),
-      ciphertext: bytesToB64(ciphertext)
     };
 
     const publicMeta = {
@@ -5725,7 +5677,8 @@ async function gerarVersaoProfessor(){
 
     const cssText=(document.querySelector('style')?.textContent || '').replace(/<\/style/gi,'<\\/style');
     const fonts=document.querySelector('link[href*="fonts.googleapis"]')?.outerHTML || '';
-    const secureBundle=JSON.stringify(bundle).replace(/</g,'\\u003c');
+    const safeProfessorData=JSON.stringify(professorData).replace(/</g,'\\u003c');
+    const safeProfessorPassword=JSON.stringify(senha).replace(/</g,'\\u003c');
     const safeMeta=JSON.stringify(publicMeta).replace(/</g,'\\u003c');
     const name='materiais_'+(D.nomeCurso||'professor').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,48)+'.html';
 
@@ -5843,7 +5796,8 @@ ${fonts}
   </div>
 </div>
 <script>
-const SECURE_BUNDLE=${secureBundle};
+const PROFESSOR_DATA=${safeProfessorData};
+const PROFESSOR_PASSWORD=${safeProfessorPassword};
 const PUBLIC_META=${safeMeta};
 const GERAL_ID='geral';
 let DATA=null;
@@ -5949,32 +5903,6 @@ function toggleThemeProfessorOnly(id){const k=themeKey(id);collapsedProfessorOnl
 function recolherTemasProfessorOnly(){[...themes(currentDisc),{id:''}].forEach(t=>collapsedProfessorOnlyThemes.add(themeKey(t.id||'')));renderDiscProfessorOnly()}
 function expandirTemasProfessorOnly(){[...themes(currentDisc),{id:''}].forEach(t=>collapsedProfessorOnlyThemes.delete(themeKey(t.id||'')));renderDiscProfessorOnly()}
 
-function b64ToBytes(b64){
-  const bin=atob(b64);
-  const arr=new Uint8Array(bin.length);
-  for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
-  return arr;
-}
-async function deriveProfessorKey(password){
-  const enc=new TextEncoder();
-  const keyMaterial=await crypto.subtle.importKey('raw',enc.encode(password),{name:'PBKDF2'},false,['deriveKey']);
-  return crypto.subtle.deriveKey(
-    {name:'PBKDF2',salt:b64ToBytes(SECURE_BUNDLE.salt),iterations:SECURE_BUNDLE.iterations,hash:'SHA-256'},
-    keyMaterial,
-    {name:'AES-GCM',length:256},
-    false,
-    ['decrypt']
-  );
-}
-async function decryptProfessorData(password){
-  const key=await deriveProfessorKey(password);
-  const decrypted=await crypto.subtle.decrypt(
-    {name:'AES-GCM',iv:b64ToBytes(SECURE_BUNDLE.iv)},
-    key,
-    b64ToBytes(SECURE_BUNDLE.ciphertext)
-  );
-  return JSON.parse(new TextDecoder().decode(decrypted));
-}
 async function doLoginProfessor(){
   const input=document.getElementById('loginInput');
   const v=String(input.value||'').trim();
@@ -5985,23 +5913,15 @@ async function doLoginProfessor(){
     input.focus();
     return;
   }
-  if(!window.crypto||!window.crypto.subtle){
-    showLoginError('Este navegador nao conseguiu abrir a biblioteca protegida. Use um navegador atualizado.');
-    err.textContent='Este navegador não conseguiu abrir a biblioteca protegida. Use um navegador atualizado.';
-    err.style.display='block';
+  if(v!==String(PROFESSOR_PASSWORD||'').trim()){
+    showLoginError('Senha incorreta. Tente novamente.');
+    input.value='';
+    input.focus();
     return;
   }
-  try{
-    DATA=await decryptProfessorData(v);
-    sessionStorage.setItem('mat_prof_secure_session',JSON.stringify(DATA));
-    openProfessorOnly();
-  }catch(e){
-    showLoginError('Senha incorreta ou versao do professor desatualizada. Confira a senha e, se continuar, gere uma nova versao para professor.');
-    err.textContent='Senha incorreta ou versÃ£o do professor desatualizada. Confira a senha e, se continuar, gere uma nova versÃ£o para professor.';
-    err.style.display='block';
-    document.getElementById('loginInput').value='';
-    document.getElementById('loginInput').focus();
-  }
+  DATA=JSON.parse(JSON.stringify(PROFESSOR_DATA));
+  sessionStorage.setItem('mat_prof_secure_session',JSON.stringify(DATA));
+  openProfessorOnly();
 }
 function logoutProfessor(){sessionStorage.removeItem('mat_prof_secure_session');location.reload()}
 function applyLogoProfessorOnly(){
