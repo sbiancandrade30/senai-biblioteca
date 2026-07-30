@@ -500,6 +500,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   .library-top p{font-size:13px;line-height:1.45}
   .library-top .inner-actions{gap:8px;margin-top:4px}
   .library-top .inner-actions .btn{padding:10px 12px}
+  #tabPlanejamento .library-top .inner-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+  #tabPlanejamento .library-top .inner-actions .btn{width:100%;min-height:36px;padding:8px 10px;font-size:11.5px}
   .summary-row{grid-template-columns:repeat(2,minmax(0,1fr))}
   .summary-card{padding:11px 12px;min-height:64px;border-radius:15px}
   .summary-num{font-size:24px;margin-bottom:5px}
@@ -523,10 +525,9 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   #tabPlanejamento>.library-top{padding:12px 14px;margin-bottom:10px}
   #tabPlanejamento>.library-top p{display:none}
   #tabPlanejamento>.summary-row{display:none}
-  #tabPlanejamento .quick-filter-row{flex-wrap:nowrap;overflow-x:auto;margin:0 0 10px;padding-bottom:2px;scrollbar-width:none}
-  #tabPlanejamento .quick-filter-row::-webkit-scrollbar{display:none}
-  #tabPlanejamento .quick-filter-btn{flex:0 0 auto}
-  #tabPlanejamento .mobile-filter-toggle{display:flex;width:100%;align-items:center;justify-content:center;border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:999px;padding:10px 12px;font-size:12px;font-weight:800;font-family:'DM Sans',sans-serif;margin:-2px 0 10px}
+  #tabPlanejamento .quick-filter-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:0 0 10px}
+  #tabPlanejamento .quick-filter-btn{width:100%;padding:8px 9px;font-size:11px}
+  #tabPlanejamento .mobile-filter-toggle{display:flex;width:100%;align-items:center;justify-content:center;border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:999px;padding:9px 12px;font-size:12px;font-weight:800;font-family:'DM Sans',sans-serif;margin:-2px 0 10px}
   #tabPlanejamento.filters-open .mobile-filter-toggle{border-color:rgba(246,88,54,.32);color:var(--orange);background:#fff8f5}
   #tabPlanejamento>.inner-filters{padding:10px;margin-bottom:10px}
   #tabPlanejamento>.inner-filters .filter-sel{display:none}
@@ -766,13 +767,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     <div class="summary-row" id="planSummary"></div>
     <div class="quick-filter-row" id="planQuickFilters">
       <button class="quick-filter-btn active" type="button" onclick="setPlanQuickFilter('')">Todos</button>
-      <button class="quick-filter-btn" type="button" onclick="setPlanQuickFilter('fixados')">Fixados</button>
       <button class="quick-filter-btn" type="button" onclick="setPlanQuickFilter('avaliacoes')">Avaliações</button>
       <button class="quick-filter-btn" type="button" onclick="setPlanQuickFilter('revisar')">A revisar</button>
       <button class="quick-filter-btn" type="button" onclick="setPlanQuickFilter('sem-tema')">Sem tema</button>
-      <button class="quick-filter-btn" type="button" onclick="setPlanQuickFilter('admin')">Somente admin</button>
     </div>
-    <button class="mobile-filter-toggle" type="button" onclick="togglePlanMobileFilters()">Filtros avanÃ§ados</button>
+    <button class="mobile-filter-toggle" type="button" onclick="togglePlanMobileFilters()">Filtros avançados</button>
     <div class="inner-filters">
       <input class="search-input" type="text" id="planSearch" placeholder="Buscar no banco de materiais..." oninput="renderPlanTab()">
       <select class="filter-sel" id="planCourse" onchange="renderPlanTab()" style="display:none"><option value="">Todos os usos</option></select>
