@@ -566,16 +566,29 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   .mat-desc{display:none}
   .mat-footer{justify-content:flex-start;gap:5px;flex-wrap:wrap}
   .mat-links{display:none}
-  .modal{width:calc(100vw - 24px)}
-  .modal-head{padding:14px 18px}
-  .modal-body{padding:16px 18px}
+  .modal-overlay{align-items:flex-start;padding:8px 0}
+  .modal{width:calc(100vw - 20px)!important;max-height:calc(100dvh - 16px);border-radius:18px}
+  .modal-head{padding:12px 16px}
+  .modal-head h2{font-size:14px}
+  .modal-body{padding:12px 14px}
   .modal-foot{padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .modal-foot .btn{width:100%;justify-content:center;padding:10px 12px;font-size:12px}
-  .tipo-grid{grid-template-columns:repeat(3,1fr);gap:6px}
-  .tipo-opt{padding:7px 5px;font-size:10.5px}
-  .tipo-opt-icon{font-size:16px}
-  .material-link-row{padding:10px;border-radius:14px}
-  .quick-textarea{min-height:120px}
+  #modalOverlay .modal-foot .btn:nth-child(2),#quickMaterialModalOverlay .modal-foot .btn:nth-child(2){display:none}
+  .quick-note{display:none}
+  .form-group{margin-bottom:10px}
+  .form-label{font-size:10px;margin-bottom:4px}
+  .form-input{padding:8px 10px;font-size:12px;border-radius:12px}
+  .link-editor{gap:8px;margin-bottom:8px}
+  .material-link-grid{grid-template-columns:1fr;gap:7px}
+  .link-remove-btn{width:100%;height:34px}
+  .add-link-btn{width:100%;justify-content:center;padding:8px 10px;font-size:12px}
+  .tipo-grid{grid-template-columns:repeat(3,1fr);gap:5px}
+  .tipo-opt{padding:6px 4px;font-size:10px;border-radius:12px;gap:2px}
+  .tipo-opt-icon{font-size:14px}
+  .pedagogy-summary{padding:9px 11px;font-size:11px}
+  .check-grid{grid-template-columns:1fr;gap:6px}
+  .material-link-row{padding:8px;border-radius:14px}
+  .quick-textarea{min-height:96px}
 }
 
 @media(max-width:460px){
