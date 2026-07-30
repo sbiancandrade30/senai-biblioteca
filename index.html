@@ -378,7 +378,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .admin-card{padding:9px 11px;border-radius:12px;gap:10px;margin-bottom:6px;align-items:flex-start}
 .admin-card:hover{transform:none;box-shadow:0 4px 16px rgba(21,24,33,.05)}
 .admin-card.card-clickable{cursor:pointer}
-.admin-card.card-clickable:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(37,87,214,.1)}
+.admin-card.card-clickable:focus{outline:none}
+.admin-card.card-clickable:focus-visible{border-color:var(--orange);box-shadow:0 0 0 3px rgba(242,90,56,.14)}
 .admin-card .mat-icon{width:30px;height:30px;border-radius:8px;font-size:15px}
 .admin-title{font-size:12.5px;margin-bottom:2px;line-height:1.25}
 .admin-meta{gap:7px 8px;margin-bottom:4px;align-items:flex-start}
@@ -3238,22 +3239,17 @@ function profCardHtml(m, showContext=false){
   const tipo=getTipo(m.tipoId);
   const links=materialLinks(m);
   const context=[labelDisc(m.disciplinaId),m.temaId?labelTema(m.temaId):''].filter(Boolean).join(' · ');
-  const linkButtons=links.map((l,idx)=>`<a class="mat-access-btn${idx>0?' secondary':''}" href="${escH(l.link)}" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>${escH(tituloLink(l,idx))}</a>`).join('');
-  return `<div class="mat-card">
+  return `<div class="mat-card card-clickable" onclick="showMaterialDetail('${escJsStr(m.id)}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showMaterialDetail('${escJsStr(m.id)}')}">
     <div class="mat-card-top">
       <div class="mat-icon" style="background:${tipoBg(tipo.id)}">${escH(tipo.icone||'📎')}</div>
       <div>
         <div class="mat-title">${escH(m.titulo)}</div>
         ${showContext && context?`<div class="mat-context-path">${escH(context)}</div>`:''}
-        ${m.descricao?`<div class="mat-desc">${escH(m.descricao)}</div>`:''}
         <div class="mat-badges">
           <span class="mat-tipo-badge" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.nome)}</span>
-          ${sourceBadgesHtml(m)}
+          ${links.length?`<span class="mat-source-badge">${links.length} link${links.length!==1?'s':''}</span>`:'<span class="mat-source-badge">Sem link</span>'}
         </div>
       </div>
-    </div>
-    <div class="mat-footer">
-      <div class="mat-links">${linkButtons || '<span class="mat-source-badge">Sem link</span>'}</div>
     </div>
   </div>`;
 }
@@ -3658,14 +3654,15 @@ function materialDetailHtml(m){
 }
 function showMaterialDetail(id){
   const m=D.materiais.find(x=>x.id===id); if(!m) return;
+  const professorMode=sessionStorage.getItem('mat_mode')==='professor';
   document.getElementById('materialDetailBody').innerHTML=materialDetailHtml(m);
   document.getElementById('materialDetailFoot').innerHTML=`
     <button class="btn btn-outline" onclick="closeMaterialDetailModal()">Fechar</button>
     <button class="btn btn-outline" onclick="compartilharMaterial('${escJsStr(m.id)}')">Compartilhar</button>
-    ${isArchived(m)?`<button class="btn btn-outline" onclick="restaurarMaterial('${escJsStr(m.id)}'); closeMaterialDetailModal()">Restaurar</button>`:''}
-    ${!isArchived(m) && needsMaterialReview(m)?`<button class="btn btn-outline" onclick="markMaterialReady('${escJsStr(m.id)}'); showMaterialDetail('${escJsStr(m.id)}')">Marcar como revisado</button>`:''}
-    ${isArchived(m)?`<button class="btn btn-outline" style="color:var(--red);border-color:var(--red)" onclick="excluirMaterial('${escJsStr(m.id)}'); closeMaterialDetailModal()">Excluir</button>`:''}
-    ${!isArchived(m)?`<button class="btn btn-primary" onclick="closeMaterialDetailModal(); openModal('${escJsStr(m.id)}')">Editar</button>`:''}
+    ${!professorMode && isArchived(m)?`<button class="btn btn-outline" onclick="restaurarMaterial('${escJsStr(m.id)}'); closeMaterialDetailModal()">Restaurar</button>`:''}
+    ${!professorMode && !isArchived(m) && needsMaterialReview(m)?`<button class="btn btn-outline" onclick="markMaterialReady('${escJsStr(m.id)}'); showMaterialDetail('${escJsStr(m.id)}')">Marcar como revisado</button>`:''}
+    ${!professorMode && isArchived(m)?`<button class="btn btn-outline" style="color:var(--red);border-color:var(--red)" onclick="excluirMaterial('${escJsStr(m.id)}'); closeMaterialDetailModal()">Excluir</button>`:''}
+    ${!professorMode && !isArchived(m)?`<button class="btn btn-primary" onclick="closeMaterialDetailModal(); openModal('${escJsStr(m.id)}')">Editar</button>`:''}
   `;
   document.getElementById('materialDetailModalOverlay').classList.add('open');
 }
@@ -3791,7 +3788,9 @@ function clearMaterialSelection(){
 }
 function selectMaterialsByList(list){
   setBulkSelectionMode(true);
-  list.filter(m=>m && m.id).forEach(m=>selectedMaterialIds.add(m.id));
+  const ids=list.filter(m=>m && m.id).map(m=>m.id);
+  const allSelected=ids.length>0 && ids.every(id=>selectedMaterialIds.has(id));
+  ids.forEach(id=>allSelected?selectedMaterialIds.delete(id):selectedMaterialIds.add(id));
   if(document.getElementById('tabPlanejamento')?.style.display !== 'none') renderPlanTab();
   renderBulkActionBar();
   syncSelectionClasses();
@@ -5744,7 +5743,11 @@ ${fonts}
 <style>
 /* Ajustes específicos da versão gerada para professor */
 .search-results-title{font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 14px}
-.prof-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:8px;align-items:start}
+.prof-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:8px;align-items:start}
+.prof-card-grid .mat-card{min-height:0;height:auto;padding:10px 12px}
+.prof-card-grid .mat-card-top>div:last-child{min-width:0;flex:1}
+.prof-card-grid .mat-context-path{font-size:10.5px;font-weight:700;color:var(--text2);line-height:1.25}
+.prof-card-grid .mat-badges{gap:5px;margin-top:5px;justify-content:flex-start}
 .theme-toggle{width:100%;background:var(--surface2);border:none;border-bottom:1px solid var(--border);padding:13px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;color:var(--text);font-family:'DM Sans',sans-serif;transition:background .12s}
 .theme-toggle:hover{background:#ece9df}
 .theme-caret{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text2);font-size:14px;transition:transform .15s;flex-shrink:0}
@@ -5823,6 +5826,16 @@ ${fonts}
     <div id="professorDiscContent"></div>
   </div>
 </div>
+<div class="modal-overlay" id="profMaterialModalOverlay">
+  <div class="modal detail-modal">
+    <div class="modal-head">
+      <h2>Detalhes do material</h2>
+      <button class="modal-close" onclick="closeProfessorMaterialDetail()">Ã—</button>
+    </div>
+    <div class="modal-body" id="profMaterialDetailBody"></div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeProfessorMaterialDetail()">Fechar</button></div>
+  </div>
+</div>
 <script>
 const SECURE_BUNDLE=${secureBundle};
 const PUBLIC_META=${safeMeta};
@@ -5847,6 +5860,7 @@ ${professorOnlyJs()}
 
 function professorOnlyJs(){ return `
 function escH(v){if(v==null)return '';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function escJs(v){return String(v==null?'':v).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\r?\n/g,'\\n')}
 function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'})}
 function norm(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}
 function modalidadeDisciplinaFallback(d){
@@ -5884,6 +5898,25 @@ function origemLink(l){return String(l.origem||'').trim()||detectarOrigem(l.link
 function tituloLink(l,idx=0){return String(l.titulo||'').trim()||origemLink(l)||('Link '+(idx+1))}
 function origens(m){return [...new Set(links(m).map(origemLink).filter(Boolean))]}
 function sourceBadges(m){return origens(m).map(o=>'<span class="mat-source-badge">'+escH(o)+'</span>').join('')}
+function materialDetailLine(label,value){const text=String(value||'').trim();return text?'<div class="pedagogy-line"><strong>'+escH(label)+':</strong> '+escH(text)+'</div>':''}
+function materialDetailHtml(m){
+  const t=tipo(m.tipoId), th=tema(m.temaId), dl=links(m);
+  const linksHtml=dl.length?dl.map((l,i)=>'<a class="material-detail-link" href="'+escH(l.link)+'" target="_blank" rel="noopener"><div class="material-detail-link-main"><div class="material-detail-link-title">'+escH(tituloLink(l,i))+'</div><div class="material-detail-link-url">'+escH(origemLink(l))+' · '+escH(l.link)+'</div></div><span class="material-detail-link-action">Abrir</span></a>').join(''):'<div class="empty" style="padding:14px"><h3>Nenhum link cadastrado.</h3></div>';
+  const info=[
+    materialDetailLine('Disciplina/área',disc(m.disciplinaId)?.nome||''),
+    materialDetailLine('Tema',th?.nome||''),
+    materialDetailLine('Tipo',t.nome),
+    materialDetailLine('Modalidade',modalidadeMaterialLabel(m.modalidadeMaterial)),
+    materialDetailLine('Unidade curricular/curso',m.unidadeCurricular||m.cursoTurma)
+  ].filter(Boolean).join('');
+  return '<div class="material-detail-section"><div class="material-detail-head"><div class="mat-icon" style="background:'+bg(m.tipoId)+'">'+escH(t.icone||'📎')+'</div><div><div class="material-detail-title">'+escH(m.titulo)+'</div><div class="material-detail-meta"><span class="mat-tipo-badge" style="background:'+bg(m.tipoId)+';color:'+cor(m.tipoId)+'">'+escH(t.nome)+'</span>'+(th?.nome?'<span class="mat-source-badge">'+escH(th.nome)+'</span>':'')+'</div></div></div></div><div class="material-detail-section"><h3>Arquivos e links</h3><div class="material-detail-links">'+linksHtml+'</div></div>'+(m.descricao?'<div class="material-detail-section"><h3>Descrição</h3><div class="material-detail-text">'+escH(m.descricao)+'</div></div>':'')+(info?'<div class="material-detail-section"><h3>Informações</h3>'+info+'</div>':'');
+}
+function showProfessorMaterialDetail(id){
+  const m=DATA.materiais.find(x=>x.id===id);if(!m)return;
+  document.getElementById('profMaterialDetailBody').innerHTML=materialDetailHtml(m);
+  document.getElementById('profMaterialModalOverlay').classList.add('open');
+}
+function closeProfessorMaterialDetail(){document.getElementById('profMaterialModalOverlay').classList.remove('open')}
 function modalidadeMaterialLabel(v){return ({presencial:'Presencial',ead:'EaD',ambos:'Presencial e EaD'})[String(v||'').toLowerCase()]||''}
 function statusMaterialLabel(v){return ({pronto:'Pronto',revisar:'Revisar',substituir:'Substituir',producao:'Em produção'})[String(v||'').toLowerCase()]||''}
 function readinessLabel(v){return ({rascunho:'Rascunho',em_uso:'Em uso',validado:'Validado',modelo:'Modelo'})[String(v||'').toLowerCase()]||''}
@@ -6093,8 +6126,7 @@ function grouped(list){
 function cardMat(m){
   const t=tipo(m.tipoId), th=tema(m.temaId), dl=links(m);
   const context=[disc(m.disciplinaId)?.nome,th?.nome].filter(Boolean).join(' · ');
-  const linksHtml=dl.map((l,i)=>'<a class="mat-open-btn" href="'+escH(l.link)+'" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 10L10 2M10 2H5M10 2v5"/></svg>'+escH(tituloLink(l,i))+'</a>').join('');
-  return '<article class="mat-card"><div class="mat-card-top"><div class="mat-icon" style="background:'+bg(m.tipoId)+'">'+escH(t.icone||'📎')+'</div><div><div class="mat-title">'+escH(m.titulo)+'</div>'+(context?'<div class="mat-context-path">'+escH(context)+'</div>':'')+((m.descricao)?'<div class="mat-desc">'+escH(m.descricao)+'</div>':'')+'<div class="mat-badges"><span class="mat-tipo-badge" style="background:'+bg(m.tipoId)+';color:'+cor(m.tipoId)+'">'+escH(t.nome)+'</span>'+sourceBadges(m)+'</div></div></div><div class="mat-footer">'+(linksHtml?'<div class="mat-links">'+linksHtml+'</div>':'<span class="mat-source-badge">Sem link</span>')+'</div></article>';
+  return '<article class="mat-card card-clickable" onclick="showProfessorMaterialDetail(\\''+escJs(m.id)+'\\')" role="button" tabindex="0" onkeydown="if(event.key===\\'Enter\\'||event.key===\\' \\'){event.preventDefault();showProfessorMaterialDetail(\\''+escJs(m.id)+'\\')}"><div class="mat-card-top"><div class="mat-icon" style="background:'+bg(m.tipoId)+'">'+escH(t.icone||'📎')+'</div><div><div class="mat-title">'+escH(m.titulo)+'</div>'+(context?'<div class="mat-context-path">'+escH(context)+'</div>':'')+'<div class="mat-badges"><span class="mat-tipo-badge" style="background:'+bg(m.tipoId)+';color:'+cor(m.tipoId)+'">'+escH(t.nome)+'</span><span class="mat-source-badge">'+dl.length+' link'+(dl.length!==1?'s':'')+'</span></div></div></div></article>';
 }
 function showToast(msg,err){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;right:24px;background:'+(err?'var(--red)':'var(--text)')+';color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)}
 applyLogoProfessorOnly();
