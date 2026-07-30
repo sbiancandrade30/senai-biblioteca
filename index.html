@@ -961,9 +961,9 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
 
     <div class="cfg-section" style="display:none">
-      <div class="cfg-head">Aplicável em</div>
+      <div class="cfg-head">Cursos e áreas sugeridos</div>
       <div class="cfg-body">
-        <div style="font-size:12px;color:var(--text2)">Use esta lista para indicar onde um material pode ser reaproveitado: curso, modalidade, laboratorio, presencial, EaD ou outro uso.</div>
+        <div style="font-size:12px;color:var(--text2)">Use esta lista para sugerir cursos, áreas ou unidades curriculares ao cadastrar materiais.</div>
         <div class="cfg-list" id="contextosConfigList"></div>
         <div class="cfg-addline">
           <input type="text" class="form-input" id="novoContextoUso" placeholder="ex: Moldador de Plástico, cursos técnicos, laboratório" style="flex:1;min-width:260px">
@@ -981,7 +981,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
             <input type="number" class="form-input" id="cfgReviewStaleDays" min="30" step="30" placeholder="180" style="max-width:160px">
             <button class="btn btn-primary" onclick="salvarPrazoRevisao()">Salvar prazo</button>
             <div style="flex-basis:100%;margin-top:8px">
-              <label class="form-label">Etiquetas personalizadas de revisao</label>
+              <label class="form-label">Etiquetas personalizadas de revisão</label>
               <div class="cfg-list" id="reviewTagsConfigList"></div>
               <div class="cfg-addline">
                 <input type="text" class="form-input" id="novaReviewTag" placeholder="ex: Falta adaptar para EaD" style="flex:1;min-width:260px">
@@ -989,7 +989,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
               </div>
             </div>
           </div>
-          <div style="font-size:12px;color:var(--text2);margin-top:6px">Sugestão: 180 dias para revisao semestral ou 365 dias para revisao anual.</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:6px">Sugestão: 180 dias para revisão semestral ou 365 dias para revisão anual.</div>
         </div>
       </div>
     </div>
@@ -1033,7 +1033,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           <button class="btn btn-outline" onclick="importFileInput.click()">↑ Importar backup (.json)</button>
         </div>
         <hr style="border:none;border-top:1px solid var(--border)">
-        <p style="font-size:12px;color:var(--text2)"><strong>Cadastro em lote:</strong> importe uma planilha <code>.xlsx</code>, <code>.xls</code> ou <code>.csv</code> com materiais, links e campos pedagógicos opcionais, como curso/turma, unidade curricular, referencia, capacidade, conhecimento e status.</p>
+        <p style="font-size:12px;color:var(--text2)"><strong>Cadastro em lote:</strong> importe uma planilha <code>.xlsx</code>, <code>.xls</code> ou <code>.csv</code> com materiais, links e campos opcionais, como curso/área, unidade curricular, referência, descrição e nota interna.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-outline" onclick="baixarModeloPlanilhaMateriais()">Baixar modelo de planilha</button>
           <button class="btn btn-outline" onclick="bulkSheetInput.click()">Importar planilha de materiais</button>
@@ -1125,7 +1125,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Curso <span style="font-weight:400;color:var(--text3)">(opcional)</span></label>
-              <input type="text" class="form-input" id="mCursoTurma" list="contextosUsoList" placeholder="ex: Moldador de Plastico">
+              <input type="text" class="form-input" id="mCursoTurma" list="contextosUsoList" placeholder="ex: Moldador de Plástico">
               <datalist id="contextosUsoList"></datalist>
             </div>
             <div class="form-group">
@@ -1604,7 +1604,7 @@ function defaults() {
                 "disciplinaId": "disc_eletromecanica",
                 "temaId": "tema_eletro_grandezas",
                 "tipoId": "tipo_video",
-                "descricao": "Vídeo complementar para revisao em casa.",
+                "descricao": "Vídeo complementar para revisão em casa.",
                 "ordem": 1,
                 "fixado": false
           },
@@ -1799,7 +1799,7 @@ function defaults() {
                 "disciplinaId": "disc_eletromecanica",
                 "temaId": "tema_eletro_motores",
                 "tipoId": "tipo_video",
-                "descricao": "Conteúdo de apoio para revisao.",
+                "descricao": "Conteúdo de apoio para revisão.",
                 "ordem": 1,
                 "fixado": false
           },
@@ -2091,7 +2091,7 @@ function defaults() {
                 "disciplinaId": "disc_tecnologia",
                 "temaId": "tema_tecnologia_polimeros",
                 "tipoId": "tipo_estudo",
-                "descricao": "Resumo visual para revisao.",
+                "descricao": "Resumo visual para revisão.",
                 "ordem": 1,
                 "fixado": false
           },
@@ -2581,9 +2581,9 @@ function pedagogyMetaHtml(m){
   const chips=[];
   if(m.createdAt) chips.push(`Criado: ${formatDateTime(m.createdAt)}`);
   if(m.updatedAt) chips.push(`Atualizado: ${formatDateTime(m.updatedAt)}`);
-  if(m.cursoTurma) chips.push(`Aplicável em: ${m.cursoTurma}`);
+  if(m.cursoTurma) chips.push(`Curso/área: ${m.cursoTurma}`);
   if(m.unidadeCurricular) chips.push(`UC: ${m.unidadeCurricular}`);
-  if(m.aulaModulo) chips.push(`Referencia: ${m.aulaModulo}`);
+  if(m.aulaModulo) chips.push(`Referência: ${m.aulaModulo}`);
   const mod=modalidadeMaterialLabel(m.modalidadeMaterial);
   if(mod) chips.push(mod);
   const status=statusMaterialLabel(m.statusMaterial);
@@ -2638,7 +2638,7 @@ function totalByTypeList(list){
   list.forEach(m=>map.set(m.tipoId,(map.get(m.tipoId)||0)+1));
   return [...map.entries()].map(([tipoId,total])=>({tipoId,total}));
 }
-function aulaModuloLabel(m){ return String(m?.aulaModulo||'').trim() || 'Sem referencia definido'; }
+function aulaModuloLabel(m){ return String(m?.aulaModulo||'').trim() || 'Sem referência definida'; }
 function aulaModuloSortValue(label){
   const s=normalizar(label);
   if(s.includes('sem aula')) return 999999;
@@ -3354,10 +3354,7 @@ function materialReviewReason(m){
 function materialQualityIssues(m){
   const issues=[];
   if(!String(m.descricao||'').trim()) issues.push('sem descrição');
-  if(!materialCourse(m)) issues.push('sem uso indicado');
   if((m.disciplinaId||GERAL_ID)!==GERAL_ID && !String(m.temaId||'').trim()) issues.push('sem tema');
-  if(!String(m.modalidadeMaterial||'').trim()) issues.push('sem modalidade');
-  if(!checklistLabels(m).length) issues.push('checklist vazio');
   return issues;
 }
 function isMaterialIncomplete(m){ return materialQualityIssues(m).length>0; }
@@ -3372,9 +3369,7 @@ function renderReviewFilterOptions(){
     ['revisar','Marcados como revisar'],
     ['incomplete','Cadastros incompletos'],
     ['semDescricao','Sem descrição'],
-    ['semContexto','Sem uso indicado'],
     ['semTema','Sem tema'],
-    ['semChecklist','Checklist vazio'],
     ['archived','Arquivados'],
     ['all','Todos os materiais']
   ];
@@ -3422,7 +3417,7 @@ function renderReviewTab(){
   const list=reviewList();
   const el=document.getElementById('reviewContent');
   if(!list.length){
-    el.innerHTML='<div class="empty"><h3>Nenhum material nesta revisao.</h3><p>Ajuste os filtros ou continue cadastrando seus materiais.</p></div>';
+    el.innerHTML='<div class="empty"><h3>Nenhum material nesta revisão.</h3><p>Ajuste os filtros ou continue cadastrando seus materiais.</p></div>';
     return;
   }
   el.innerHTML=`<div class="theme-section">
@@ -4131,7 +4126,7 @@ function aplicarModeloPedagogico(modelo){
   }
   if(modelo==='revisar'){
     document.getElementById('mStatusMaterial').value='revisar';
-    showToast('Material marcado para revisao.');
+    showToast('Material marcado para revisão.');
   }
 }
 function renderThemeSelectForMaterial(preselect=''){
@@ -4456,7 +4451,7 @@ function salvarPrazoRevisao(){
   salvar();
   renderConfigTab();
   if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
-  showToast('Prazo de revisao salvo!');
+  showToast('Prazo de revisão salvo!');
 }
 function reviewTagsOrdenadas(){
   return [...new Set((D.reviewTags||[]).map(t=>String(t||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
@@ -4638,9 +4633,9 @@ function exportarAcervoPlanilha(){
       Tema:labelTema(m.temaId),
       Tipo:labelTipo(m.tipoId),
       Título:m.titulo,
-      'Aplicável em':m.cursoTurma||'',
+      'Curso/área':m.cursoTurma||'',
       'Unidade curricular':m.unidadeCurricular||'',
-      'referencia':m.aulaModulo||'',
+      'Referência':m.aulaModulo||'',
       'Capacidade/competência':m.capacidadeCompetencia||'',
       Conhecimento:m.conhecimento||'',
       Modalidade:modalidadeMaterialLabel(m.modalidadeMaterial)||modalidadeLabel(modalidadeDisciplina(getDisc(m.disciplinaId)||{})),
@@ -4764,7 +4759,7 @@ function baixarModeloPlanilhaMateriais(disciplinaId=''){
   const nomeDisc=disc && disciplinaId ? disc.nome : 'Ensaios';
   const modalidade=disc && disciplinaId ? modalidadeLabel(modalidadeDisciplina(disc)) : 'Presencial';
   const headers=[
-    'Disciplina','Modalidade','Tema','Tipo','Título','Aplicável em','Unidade curricular','referencia',
+    'Disciplina','Modalidade','Tema','Tipo','Título','Curso/área','Unidade curricular','Referência',
     'Capacidade/competência','Conhecimento','Modalidade do material','Status','Prontidão','Etiquetas de revisão','Data de criação','Último upload',
     'Tem objetivo','Tem atividade','Tem avaliação','Tem gabarito','Revisado presencial','Revisado EaD',
     'Link','Origem','Título do link',
@@ -4893,7 +4888,7 @@ function importarPlanilhaMateriais(input){
         const tipoId=findOrCreateTipoByName(tipo);
         const descricao=valorLinha(row, header, ['descricao','descrição','observacao','observacoes','obs']);
         const internalNotes=valorLinha(row, header, ['nota_interna','notas_internas','observacao_interna','observação_interna','admin_notes']);
-        const cursoTurma=valorLinha(row, header, ['aplicavel_em','aplicável_em','contexto','contextos','curso_turma','curso','turma','curso_ou_turma']);
+        const cursoTurma=valorLinha(row, header, ['curso_area','curso/area','curso_área','curso/área','aplicavel_em','aplicável_em','contexto','contextos','curso_turma','curso','turma','curso_ou_turma']);
         const unidadeCurricular=valorLinha(row, header, ['unidade_curricular','uc','componente_curricular']);
         const aulaModulo=valorLinha(row, header, ['aula_modulo','aula','modulo','aula_ou_modulo']);
         const capacidadeCompetencia=valorLinha(row, header, ['capacidade_competencia','capacidade','competencia','competência']);
@@ -5651,7 +5646,7 @@ function reviewBadge(m){if(m.statusMaterial==='substituir')return '<span class="
 function checklistLabels(m){const c=m&&m.checklist||{};return [c.objetivo?'objetivo':'',c.atividade?'atividade':'',c.avaliacao?'avaliação':'',c.gabarito?'gabarito':'',c.presencial?'revisado presencial':'',c.ead?'revisado EaD':''].filter(Boolean)}
 function materialReviewTags(m){return Array.isArray(m&&m.reviewTags)?m.reviewTags.map(t=>String(t||'').trim()).filter(Boolean):[]}
 function pedagogyText(m){return [m.cursoTurma,m.unidadeCurricular,m.aulaModulo,m.capacidadeCompetencia,m.conhecimento,modalidadeMaterialLabel(m.modalidadeMaterial),statusMaterialLabel(m.statusMaterial),readinessLabel(m.readiness),checklistLabels(m).join(' '),materialReviewTags(m).join(' '),formatDateTime(m.createdAt),formatDateTime(m.updatedAt)].join(' ')}
-function pedagogyMeta(m){const chips=[];if(m.createdAt)chips.push('Criado: '+formatDateTime(m.createdAt));if(m.updatedAt)chips.push('Atualizado: '+formatDateTime(m.updatedAt));if(m.cursoTurma)chips.push('Aplicável em: '+m.cursoTurma);if(m.unidadeCurricular)chips.push('UC: '+m.unidadeCurricular);if(m.aulaModulo)chips.push('Referencia: '+m.aulaModulo);const mod=modalidadeMaterialLabel(m.modalidadeMaterial);if(mod)chips.push(mod);const rb=reviewBadge(m);const st=statusMaterialLabel(m.statusMaterial);if(st&&!rb)chips.push('Status: '+st);const rd=readinessLabel(m.readiness);if(rd)chips.push('Prontidão: '+rd);const chipHtml=chips.map(c=>'<span class="pedagogy-pill">'+escH(c)+'</span>').join('');const lines=[];if(m.capacidadeCompetencia)lines.push('<div class="pedagogy-line"><strong>Capacidade:</strong> '+escH(m.capacidadeCompetencia)+'</div>');if(m.conhecimento)lines.push('<div class="pedagogy-line"><strong>Conhecimento:</strong> '+escH(m.conhecimento)+'</div>');const checks=checklistLabels(m);if(checks.length)lines.push('<div class="pedagogy-line"><strong>Checklist:</strong> '+escH(checks.join(', '))+'</div>');const tags=materialReviewTags(m);if(tags.length)lines.push('<div class="pedagogy-line"><strong>Etiquetas:</strong> '+escH(tags.join(', '))+'</div>');return chipHtml||rb||lines.length?'<div class="pedagogy-meta">'+rb+chipHtml+'</div>'+lines.join(''):''}
+function pedagogyMeta(m){const chips=[];if(m.createdAt)chips.push('Criado: '+formatDateTime(m.createdAt));if(m.updatedAt)chips.push('Atualizado: '+formatDateTime(m.updatedAt));if(m.cursoTurma)chips.push('Curso/área: '+m.cursoTurma);if(m.unidadeCurricular)chips.push('UC: '+m.unidadeCurricular);if(m.aulaModulo)chips.push('Referência: '+m.aulaModulo);const mod=modalidadeMaterialLabel(m.modalidadeMaterial);if(mod)chips.push(mod);const rb=reviewBadge(m);const st=statusMaterialLabel(m.statusMaterial);if(st&&!rb)chips.push('Status: '+st);const rd=readinessLabel(m.readiness);if(rd)chips.push('Prontidão: '+rd);const chipHtml=chips.map(c=>'<span class="pedagogy-pill">'+escH(c)+'</span>').join('');const lines=[];if(m.capacidadeCompetencia)lines.push('<div class="pedagogy-line"><strong>Capacidade:</strong> '+escH(m.capacidadeCompetencia)+'</div>');if(m.conhecimento)lines.push('<div class="pedagogy-line"><strong>Conhecimento:</strong> '+escH(m.conhecimento)+'</div>');const checks=checklistLabels(m);if(checks.length)lines.push('<div class="pedagogy-line"><strong>Checklist:</strong> '+escH(checks.join(', '))+'</div>');const tags=materialReviewTags(m);if(tags.length)lines.push('<div class="pedagogy-line"><strong>Etiquetas:</strong> '+escH(tags.join(', '))+'</div>');return chipHtml||rb||lines.length?'<div class="pedagogy-meta">'+rb+chipHtml+'</div>'+lines.join(''):''}
 function searchable(m){return norm([m.titulo,m.descricao,links(m).map((l,i)=>tituloLink(l,i)+' '+origemLink(l)+' '+l.link).join(' '),disc(m.disciplinaId)?.nome,tema(m.temaId)?.nome,tipo(m.tipoId)?.nome,pedagogyText(m),m.fixado?'fixado destaque':''].join(' '))}
 function matchesSearch(m,search){const terms=norm(search).split(/\s+/).filter(Boolean);if(!terms.length)return true;const hay=searchable(m);return terms.every(t=>hay.includes(t))}
 function filtered(list,{search='',tipoId='',temaId='',revisao=''}={}){return sortM(list.filter(m=>{if(tipoId&&m.tipoId!==tipoId)return false;if(temaId&&(m.temaId||'')!==temaId)return false;if(revisao==='review'&&!needsMaterialReview(m))return false;if(revisao==='stale'&&!isMaterialStale(m))return false;if(revisao==='ready'&&needsMaterialReview(m))return false;if(!matchesSearch(m,search))return false;return true}))}
