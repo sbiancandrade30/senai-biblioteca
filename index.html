@@ -3809,13 +3809,22 @@ function selectMaterialsByList(list, toggleKey=''){
 function visiblePlanMaterialIds(root){
   const scope=root || document.getElementById('planContent') || document;
   return [...scope.querySelectorAll('.admin-card[data-material-id]')]
-    .filter(card=>card.offsetParent!==null)
-    .map(card=>card.getAttribute('data-material-id'));
+    .map(card=>card.dataset.materialId || card.getAttribute('data-material-id'))
+    .filter(Boolean);
 }
-function selectVisibleMaterials(){ selectMaterialsByIds(visiblePlanMaterialIds(),'all-visible'); }
+function selectVisibleMaterials(){
+  const ids=visiblePlanMaterialIds();
+  selectMaterialsByIds(ids.length?ids:planFilteredMaterials().map(m=>m.id),'all-visible');
+}
 function selectDiscMaterialsFromButton(btn){
   const section=btn.closest('.theme-section');
-  selectMaterialsByIds(visiblePlanMaterialIds(section||document),'disc-visible');
+  const ids=visiblePlanMaterialIds(section||document);
+  if(ids.length){
+    selectMaterialsByIds(ids,'disc-visible');
+    return;
+  }
+  const discId=section?.dataset?.discId;
+  selectDiscMaterials(discId||'');
 }
 function selectDiscMaterials(discId){
   selectMaterialsByList(planFilteredMaterials().filter(m=>(m.disciplinaId||GERAL_ID)===discId),'disc:'+discId);
@@ -4009,7 +4018,7 @@ function planSectionHtml(discId,mats){
   `).join('');
   const body=themeBlocks+assessmentsBlock;
   const review=mats.filter(needsMaterialReview).length;
-  return `<section class="theme-section">
+  return `<section class="theme-section" data-disc-id="${escH(discId)}">
     <div class="theme-head">
       <div>
         <div class="theme-name">${escH(labelDisc(discId))}</div>
