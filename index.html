@@ -110,9 +110,13 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 .admin-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;transition:all .15s;margin-bottom:8px;box-shadow:0 1px 0 rgba(21,24,33,.02)}
 .admin-card:hover{border-color:var(--border2);box-shadow:var(--shadow-soft);transform:translateY(-1px)}
 .admin-card.selected{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,87,214,.12)}
-.bulk-selector{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;margin-top:4px;padding:6px 8px;border:1px solid var(--border);border-radius:999px;background:var(--surface2);font-size:11px;font-weight:700;color:var(--text2);cursor:pointer;user-select:none}
-.bulk-selector:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.bulk-selector{display:none;align-items:center;align-self:flex-start;margin-top:5px;padding:0;border:0;background:transparent;cursor:pointer;user-select:none}
+.bulk-selection-mode .bulk-selector{display:inline-flex}
+.bulk-selector:hover .bulk-check{box-shadow:0 0 0 3px rgba(37,87,214,.12)}
+.bulk-selector span{display:none}
 .bulk-check{width:16px;height:16px;accent-color:var(--accent);flex:0 0 auto;cursor:pointer}
+.bulk-head-actions{display:none;gap:8px;flex-wrap:wrap;align-items:center}
+.bulk-selection-mode .bulk-head-actions{display:flex}
 .admin-body{flex:1;min-width:0}
 .admin-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
 .admin-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--text3);margin-bottom:4px}
@@ -841,6 +845,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <p id="pageSubAcervo">Consulte todo o acervo por disciplina, tema, tipo e status. A organização aqui é reutilizável e não depende de uma turma ou aula específica.</p>
       </div>
       <div class="inner-actions">
+        <button class="btn btn-outline" id="bulkModeBtn" onclick="toggleBulkSelectionMode()">Selecionar materiais</button>
+        <button class="btn btn-outline bulk-head-actions" onclick="selectVisibleMaterials()">Selecionar tudo</button>
         <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rápido</button>
         <button class="btn btn-primary" onclick="openModal()">+ Novo material</button>
       </div>
@@ -3740,13 +3746,25 @@ function adminCardHtml(m){
 // ════════════════════════════════════════════════════════
 // PLANEJAMENTO POR AULA
 const selectedMaterialIds=new Set();
+let bulkSelectionMode=false;
 function scrollToTop(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
+function setBulkSelectionMode(active){
+  bulkSelectionMode=!!active;
+  document.body.classList.toggle('bulk-selection-mode', bulkSelectionMode);
+  const btn=document.getElementById('bulkModeBtn');
+  if(btn) btn.textContent=bulkSelectionMode?'Sair da seleção':'Selecionar materiais';
+  if(!bulkSelectionMode) selectedMaterialIds.clear();
+  renderBulkActionBar();
+  syncSelectionClasses();
+}
+function toggleBulkSelectionMode(){ setBulkSelectionMode(!bulkSelectionMode); }
 function toggleMaterialSelection(event,id){
   event.stopPropagation();
   if(event.currentTarget?.checked || event.target.checked) selectedMaterialIds.add(id);
   else selectedMaterialIds.delete(id);
+  if(selectedMaterialIds.size) setBulkSelectionMode(true);
   renderBulkActionBar();
   syncSelectionClasses();
 }
@@ -3764,13 +3782,21 @@ function renderBulkActionBar(){
   if(!bar || !count) return;
   const total=selectedMaterialIds.size;
   count.textContent=`${total} selecionado${total!==1?'s':''}`;
-  bar.classList.toggle('show', total>0 && mode==='admin');
+  bar.classList.toggle('show', bulkSelectionMode && total>0 && mode==='admin');
 }
 function clearMaterialSelection(){
   selectedMaterialIds.clear();
   renderBulkActionBar();
   syncSelectionClasses();
 }
+function selectMaterialsByList(list){
+  setBulkSelectionMode(true);
+  list.filter(m=>m && m.id).forEach(m=>selectedMaterialIds.add(m.id));
+  renderBulkActionBar();
+  syncSelectionClasses();
+}
+function selectVisibleMaterials(){ selectMaterialsByList(planFilteredMaterials()); }
+function selectDiscMaterials(discId){ selectMaterialsByList(planFilteredMaterials().filter(m=>(m.disciplinaId||GERAL_ID)===discId)); }
 function refreshMaterialViews(){
   renderAdminHome();
   if(currentAdminDiscId) renderAdminDisc();
@@ -3900,6 +3926,9 @@ function planFilteredMaterials(){
 function renderPlanTab(){
   renderPlanSelectors();
   updatePlanQuickFilterButtons();
+  document.body.classList.toggle('bulk-selection-mode', bulkSelectionMode);
+  const bulkBtn=document.getElementById('bulkModeBtn');
+  if(bulkBtn) bulkBtn.textContent=bulkSelectionMode?'Sair da seleção':'Selecionar materiais';
   const list=planFilteredMaterials();
   renderPlanFilterStatus(list.length);
   const discs=[...new Set(list.map(m=>m.disciplinaId||GERAL_ID))];
@@ -3962,6 +3991,9 @@ function planSectionHtml(discId,mats){
       <div>
         <div class="theme-name">${escH(labelDisc(discId))}</div>
         <div class="theme-meta">${materialCountLabel(mats.length)}${review?` - ${review} a revisar`:''}</div>
+      </div>
+      <div class="bulk-head-actions" onclick="event.stopPropagation()">
+        <button class="a-btn" type="button" onclick="selectDiscMaterials('${escJsStr(discId)}')">Selecionar disciplina</button>
       </div>
     </div>
     <div class="theme-body">${body}</div>
@@ -5685,8 +5717,8 @@ async function gerarVersaoProfessor(){
       favicon: D.favicon || DEFAULT_FAVICON_DATA_URL
     };
 
-    const css=document.querySelector('style').outerHTML;
-    const fonts=document.querySelector('link[href*="fonts.googleapis"]').outerHTML;
+    const cssText=(document.querySelector('style')?.textContent || '').replace(/<\/style/gi,'<\\/style');
+    const fonts=document.querySelector('link[href*="fonts.googleapis"]')?.outerHTML || '';
     const secureBundle=JSON.stringify(bundle).replace(/</g,'\\u003c');
     const safeMeta=JSON.stringify(publicMeta).replace(/</g,'\\u003c');
     const name='materiais_'+(D.nomeCurso||'professor').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,48)+'.html';
@@ -5707,7 +5739,7 @@ async function gerarVersaoProfessor(){
 <title>${escH(publicMeta.nomeCurso)}</title>
 ${publicMeta.favicon ? `<link rel="icon" href="${publicMeta.favicon}">` : ''}
 ${fonts}
-${css}
+<style>${cssText}</style>
 <style>
 /* Ajustes específicos da versão gerada para professor */
 .search-results-title{font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 14px}
