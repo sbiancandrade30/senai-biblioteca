@@ -28,9 +28,9 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 /* ── LOGIN ─────────────────────────────── */
 .login-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 8%,#fff 0,#f7f8fb 34%,#f1f3f7 100%);z-index:9999;padding:18px}
 .login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:0 18px 54px rgba(21,24,33,.12);width:380px;overflow:hidden}
-.login-top{background:#fff;padding:28px 32px 24px;display:flex;flex-direction:column;align-items:center;gap:9px;position:relative;border-bottom:1px solid var(--border)}
+.login-top{background:#fff;padding:24px 32px 20px;display:flex;flex-direction:column;align-items:center;gap:9px;position:relative;border-bottom:1px solid var(--border)}
 .login-top::after{content:'';position:absolute;left:32px;right:32px;bottom:-1px;height:3px;border-radius:999px;background:linear-gradient(90deg,#164194 0 72%,#f25a38 72% 100%)}
-.login-logo-img{max-height:112px;max-width:280px;object-fit:contain;opacity:1}
+.login-logo-img{max-height:76px;max-width:220px;object-fit:contain;opacity:1}
 .login-brand{font-size:24px;font-weight:800;font-style:italic;color:#164194;letter-spacing:-.04em}
 .login-curso{font-size:15px;font-weight:800;color:var(--text);text-align:center;line-height:1.25;max-width:300px}
 .login-sub{font-size:11px;color:var(--text2);text-align:center;line-height:1.4;max-width:300px}
@@ -500,6 +500,10 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 }
 
 @media(max-width:460px){
+  .login-wrap{padding:14px}
+  .login-card{width:100%;max-width:380px}
+  .login-top{padding:22px 24px 18px}
+  .login-logo-img{max-height:64px;max-width:190px}
   .app-header{padding:7px 10px}
   .h-left{grid-template-columns:auto 1px minmax(0,1fr);gap:7px}
   .h-logo{height:32px;max-width:104px}
