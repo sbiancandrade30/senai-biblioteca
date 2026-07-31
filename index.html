@@ -3493,6 +3493,7 @@ function materialReviewReasons(m){
   return reasons;
 }
 function materialReviewExplanationHtml(m){
+  if(!needsMaterialReview(m)) return '';
   const reasons=materialReviewReasons(m);
   if(!reasons.length) return '';
   return `<div class="material-detail-section"><div class="review-explain">
@@ -3500,6 +3501,31 @@ function materialReviewExplanationHtml(m){
     <div class="review-checklist">${reasons.map(r=>`<label class="review-checkitem"><input type="checkbox" disabled><span>${escH(r)}</span></label>`).join('')}</div>
     <div class="review-check-hint">Depois de corrigir os pontos pendentes, use “Marcar como revisado” para remover o alerta.</div>
   </div></div>`;
+}
+function materialReviewExplanationHtml(m){
+  const reasons=materialReviewReasons(m);
+  if(!reasons.length) return '';
+  const professorMode=sessionStorage.getItem('mat_mode')==='professor';
+  const checks=reasons.map(r=>`<label class="review-checkitem">
+    <input type="checkbox" ${professorMode?'disabled':''} onchange="handleReviewChecklistChange('${escJsStr(m.id)}')">
+    <span>${escH(r)}</span>
+  </label>`).join('');
+  return `<div class="material-detail-section"><div class="review-explain">
+    <strong>Checklist de revisão</strong>
+    <div class="review-checklist" data-review-checklist="${escH(m.id)}">${checks}</div>
+    <div class="review-check-hint">${professorMode?'Itens que a professora marcou para revisão.':'Marque os itens conforme forem resolvidos. Ao concluir todos, o alerta sai automaticamente.'}</div>
+  </div></div>`;
+}
+function handleReviewChecklistChange(id){
+  const selector=window.CSS && CSS.escape ? CSS.escape(id) : String(id).replace(/"/g,'\\"');
+  const box=document.querySelector(`[data-review-checklist="${selector}"]`);
+  if(!box) return;
+  const checks=[...box.querySelectorAll('input[type="checkbox"]')];
+  if(checks.length && checks.every(c=>c.checked)){
+    markMaterialReady(id);
+    showMaterialDetail(id);
+    showToast('Checklist concluída. Material marcado como revisado.');
+  }
 }
 function materialQualityIssues(m){
   const issues=[];
