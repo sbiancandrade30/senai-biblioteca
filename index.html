@@ -3184,7 +3184,23 @@ function discCardHtml(d, professor=false){
 }
 function renderProfessorSearchResults(mats){
   if(!mats.length) return `<div class="empty"><h3>Nenhum material encontrado.</h3><p>Tente outro termo.</p></div>`;
-  return `<div class="prof-card-grid">${mats.map(m=>profCardHtml(m,true)).join('')}</div>`;
+  const grouped=new Map();
+  mats.forEach(m=>{
+    const key=m.disciplinaId||GERAL_ID;
+    if(!grouped.has(key)) grouped.set(key,[]);
+    grouped.get(key).push(m);
+  });
+  return [...grouped.entries()]
+    .sort((a,b)=>labelDisc(a[0]).localeCompare(labelDisc(b[0]),'pt-BR'))
+    .map(([discId,items])=>`<section class="theme-section prof-search-group">
+      <div class="theme-head">
+        <div>
+          <div class="theme-name">${escH(labelDisc(discId))}</div>
+          <div class="theme-meta">${items.length} resultado${items.length!==1?'s':''}</div>
+        </div>
+      </div>
+      <div class="theme-body"><div class="prof-card-grid">${items.map(m=>profCardHtml(m,true)).join('')}</div></div>
+    </section>`).join('');
 }
 function abrirProfessorDisc(discId){
   currentProfessorDiscId=discId;
@@ -6166,7 +6182,13 @@ function cardDisc(id){
 function searchCardsList(list){
   const el=document.getElementById('professorHomeContent');
   if(!list.length){el.innerHTML='<div class="empty"><h3>Nenhum material encontrado.</h3><p>Tente outra palavra.</p></div>';return}
-  el.innerHTML='<div class="search-results-title">'+list.length+' resultado'+(list.length!==1?'s':'')+' encontrado'+(list.length!==1?'s':'')+'</div><div class="prof-card-grid">'+list.map(cardMat).join('')+'</div>';
+  const grouped={};
+  list.forEach(m=>{const k=m.disciplinaId||GERAL_ID;if(!grouped[k])grouped[k]=[];grouped[k].push(m)});
+  const sections=Object.keys(grouped)
+    .sort((a,b)=>(disc(a)?.nome||'').localeCompare(disc(b)?.nome||'','pt-BR'))
+    .map(id=>'<section class="theme-section prof-search-group"><div class="theme-head"><div><div class="theme-name">'+escH(disc(id)?.nome||'Materiais gerais')+'</div><div class="theme-meta">'+grouped[id].length+' resultado'+(grouped[id].length!==1?'s':'')+'</div></div></div><div class="theme-body"><div class="prof-card-grid">'+grouped[id].map(cardMat).join('')+'</div></div></section>')
+    .join('');
+  el.innerHTML='<div class="search-results-title">'+list.length+' resultado'+(list.length!==1?'s':'')+' encontrado'+(list.length!==1?'s':'')+'</div>'+sections;
 }
 function searchCards(s){
   searchCardsList(sortM(activeMats().filter(m=>matchesSearch(m,s))));
