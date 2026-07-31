@@ -3790,20 +3790,26 @@ function setBulkCardState(card, selected){
   if(checked) selectedMaterialIds.add(id);
   else selectedMaterialIds.delete(id);
 }
-function toggleBulkCards(cards){
+function toggleBulkCards(cards, control){
   const usable=cards.filter(card=>card && (card.dataset.materialId || card.getAttribute('data-material-id')));
   if(!usable.length){
     showToast('Nenhum material encontrado para selecionar.', true);
     return;
   }
   syncSelectedIdsFromChecks();
-  const shouldDeselect=usable.every(card=>{
+  const shouldDeselect=control?.dataset?.bulkSelected==='1' || usable.every(card=>{
     const id=card.dataset.materialId || card.getAttribute('data-material-id');
     const chk=card.querySelector('.bulk-check');
     return selectedMaterialIds.has(id) || !!chk?.checked || card.classList.contains('selected');
   });
   setBulkSelectionMode(true);
   usable.forEach(card=>setBulkCardState(card,!shouldDeselect));
+  if(control){
+    control.dataset.bulkSelected=shouldDeselect?'0':'1';
+    control.textContent=shouldDeselect
+      ? (control.id==='bulkSelectAllBtn'?'Selecionar tudo':'Selecionar disciplina')
+      : (control.id==='bulkSelectAllBtn'?'Desmarcar tudo':'Desmarcar disciplina');
+  }
   renderBulkActionBar();
   showToast(shouldDeselect?'Seleção removida.':`${usable.length} material${usable.length!==1?'is':''} selecionado${usable.length!==1?'s':''}.`);
 }
@@ -3829,6 +3835,7 @@ function captureBulkCardClick(event){
   if(typeof event.stopImmediatePropagation==='function') event.stopImmediatePropagation();
   if(selectedMaterialIds.has(id)) selectedMaterialIds.delete(id);
   else selectedMaterialIds.add(id);
+  resetBulkControls();
   renderBulkActionBar();
   syncSelectionClasses();
 }
@@ -3844,6 +3851,7 @@ function renderBulkActionBar(){
 function clearMaterialSelection(){
   selectedMaterialIds.clear();
   lastBulkToggleKey='';
+  resetBulkControls();
   renderBulkActionBar();
   syncSelectionClasses();
 }
@@ -3883,12 +3891,23 @@ function selectDiscMaterials(discId){
     'disc:'+normalizedDiscId
   );
 }
-function bulkSelectAll(){
-  toggleBulkCards(planCardsIn(document.getElementById('planContent')));
+function resetBulkControls(){
+  const allBtn=document.getElementById('bulkSelectAllBtn');
+  if(allBtn){
+    allBtn.dataset.bulkSelected='0';
+    allBtn.textContent='Selecionar tudo';
+  }
+  document.querySelectorAll('.bulk-disc-btn').forEach(btn=>{
+    btn.dataset.bulkSelected='0';
+    btn.textContent='Selecionar disciplina';
+  });
+}
+function bulkSelectAll(control){
+  toggleBulkCards(planCardsIn(document.getElementById('planContent')), control || document.getElementById('bulkSelectAllBtn'));
   return false;
 }
 function bulkSelectSection(btn){
-  toggleBulkCards(planCardsIn(btn?.closest('.theme-section')));
+  toggleBulkCards(planCardsIn(btn?.closest('.theme-section')), btn);
   return false;
 }
 function captureBulkSelectionButtons(event){
@@ -3899,7 +3918,7 @@ function captureBulkSelectionButtons(event){
   event.preventDefault();
   event.stopPropagation();
   if(typeof event.stopImmediatePropagation==='function') event.stopImmediatePropagation();
-  if(allBtn) bulkSelectAll();
+  if(allBtn) bulkSelectAll(allBtn);
   if(discBtn) bulkSelectSection(discBtn);
 }
 document.addEventListener('click',captureBulkSelectionButtons,true);
