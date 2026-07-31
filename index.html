@@ -3796,12 +3796,13 @@ function toggleBulkCards(cards){
     showToast('Nenhum material encontrado para selecionar.', true);
     return;
   }
-  setBulkSelectionMode(true);
+  syncSelectedIdsFromChecks();
   const shouldDeselect=usable.every(card=>{
     const id=card.dataset.materialId || card.getAttribute('data-material-id');
     const chk=card.querySelector('.bulk-check');
     return selectedMaterialIds.has(id) || !!chk?.checked || card.classList.contains('selected');
   });
+  setBulkSelectionMode(true);
   usable.forEach(card=>setBulkCardState(card,!shouldDeselect));
   renderBulkActionBar();
   showToast(shouldDeselect?'Seleção removida.':`${usable.length} material${usable.length!==1?'is':''} selecionado${usable.length!==1?'s':''}.`);
