@@ -3490,13 +3490,36 @@ function materialReviewReasons(m){
     const days=daysSinceDate(m.updatedAt || m.createdAt);
     reasons.push(`Conferir se o conteúdo ainda está atualizado. Ele está há ${days} dias sem alteração; o prazo configurado é ${reviewStaleDays()} dias.`);
   }
-  materialQualityIssues(m).forEach(issue=>{
-    if(issue==='sem descrição') reasons.push('Preencher uma descrição curta dizendo o que é o material e quando usar.');
-    if(issue==='sem tema') reasons.push('Escolher um tema para este material dentro da disciplina/área.');
-  });
+  materialCompletionTasks(m).forEach(task=>reasons.push(task));
   const tags=materialReviewTags(m);
   tags.forEach(tag=>reasons.push(reviewTagToTask(tag)));
-  return reasons;
+  return uniqueReviewTasks(reasons);
+}
+function uniqueReviewTasks(tasks){
+  const seen=new Set();
+  return tasks.map(t=>String(t||'').trim()).filter(t=>{
+    const key=normalizar(t);
+    if(!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+function materialCompletionTasks(m){
+  const tasks=[];
+  const links=materialLinks(m);
+  const discId=m?.disciplinaId||'';
+  const tipoId=m?.tipoId||'';
+  const tipoOk=!!tipoId && D.tipos.some(t=>t.id===tipoId);
+  if(!String(m?.titulo||'').trim()) tasks.push('Preencher o título do material.');
+  if(!links.length) tasks.push('Adicionar pelo menos um link ou arquivo de acesso.');
+  if(links.length>1 && links.some(l=>!String(l.titulo||'').trim())) tasks.push('Nomear os links para o professor saber o que abre em cada botão.');
+  if(!tipoOk) tasks.push('Escolher o tipo do material, como slide, atividade, prova, gabarito, vídeo ou outro.');
+  if(!discId) tasks.push('Escolher a disciplina/área onde o material deve ficar.');
+  if(discId===GERAL_ID) tasks.push('Confirmar se este material deve ficar em Materiais gerais ou se pertence a uma disciplina/área.');
+  if(discId && discId!==GERAL_ID && !String(m?.temaId||'').trim()) tasks.push('Escolher um tema dentro da disciplina/área.');
+  if(!String(m?.descricao||'').trim()) tasks.push('Preencher uma descrição curta dizendo o que é o material e quando usar.');
+  if(!String(m?.cursoTurma||'').trim() && !String(m?.unidadeCurricular||'').trim()) tasks.push('Informar a unidade curricular/curso quando isso ajudar a reaproveitar o material depois.');
+  return tasks;
 }
 function reviewTagToTask(tag){
   const clean=String(tag||'').trim();
