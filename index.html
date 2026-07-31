@@ -3484,19 +3484,30 @@ function materialReviewReason(m){
 }
 function materialReviewReasons(m){
   const reasons=[];
-  if(m.statusMaterial==='substituir') reasons.push('Foi marcado como material que precisa ser substituído.');
-  if(m.statusMaterial==='revisar') reasons.push('Foi marcado manualmente como material que precisa ser revisado.');
+  if(m.statusMaterial==='substituir') reasons.push('Substituir este material por uma versão mais adequada ou atualizada.');
+  if(m.statusMaterial==='revisar') reasons.push('Revisar este material antes de considerar pronto para uso.');
   if(isMaterialStale(m)){
     const days=daysSinceDate(m.updatedAt || m.createdAt);
-    reasons.push(`Está há ${days} dias sem atualização. O prazo atual configurado é de ${reviewStaleDays()} dias.`);
+    reasons.push(`Conferir se o conteúdo ainda está atualizado. Ele está há ${days} dias sem alteração; o prazo configurado é ${reviewStaleDays()} dias.`);
   }
   materialQualityIssues(m).forEach(issue=>{
-    if(issue==='sem descrição') reasons.push('Está sem descrição do conteúdo ou orientação de uso.');
-    if(issue==='sem tema') reasons.push('Está sem tema definido dentro da disciplina/área.');
+    if(issue==='sem descrição') reasons.push('Preencher uma descrição curta dizendo o que é o material e quando usar.');
+    if(issue==='sem tema') reasons.push('Escolher um tema para este material dentro da disciplina/área.');
   });
   const tags=materialReviewTags(m);
-  if(tags.length) reasons.push(`Etiqueta(s) de revisão: ${tags.join(', ')}.`);
+  tags.forEach(tag=>reasons.push(reviewTagToTask(tag)));
   return reasons;
+}
+function reviewTagToTask(tag){
+  const clean=String(tag||'').trim();
+  const key=normalizar(clean);
+  if(key.includes('gabarito')) return 'Anexar, conferir ou finalizar o gabarito deste material.';
+  if(key.includes('link')) return 'Abrir e conferir se todos os links funcionam corretamente.';
+  if(key.includes('adaptar') || key.includes('ead')) return 'Adaptar o material para o uso previsto, como presencial, EaD ou outra turma.';
+  if(key.includes('cadastro')) return 'Completar o cadastro: título, tipo, tema, descrição e links.';
+  if(key.includes('substituir')) return 'Substituir por uma versão melhor ou mais atual.';
+  if(key.includes('revisar')) return 'Revisar o conteúdo e confirmar se está pronto para uso.';
+  return clean ? `Resolver pendência: ${clean}.` : 'Resolver pendência de revisão.';
 }
 function materialReviewExplanationHtml(m){
   if(!needsMaterialReview(m)) return '';
