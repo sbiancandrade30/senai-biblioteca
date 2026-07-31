@@ -3766,8 +3766,7 @@ function toggleMaterialSelection(event,id){
   if(event.currentTarget?.checked || event.target.checked) selectedMaterialIds.add(id);
   else selectedMaterialIds.delete(id);
   if(selectedMaterialIds.size) setBulkSelectionMode(true);
-  renderBulkActionBar();
-  syncSelectionClasses();
+  syncSelectedIdsFromChecks();
 }
 function syncSelectionClasses(){
   document.querySelectorAll('.admin-card').forEach(card=>{
@@ -3776,6 +3775,46 @@ function syncSelectionClasses(){
     const chk=card.querySelector('.bulk-check');
     if(chk) chk.checked=selectedMaterialIds.has(id);
   });
+}
+function planCardsIn(scope){
+  const root=scope || document.getElementById('planContent') || document;
+  return [...root.querySelectorAll('.admin-card[data-material-id]')].filter(card=>card.querySelector('.bulk-check'));
+}
+function setBulkCardState(card, selected){
+  const id=card.dataset.materialId || card.getAttribute('data-material-id');
+  if(!id) return;
+  const checked=!!selected;
+  card.classList.toggle('selected', checked);
+  const chk=card.querySelector('.bulk-check');
+  if(chk) chk.checked=checked;
+  if(checked) selectedMaterialIds.add(id);
+  else selectedMaterialIds.delete(id);
+}
+function toggleBulkCards(cards){
+  const usable=cards.filter(card=>card && (card.dataset.materialId || card.getAttribute('data-material-id')));
+  if(!usable.length){
+    showToast('Nenhum material encontrado para selecionar.', true);
+    return;
+  }
+  setBulkSelectionMode(true);
+  const shouldDeselect=usable.every(card=>{
+    const id=card.dataset.materialId || card.getAttribute('data-material-id');
+    const chk=card.querySelector('.bulk-check');
+    return selectedMaterialIds.has(id) || !!chk?.checked || card.classList.contains('selected');
+  });
+  usable.forEach(card=>setBulkCardState(card,!shouldDeselect));
+  renderBulkActionBar();
+  showToast(shouldDeselect?'Seleção removida.':`${usable.length} material${usable.length!==1?'is':''} selecionado${usable.length!==1?'s':''}.`);
+}
+function syncSelectedIdsFromChecks(){
+  selectedMaterialIds.clear();
+  document.querySelectorAll('#planContent .admin-card[data-material-id]').forEach(card=>{
+    const id=card.dataset.materialId || card.getAttribute('data-material-id');
+    const checked=!!card.querySelector('.bulk-check')?.checked;
+    card.classList.toggle('selected', checked);
+    if(id && checked) selectedMaterialIds.add(id);
+  });
+  renderBulkActionBar();
 }
 function captureBulkCardClick(event){
   if(!bulkSelectionMode) return;
@@ -3844,12 +3883,11 @@ function selectDiscMaterials(discId){
   );
 }
 function bulkSelectAll(){
-  selectVisibleMaterials();
+  toggleBulkCards(planCardsIn(document.getElementById('planContent')));
   return false;
 }
 function bulkSelectSection(btn){
-  const discId=btn?.dataset?.discId || btn?.closest('.theme-section')?.dataset?.discId || '';
-  selectDiscMaterials(discId);
+  toggleBulkCards(planCardsIn(btn?.closest('.theme-section')));
   return false;
 }
 function captureBulkSelectionButtons(event){
@@ -3882,6 +3920,7 @@ function refreshMaterialViews(){
   if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
 }
 function archiveSelectedMaterials(){
+  syncSelectedIdsFromChecks();
   const ids=[...selectedMaterialIds].filter(id=>D.materiais.some(m=>m.id===id));
   if(!ids.length) return;
   if(!confirm(`Arquivar ${ids.length} material${ids.length!==1?'is':''} selecionado${ids.length!==1?'s':''}?`)) return;
@@ -3899,6 +3938,7 @@ function archiveSelectedMaterials(){
   showToast(`${ids.length} material${ids.length!==1?'is':''} arquivado${ids.length!==1?'s':''}.`);
 }
 function deleteSelectedMaterials(){
+  syncSelectedIdsFromChecks();
   const ids=[...selectedMaterialIds].filter(id=>D.materiais.some(m=>m.id===id));
   if(!ids.length) return;
   if(!confirm(`Excluir definitivamente ${ids.length} material${ids.length!==1?'is':''} selecionado${ids.length!==1?'s':''}?\n\nEsta ação não pode ser desfeita.`)) return;
