@@ -3767,10 +3767,15 @@ function setBulkSelectionMode(active){
 function toggleBulkSelectionMode(){ setBulkSelectionMode(!bulkSelectionMode); }
 function toggleMaterialSelection(event,id){
   event.stopPropagation();
-  if(event.currentTarget?.checked || event.target.checked) selectedMaterialIds.add(id);
-  else selectedMaterialIds.delete(id);
-  if(selectedMaterialIds.size) setBulkSelectionMode(true);
-  syncSelectedIdsFromChecks();
+  const input=event.currentTarget || event.target;
+  const card=input?.closest ? input.closest('.admin-card[data-material-id]') : null;
+  const materialId=id || card?.dataset.materialId || card?.getAttribute('data-material-id');
+  const checked=!!input?.checked;
+  if(materialId && checked) selectedMaterialIds.add(materialId);
+  if(materialId && !checked) selectedMaterialIds.delete(materialId);
+  if(!bulkSelectionMode) setBulkSelectionMode(true);
+  if(card) setBulkCardState(card, checked);
+  renderBulkActionBar();
 }
 function syncSelectionClasses(){
   document.querySelectorAll('.admin-card').forEach(card=>{
