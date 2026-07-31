@@ -847,7 +847,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       </div>
       <div class="inner-actions">
         <button class="btn btn-outline" id="bulkModeBtn" onclick="toggleBulkSelectionMode()">Selecionar materiais</button>
-        <button class="btn btn-outline bulk-head-actions" onclick="return bulkSelectAll()">Selecionar tudo</button>
+        <button class="btn btn-outline bulk-head-actions" id="bulkSelectAllBtn" type="button">Selecionar tudo</button>
         <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rápido</button>
         <button class="btn btn-primary" onclick="openModal()">+ Novo material</button>
       </div>
@@ -3777,6 +3777,22 @@ function syncSelectionClasses(){
     if(chk) chk.checked=selectedMaterialIds.has(id);
   });
 }
+function captureBulkCardClick(event){
+  if(!bulkSelectionMode) return;
+  const card=event.target.closest ? event.target.closest('#planContent .admin-card[data-material-id]') : null;
+  if(!card) return;
+  if(event.target.closest('button,a,input,label,select,textarea')) return;
+  const id=card.dataset.materialId || card.getAttribute('data-material-id');
+  if(!id) return;
+  event.preventDefault();
+  event.stopPropagation();
+  if(typeof event.stopImmediatePropagation==='function') event.stopImmediatePropagation();
+  if(selectedMaterialIds.has(id)) selectedMaterialIds.delete(id);
+  else selectedMaterialIds.add(id);
+  renderBulkActionBar();
+  syncSelectionClasses();
+}
+document.addEventListener('click',captureBulkCardClick,true);
 function renderBulkActionBar(){
   const bar=document.getElementById('bulkActionBar');
   const count=document.getElementById('bulkCount');
@@ -3832,16 +3848,29 @@ function bulkSelectAll(){
   return false;
 }
 function bulkSelectSection(btn){
-  const section=btn.closest('.theme-section');
-  selectDiscMaterials(section?.dataset?.discId || '');
+  const discId=btn?.dataset?.discId || btn?.closest('.theme-section')?.dataset?.discId || '';
+  selectDiscMaterials(discId);
   return false;
 }
+function captureBulkSelectionButtons(event){
+  const target=event.target;
+  const allBtn=target.closest ? target.closest('#bulkSelectAllBtn') : null;
+  const discBtn=target.closest ? target.closest('.bulk-disc-btn') : null;
+  if(!allBtn && !discBtn) return;
+  event.preventDefault();
+  event.stopPropagation();
+  if(typeof event.stopImmediatePropagation==='function') event.stopImmediatePropagation();
+  if(allBtn) bulkSelectAll();
+  if(discBtn) bulkSelectSection(discBtn);
+}
+document.addEventListener('click',captureBulkSelectionButtons,true);
 Object.assign(window,{
   toggleBulkSelectionMode,
   toggleMaterialSelection,
   clearMaterialSelection,
   bulkSelectAll,
   bulkSelectSection,
+  captureBulkSelectionButtons,
   selectVisibleMaterials,
   selectDiscMaterials,
   selectDiscMaterialsFromButton
@@ -4045,7 +4074,7 @@ function planSectionHtml(discId,mats){
         <div class="theme-meta">${materialCountLabel(mats.length)}${review?` - ${review} a revisar`:''}</div>
       </div>
       <div class="bulk-head-actions" onclick="event.stopPropagation()">
-        <button class="a-btn" type="button" onclick="return bulkSelectSection(this)">Selecionar disciplina</button>
+        <button class="a-btn bulk-disc-btn" type="button" data-disc-id="${escH(discId)}">Selecionar disciplina</button>
       </div>
     </div>
     <div class="theme-body">${body}</div>
