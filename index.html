@@ -105,6 +105,15 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 .mat-source-badge{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);white-space:nowrap}
 .mat-open-btn{font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(45,91,227,.2);border-radius:var(--radius);padding:4px 10px;display:inline-flex;align-items:center;gap:4px;text-decoration:none;transition:all .15s;white-space:nowrap}
 .mat-open-btn:hover{background:var(--accent);color:#fff}
+.prof-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;align-items:start}
+.prof-card-grid .mat-card{min-height:0;height:auto;padding:9px 10px;border-radius:12px;gap:5px}
+.prof-card-grid .mat-card-top{align-items:flex-start;gap:8px}
+.prof-card-grid .mat-card-top>div:last-child{min-width:0;flex:1}
+.prof-card-grid .mat-icon{width:30px;height:30px;border-radius:8px;font-size:15px}
+.prof-card-grid .mat-title{font-size:12.5px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.prof-card-grid .mat-context-path{font-size:10.5px;font-weight:800;color:#26395d;line-height:1.25;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.prof-card-grid .mat-badges{gap:4px;margin-top:5px;justify-content:flex-start}
+.prof-card-grid .mat-tipo-badge,.prof-card-grid .mat-source-badge{font-size:9px;padding:2px 6px;line-height:1.25}
 
 /* ── CARDS ADMIN ───────────────────────── */
 .admin-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;transition:all .15s;margin-bottom:8px;box-shadow:0 1px 0 rgba(21,24,33,.02)}
@@ -3175,7 +3184,7 @@ function discCardHtml(d, professor=false){
 }
 function renderProfessorSearchResults(mats){
   if(!mats.length) return `<div class="empty"><h3>Nenhum material encontrado.</h3><p>Tente outro termo.</p></div>`;
-  return `<div class="mat-grid">${mats.map(m=>profCardHtml(m,true)).join('')}</div>`;
+  return `<div class="prof-card-grid">${mats.map(m=>profCardHtml(m,true)).join('')}</div>`;
 }
 function abrirProfessorDisc(discId){
   currentProfessorDiscId=discId;
@@ -3221,7 +3230,7 @@ function renderProfessorGrouped(list, discId){
       if(!items.length) return '';
       return `<div class="material-group">
         <div class="material-group-title"><div class="tipo-dot" style="background:${tipoCor(tipo.id)}"></div>${escH(tipo.nome)}</div>
-        <div class="mat-grid">${items.map(m=>profCardHtml(m)).join('')}</div>
+        <div class="prof-card-grid">${items.map(m=>profCardHtml(m)).join('')}</div>
       </div>`;
     }).join('');
     const collapsed=isThemeCollapsedProfessor(theme.id||'');
@@ -5822,11 +5831,15 @@ ${fonts}
 <style>
 /* Ajustes específicos da versão gerada para professor */
 .search-results-title{font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 14px}
-.prof-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:8px;align-items:start}
-.prof-card-grid .mat-card{min-height:0;height:auto;padding:10px 12px}
+.prof-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;align-items:start}
+.prof-card-grid .mat-card{min-height:0;height:auto;padding:9px 10px;border-radius:12px;gap:5px}
+.prof-card-grid .mat-card-top{align-items:flex-start;gap:8px}
 .prof-card-grid .mat-card-top>div:last-child{min-width:0;flex:1}
-.prof-card-grid .mat-context-path{font-size:10.5px;font-weight:700;color:var(--text2);line-height:1.25}
-.prof-card-grid .mat-badges{gap:5px;margin-top:5px;justify-content:flex-start}
+.prof-card-grid .mat-icon{width:30px;height:30px;border-radius:8px;font-size:15px}
+.prof-card-grid .mat-title{font-size:12.5px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.prof-card-grid .mat-context-path{font-size:10.5px;font-weight:800;color:#26395d;line-height:1.25;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.prof-card-grid .mat-badges{gap:4px;margin-top:5px;justify-content:flex-start}
+.prof-card-grid .mat-tipo-badge,.prof-card-grid .mat-source-badge{font-size:9px;padding:2px 6px;line-height:1.25}
 .theme-toggle{width:100%;background:var(--surface2);border:none;border-bottom:1px solid var(--border);padding:13px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;color:var(--text);font-family:'DM Sans',sans-serif;transition:background .12s}
 .theme-toggle:hover{background:#ece9df}
 .theme-caret{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text2);font-size:14px;transition:transform .15s;flex-shrink:0}
@@ -5863,7 +5876,7 @@ ${fonts}
       <input class="login-input" type="password" id="loginInput" placeholder="Digite a senha..." onkeydown="if(event.key==='Enter')doLoginProfessor()">
       <button class="login-btn" type="button" onclick="doLoginProfessor()">Entrar</button>
       <div class="professor-version-note">
-        A biblioteca é aberta somente após validar a senha de acesso.<br>Versão professor: 2026-07-30-4
+        A biblioteca é aberta somente após validar a senha de acesso.<br>Versão professor: 2026-07-31-1
       </div>
     </div>
   </div>
