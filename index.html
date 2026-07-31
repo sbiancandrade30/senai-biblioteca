@@ -3802,6 +3802,7 @@ function selectMaterialsByIds(ids, toggleKey=''){
   lastBulkToggleKey=shouldDeselect?'':toggleKey;
   renderBulkActionBar();
   syncSelectionClasses();
+  if(uniqueIds.length) showToast(shouldDeselect?'Seleção removida.':`${uniqueIds.length} material${uniqueIds.length!==1?'is':''} selecionado${uniqueIds.length!==1?'s':''}.`);
 }
 function selectMaterialsByList(list, toggleKey=''){
   selectMaterialsByIds(list.filter(m=>m && m.id).map(m=>m.id), toggleKey);
@@ -3813,21 +3814,18 @@ function visiblePlanMaterialIds(root){
     .filter(Boolean);
 }
 function selectVisibleMaterials(){
-  const ids=visiblePlanMaterialIds();
-  selectMaterialsByIds(ids.length?ids:planFilteredMaterials().map(m=>m.id),'all-visible');
+  selectMaterialsByIds(planFilteredMaterials().map(m=>m.id),'all-visible');
 }
 function selectDiscMaterialsFromButton(btn){
   const section=btn.closest('.theme-section');
-  const ids=visiblePlanMaterialIds(section||document);
-  if(ids.length){
-    selectMaterialsByIds(ids,'disc-visible');
-    return;
-  }
-  const discId=section?.dataset?.discId;
-  selectDiscMaterials(discId||'');
+  selectDiscMaterials(section?.dataset?.discId || '');
 }
 function selectDiscMaterials(discId){
-  selectMaterialsByList(planFilteredMaterials().filter(m=>(m.disciplinaId||GERAL_ID)===discId),'disc:'+discId);
+  const normalizedDiscId=discId || GERAL_ID;
+  selectMaterialsByIds(
+    planFilteredMaterials().filter(m=>(m.disciplinaId||GERAL_ID)===normalizedDiscId).map(m=>m.id),
+    'disc:'+normalizedDiscId
+  );
 }
 function bulkSelectAll(event){
   if(event){
@@ -3841,7 +3839,8 @@ function bulkSelectSection(btn,event){
     event.preventDefault();
     event.stopPropagation();
   }
-  selectDiscMaterialsFromButton(btn);
+  const section=btn.closest('.theme-section');
+  selectDiscMaterials(section?.dataset?.discId || '');
 }
 Object.assign(window,{
   toggleBulkSelectionMode,
@@ -3938,6 +3937,9 @@ function clearPlanFilters(){
   planQuickFilter='';
   const ids=['planSearch','planCourse','planDisc','planTipo','planStatus'];
   ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  selectedMaterialIds.clear();
+  lastBulkToggleKey='';
+  setBulkSelectionMode(false);
   renderPlanTab();
 }
 function renderPlanFilterStatus(total){
