@@ -847,7 +847,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       </div>
       <div class="inner-actions">
         <button class="btn btn-outline" id="bulkModeBtn" onclick="toggleBulkSelectionMode()">Selecionar materiais</button>
-        <button class="btn btn-outline bulk-head-actions" data-bulk-action="all">Selecionar tudo</button>
+        <button class="btn btn-outline bulk-head-actions" onclick="bulkSelectAll(event)">Selecionar tudo</button>
         <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rápido</button>
         <button class="btn btn-primary" onclick="openModal()">+ Novo material</button>
       </div>
@@ -3829,21 +3829,26 @@ function selectDiscMaterialsFromButton(btn){
 function selectDiscMaterials(discId){
   selectMaterialsByList(planFilteredMaterials().filter(m=>(m.disciplinaId||GERAL_ID)===discId),'disc:'+discId);
 }
-function handleBulkSelectionClick(event){
-  const btn=event.target.closest('[data-bulk-action]');
-  if(!btn) return;
-  const action=btn.dataset.bulkAction;
-  if(action!=='all' && action!=='disc') return;
-  event.preventDefault();
-  event.stopPropagation();
-  if(action==='all') selectVisibleMaterials();
-  if(action==='disc') selectDiscMaterialsFromButton(btn);
+function bulkSelectAll(event){
+  if(event){
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  selectVisibleMaterials();
 }
-document.addEventListener('click',handleBulkSelectionClick);
+function bulkSelectSection(btn,event){
+  if(event){
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  selectDiscMaterialsFromButton(btn);
+}
 Object.assign(window,{
   toggleBulkSelectionMode,
   toggleMaterialSelection,
   clearMaterialSelection,
+  bulkSelectAll,
+  bulkSelectSection,
   selectVisibleMaterials,
   selectDiscMaterials,
   selectDiscMaterialsFromButton
@@ -4044,7 +4049,7 @@ function planSectionHtml(discId,mats){
         <div class="theme-meta">${materialCountLabel(mats.length)}${review?` - ${review} a revisar`:''}</div>
       </div>
       <div class="bulk-head-actions" onclick="event.stopPropagation()">
-        <button class="a-btn" type="button" data-bulk-action="disc">Selecionar disciplina</button>
+        <button class="a-btn" type="button" onclick="bulkSelectSection(this,event)">Selecionar disciplina</button>
       </div>
     </div>
     <div class="theme-body">${body}</div>
