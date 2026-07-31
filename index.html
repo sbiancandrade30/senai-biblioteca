@@ -847,7 +847,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       </div>
       <div class="inner-actions">
         <button class="btn btn-outline" id="bulkModeBtn" onclick="toggleBulkSelectionMode()">Selecionar materiais</button>
-        <button class="btn btn-outline bulk-head-actions" onclick="bulkSelectAll(event)">Selecionar tudo</button>
+        <button class="btn btn-outline bulk-head-actions" onclick="return bulkSelectAll()">Selecionar tudo</button>
         <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rápido</button>
         <button class="btn btn-primary" onclick="openModal()">+ Novo material</button>
       </div>
@@ -3827,20 +3827,14 @@ function selectDiscMaterials(discId){
     'disc:'+normalizedDiscId
   );
 }
-function bulkSelectAll(event){
-  if(event){
-    event.preventDefault();
-    event.stopPropagation();
-  }
+function bulkSelectAll(){
   selectVisibleMaterials();
+  return false;
 }
-function bulkSelectSection(btn,event){
-  if(event){
-    event.preventDefault();
-    event.stopPropagation();
-  }
+function bulkSelectSection(btn){
   const section=btn.closest('.theme-section');
   selectDiscMaterials(section?.dataset?.discId || '');
+  return false;
 }
 Object.assign(window,{
   toggleBulkSelectionMode,
@@ -4051,7 +4045,7 @@ function planSectionHtml(discId,mats){
         <div class="theme-meta">${materialCountLabel(mats.length)}${review?` - ${review} a revisar`:''}</div>
       </div>
       <div class="bulk-head-actions" onclick="event.stopPropagation()">
-        <button class="a-btn" type="button" onclick="bulkSelectSection(this,event)">Selecionar disciplina</button>
+        <button class="a-btn" type="button" onclick="return bulkSelectSection(this)">Selecionar disciplina</button>
       </div>
     </div>
     <div class="theme-body">${body}</div>
