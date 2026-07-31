@@ -1205,6 +1205,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
             <label class="form-label">Etiquetas de revisão</label>
             <div class="check-grid" id="mReviewTagsList"></div>
           </div>
+          <div class="form-group">
+            <label class="form-label">Checklist manual de revisão</label>
+            <textarea class="form-input" id="mReviewChecklist" placeholder="Um item por linha. Ex: Conferir link&#10;Atualizar descrição&#10;Adaptar para EaD"></textarea>
+            <div style="font-size:11px;color:var(--text3);margin-top:6px">Use quando quiser criar uma checklist específica para este material.</div>
+          </div>
         </div>
       </details>
       <div style="display:none">
@@ -2721,6 +2726,7 @@ function searchable(m, includeInternal=false){
     labelTipo(m.tipoId),
     origemMaterial(m),
     origensMaterial(m).join(' '),
+    Array.isArray(m.reviewChecklist)?m.reviewChecklist.join(' '):'',
     pedagogicalSearchText(m),
     materialQualityIssues(m).join(' '),
     isArchived(m)?'arquivado inativo':'',
@@ -3503,7 +3509,9 @@ function materialReviewExplanationHtml(m){
   </div></div>`;
 }
 function materialReviewExplanationHtml(m){
-  const reasons=materialReviewReasons(m);
+  const manual=Array.isArray(m?.reviewChecklist)?m.reviewChecklist.map(v=>String(v||'').trim()).filter(Boolean):[];
+  const automatic=needsMaterialReview(m)?materialReviewReasons(m):[];
+  const reasons=[...manual,...automatic];
   if(!reasons.length) return '';
   const professorMode=sessionStorage.getItem('mat_mode')==='professor';
   const checks=reasons.map(r=>`<label class="review-checkitem">
@@ -3761,6 +3769,7 @@ function markMaterialReady(id){
   const m=D.materiais.find(x=>x.id===id); if(!m) return;
   m.statusMaterial='pronto';
   m.reviewTags=[];
+  m.reviewChecklist=[];
   m.updatedAt=isoNow();
   salvar();
   renderReviewTab();
@@ -4487,6 +4496,7 @@ function openModal(id=null, preferredDiscId=null){
   document.getElementById('mModalidadeMaterial').value=m?.modalidadeMaterial||'';
   document.getElementById('mStatusMaterial').value=m?.statusMaterial||'';
   document.getElementById('mReadiness').value=m?.readiness||'';
+  document.getElementById('mReviewChecklist').value=Array.isArray(m?.reviewChecklist)?m.reviewChecklist.join('\n'):'';
   const chk=m?.checklist||{};
   document.getElementById('mChkObjetivo').checked=!!chk.objetivo;
   document.getElementById('mChkAtividade').checked=!!chk.atividade;
@@ -4499,7 +4509,7 @@ function openModal(id=null, preferredDiscId=null){
   document.getElementById('mUpdatedAtInfo').value=formatDateTime(m?.updatedAt)||'Será definido ao salvar';
   const quick=document.getElementById('quickDetailsBox');
   if(quick){
-    quick.open=Boolean(m && (m.cursoTurma || m.unidadeCurricular || m.internalNotes || m.fixado || m.hiddenProfessor || materialReviewTags(m).length));
+    quick.open=Boolean(m && (m.cursoTurma || m.unidadeCurricular || m.internalNotes || m.fixado || m.hiddenProfessor || materialReviewTags(m).length || (Array.isArray(m.reviewChecklist) && m.reviewChecklist.length)));
   }
   const linksWrap=document.getElementById('mLinksList');
   linksWrap.innerHTML='';
@@ -4593,6 +4603,10 @@ function salvarMaterial(options={}){
   const statusMaterial=document.getElementById('mStatusMaterial').value;
   const readiness=document.getElementById('mReadiness').value;
   let reviewTags=collectMaterialReviewTags();
+  const reviewChecklist=String(document.getElementById('mReviewChecklist')?.value||'')
+    .split(/\r?\n/)
+    .map(v=>v.trim())
+    .filter(Boolean);
   const checklist={
     objetivo:document.getElementById('mChkObjetivo').checked,
     atividade:document.getElementById('mChkAtividade').checked,
@@ -4624,7 +4638,7 @@ function salvarMaterial(options={}){
   const now=isoNow();
   const createdAt=existing?.createdAt || now;
   const updatedAt=now;
-  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,internalNotes,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,readiness,reviewTags,checklist,ordem,fixado,hiddenProfessor,archived:!!existing?.archived,archivedAt:existing?.archivedAt||''};
+  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,internalNotes,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,readiness,reviewTags,reviewChecklist,checklist,ordem,fixado,hiddenProfessor,archived:!!existing?.archived,archivedAt:existing?.archivedAt||''};
   const wasEditing=Boolean(editingMaterialId);
   if(editingMaterialId){
     const idx=D.materiais.findIndex(x=>x.id===editingMaterialId);
