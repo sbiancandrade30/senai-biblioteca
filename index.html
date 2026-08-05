@@ -797,8 +797,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 <!-- CORPO ADMIN -->
 <div class="app-body" id="viewAdmin" style="display:none">
   <div class="tabs">
-    <button class="tab-btn active" onclick="setTab('materiais',this)"><span class="tab-full">Materiais</span><span class="tab-short">Materiais</span></button>
-    <button class="tab-btn" onclick="setTab('planejamento',this)"><span class="tab-full">Acervo</span><span class="tab-short">Acervo</span></button>
+    <button class="tab-btn active" data-tab="materiais" onclick="setTab('materiais',this)"><span class="tab-full">Materiais</span><span class="tab-short">Materiais</span></button>
+    <button class="tab-btn" data-tab="planejamento" onclick="setTab('planejamento',this)"><span class="tab-full">Acervo</span><span class="tab-short">Acervo</span></button>
     <button class="tab-btn" onclick="setTab('revisao',this)"><span class="tab-full">Revisão</span><span class="tab-short">Revisão</span></button>
     <button class="tab-btn" onclick="setTab('configuracoes',this)"><span class="tab-full">Configurações</span><span class="tab-short">Config.</span></button>
   </div>
@@ -2534,7 +2534,10 @@ function moverMaterialPara(id,discId,temaId=''){
   if(m.disciplinaId===nextDisc && (m.temaId||'')===nextTema) return showToast('O material já está neste agrupamento.');
   materialDragUndo={id,disciplinaId:m.disciplinaId,temaId:m.temaId||''};
   m.disciplinaId=nextDisc; m.temaId=nextTema; m.updatedAt=new Date().toISOString();
-  salvar(); renderAdminHome();
+  salvar();
+  if(currentAdminDiscId){ renderAdminDisc(); }
+  else if(document.getElementById('tabPlanejamento')?.style.display !== 'none'){ renderPlanTab(); }
+  else { renderAdminHome(); }
   showToastWithAction('Material reorganizado.', 'Desfazer', desfazerMoverMaterial);
 }
 function desfazerMoverMaterial(){
@@ -2903,8 +2906,9 @@ function abrirApp(){
   document.getElementById('viewAdmin').style.display='';
   document.getElementById('viewProfessor').style.display='none';
 
-  renderAdminHome();
-  if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
+  const savedTab=sessionStorage.getItem('mat_admin_tab')||'materiais';
+  const savedBtn=document.querySelector(`.tab-btn[data-tab="${savedTab}"]`) || document.querySelector('.tab-btn');
+  setTab(savedTab,savedBtn);
   renderConfigTab();
   renderBulkActionBar();
   startCloudAutoSync();
@@ -3111,6 +3115,7 @@ function goHome(){
   window.scrollTo({top:0, behavior:'smooth'});
 }
 function setTab(tab, btn){
+  sessionStorage.setItem('mat_admin_tab',tab);
   closeHeaderActions();
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
