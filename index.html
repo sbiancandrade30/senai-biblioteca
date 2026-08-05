@@ -4830,9 +4830,10 @@ function moverMaterial(id,dir){
 // ════════════════════════════════════════════════════════
 let editingThemeId=null;
 function openThemeModal(id=null){
-  if(!currentAdminDiscId) return showToast('Abra uma disciplina para criar temas.',true);
   editingThemeId=id||null;
   const t=id?D.temas.find(x=>x.id===id):null;
+  if(t) currentAdminDiscId=t.disciplinaId;
+  if(!currentAdminDiscId) return showToast('Abra uma disciplina para criar temas.',true);
   document.getElementById('themeModalTitle').textContent=t?'Editar tema':'Novo tema';
   document.getElementById('temaNome').value=t?.nome||'';
   document.getElementById('themeModalOverlay').classList.add('open');
@@ -4850,14 +4851,20 @@ function salvarTema(){
     const max=Math.max(0,...temasDaDisc(currentAdminDiscId).map(t=>Number(t.ordem)||0));
     D.temas.push({id:uid('tema'),disciplinaId:currentAdminDiscId,nome,ordem:max+1});
   }
-  salvar(); closeThemeModal(); renderAdminDiscSelectors(); renderAdminDisc(); showToast(editingThemeId?'Tema atualizado!':'Tema criado!');
+  const wasPlan=document.getElementById('tabPlanejamento')?.style.display !== 'none';
+  salvar(); closeThemeModal();
+  if(wasPlan) renderPlanTab(); else { renderAdminDiscSelectors(); renderAdminDisc(); renderAdminHome(); }
+  showToast(editingThemeId?'Tema atualizado!':'Tema criado!');
 }
 function excluirTema(id){
   const t=D.temas.find(x=>x.id===id); if(!t) return;
   const used=D.materiais.filter(m=>m.temaId===id).length;
   if(used){ showToast(`Não dá para excluir: há ${used} material${used!==1?'is':''} neste tema.`,true); return; }
   if(!confirm(`Excluir o tema "${t.nome}"?`)) return;
-  D.temas=D.temas.filter(x=>x.id!==id); salvar(); renderAdminDiscSelectors(); renderAdminDisc(); showToast('Tema excluído.');
+  const wasPlan=document.getElementById('tabPlanejamento')?.style.display !== 'none';
+  D.temas=D.temas.filter(x=>x.id!==id); salvar();
+  if(wasPlan) renderPlanTab(); else { renderAdminDiscSelectors(); renderAdminDisc(); renderAdminHome(); }
+  showToast('Tema excluído.');
 }
 
 // ════════════════════════════════════════════════════════
