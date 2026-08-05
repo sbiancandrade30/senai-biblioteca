@@ -4167,6 +4167,7 @@ function planFilterLabel(state=getPlanFilterState()){
 }
 function clearPlanFilters(){
   planQuickFilter='';
+  localStorage.removeItem('mat_library_view_state');
   const ids=['planSearch','planCourse','planDisc','planTipo','planStatus'];
   ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   selectedMaterialIds.clear();
@@ -4190,9 +4191,9 @@ function renderPlanSelectors(){
   const discSel=document.getElementById('planDisc');
   const tipoSel=document.getElementById('planTipo');
   const saved=restoreLibraryViewState();
-  const oldCourse=courseSel.value||saved.course||'';
-  const oldDisc=discSel.value||saved.discId||'';
-  const oldTipo=tipoSel?.value||saved.tipoId||'';
+  const oldCourse=courseSel.value || (courseSel.dataset.restored==='1'?'':saved.course||'');
+  const oldDisc=discSel.value || (discSel.dataset.restored==='1'?'':saved.discId||'');
+  const oldTipo=tipoSel?.value || (tipoSel?.dataset.restored==='1'?'':saved.tipoId||'');
   const base=activeMaterials();
   courseSel.innerHTML='<option value="">Todos os usos</option>'+cursosOrdenados().map(c=>`<option value="${escH(c)}">${escH(c)}</option>`).join('');
   discSel.innerHTML='<option value="">Todas as disciplinas</option>'+[getDisc(GERAL_ID),...discsOrdenadas()].map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`).join('');
@@ -4200,6 +4201,7 @@ function renderPlanSelectors(){
   if(oldCourse) courseSel.value=oldCourse;
   if(oldDisc) discSel.value=oldDisc;
   if(tipoSel && oldTipo) tipoSel.value=oldTipo;
+  courseSel.dataset.restored='1'; discSel.dataset.restored='1'; if(tipoSel) tipoSel.dataset.restored='1';
 }
 function planFilteredMaterials(){
   const {search,course,discId,tipoId,status}=getPlanFilterState();
