@@ -2532,6 +2532,16 @@ function materialDragStart(event,id){
   event.currentTarget.classList.add('dragging');
 }
 function materialDragEnd(event){ event.currentTarget.classList.remove('dragging'); document.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target')); if(materialDragScrollFrame){cancelAnimationFrame(materialDragScrollFrame);materialDragScrollFrame=0;} }
+function materialCardDragOver(event){ event.preventDefault(); event.stopPropagation(); event.currentTarget.classList.add('drop-target'); if(event.dataTransfer) event.dataTransfer.dropEffect='move'; }
+function materialCardDrop(event,targetId){ event.preventDefault(); event.stopPropagation(); event.currentTarget.classList.remove('drop-target'); const id=event.dataTransfer?.getData('text/plain'); if(id && id!==targetId) reordenarMaterialAntesDe(id,targetId); }
+function reordenarMaterialAntesDe(id,targetId){
+  const source=D.materiais.find(m=>m.id===id), target=D.materiais.find(m=>m.id===targetId);
+  if(!source||!target) return;
+  if(source.disciplinaId!==target.disciplinaId || (source.temaId||'')!==(target.temaId||'')) return moverMaterialPara(id,target.disciplinaId,target.temaId||'');
+  const group=D.materiais.filter(m=>m.disciplinaId===target.disciplinaId&&(m.temaId||'')===(target.temaId||'')).filter(m=>m.id!==id);
+  group.splice(Math.max(0,group.findIndex(m=>m.id===targetId)),0,source); group.forEach((m,i)=>m.ordemManual=i);
+  salvar(); if(currentAdminDiscId) renderAdminDisc(); else renderAdminHome(); showToast('Ordem dos materiais atualizada.');
+}
 function materialDragOver(event){
   event.preventDefault(); if(event.dataTransfer) event.dataTransfer.dropEffect='move'; event.currentTarget.classList.add('drop-target');
   const edge=90, y=event.clientY||0, h=window.innerHeight||0;
@@ -2547,6 +2557,8 @@ function materialDrop(event,discId,temaId=''){
   event.preventDefault(); event.stopPropagation();
   const id=event.dataTransfer.getData('text/plain');
   event.currentTarget.classList.remove('drop-target');
+  const target=event.target.closest?.('.admin-card[data-material-id]');
+  if(target && id){ reordenarMaterialAntesDe(id,target.dataset.materialId); return; }
   if(id) moverMaterialPara(id,discId,temaId);
 }
 function moverMaterialPara(id,discId,temaId=''){
@@ -4313,6 +4325,7 @@ function planSectionHtml(discId,mats){
       ? ['trabalho','prova','gabarito']
       : ['aula','atividade','outro','material de estudo'];
     const orderedItems=[...items].sort((a,b)=>{
+      if(Number.isFinite(a.ordemManual)||Number.isFinite(b.ordemManual)) return (a.ordemManual??999999)-(b.ordemManual??999999);
       const ai=typeOrder.indexOf(normalizar(labelTipo(a.tipoId)));
       const bi=typeOrder.indexOf(normalizar(labelTipo(b.tipoId)));
       const ar=ai<0?typeOrder.length:ai;
