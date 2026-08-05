@@ -1140,6 +1140,14 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       </div>
     </div>
 
+    <div class="cfg-section">
+      <div class="cfg-head">Limpeza da biblioteca</div>
+      <div class="cfg-body">
+        <p style="font-size:12px;color:var(--text2);line-height:1.6">Remove todos os materiais cadastrados, mantendo disciplinas, temas, tipos e configurações.</p>
+        <button class="btn btn-outline" style="color:var(--red);border-color:var(--red)" onclick="resetarTodosMateriais()">Excluir todos os materiais</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -4074,7 +4082,8 @@ Object.assign(window,{
   selectVisibleMaterials,
   selectDiscMaterials,
   selectDiscMaterialsFromButton,
-  deleteSelectedMaterials
+  deleteSelectedMaterials,
+  resetarTodosMateriais
 });
 function refreshMaterialViews(){
   renderAdminHome();
@@ -4110,6 +4119,17 @@ function deleteSelectedMaterials(){
   clearMaterialSelection();
   refreshMaterialViews();
   showToast(`${ids.length} material${ids.length!==1?'is':''} excluído${ids.length!==1?'s':''}.`);
+}
+function resetarTodosMateriais(){
+  const total=D.materiais.length;
+  if(!total){ showToast('Não há materiais para excluir.'); return; }
+  if(!confirm(`Excluir definitivamente os ${total} materiais da Biblioteca?\n\nDisciplinas, temas, tipos e configurações serão mantidos.`)) return;
+  if(!confirm('Confirma a exclusão definitiva de todos os materiais?')) return;
+  D.materiais=[];
+  salvar();
+  clearMaterialSelection();
+  refreshMaterialViews();
+  showToast('Todos os materiais foram excluídos.');
 }
 let planQuickFilter = '';
 function togglePlanMobileFilters(){
