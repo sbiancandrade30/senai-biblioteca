@@ -4138,6 +4138,16 @@ function getPlanFilterState(){
     quick:planQuickFilter
   };
 }
+function saveLibraryViewState(){
+  try{
+    const state=getPlanFilterState();
+    state.scrollY=window.scrollY||0;
+    localStorage.setItem('mat_library_view_state',JSON.stringify(state));
+  }catch(e){}
+}
+function restoreLibraryViewState(){
+  try{return JSON.parse(localStorage.getItem('mat_library_view_state')||'null')||{};}catch(e){return {};}
+}
 function isPlanFilterActive(state=getPlanFilterState()){
   return Boolean(state.search || state.course || state.discId || state.tipoId || state.status || state.quick);
 }
@@ -4179,9 +4189,10 @@ function renderPlanSelectors(){
   const courseSel=document.getElementById('planCourse');
   const discSel=document.getElementById('planDisc');
   const tipoSel=document.getElementById('planTipo');
-  const oldCourse=courseSel.value;
-  const oldDisc=discSel.value;
-  const oldTipo=tipoSel?.value||'';
+  const saved=restoreLibraryViewState();
+  const oldCourse=courseSel.value||saved.course||'';
+  const oldDisc=discSel.value||saved.discId||'';
+  const oldTipo=tipoSel?.value||saved.tipoId||'';
   const base=activeMaterials();
   courseSel.innerHTML='<option value="">Todos os usos</option>'+cursosOrdenados().map(c=>`<option value="${escH(c)}">${escH(c)}</option>`).join('');
   discSel.innerHTML='<option value="">Todas as disciplinas</option>'+[getDisc(GERAL_ID),...discsOrdenadas()].map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`).join('');
@@ -4204,6 +4215,12 @@ function planFilteredMaterials(){
   }),{search,tipoId,revisao:status,includeInternal:true});
 }
 function renderPlanTab(){
+  const saved=restoreLibraryViewState();
+  const searchEl=document.getElementById('planSearch');
+  if(searchEl && !searchEl.value && saved.search) searchEl.value=saved.search;
+  const statusEl=document.getElementById('planStatus');
+  if(statusEl && !statusEl.value && saved.status) statusEl.value=saved.status;
+  if(saved.quick) planQuickFilter=saved.quick;
   renderPlanSelectors();
   updatePlanQuickFilterButtons();
   document.body.classList.toggle('bulk-selection-mode', bulkSelectionMode);
@@ -6402,7 +6419,9 @@ function showToastWithAction(msg,label,action){
 carregar();
 applySharedCloudConfigFromUrl();
 applyBranding();
+window.addEventListener('beforeunload',saveLibraryViewState);
 checkLogin();
+setTimeout(()=>{const state=restoreLibraryViewState();if(state.scrollY) window.scrollTo(0,state.scrollY);},250);
 </script>
 </body>
 </html>
