@@ -870,6 +870,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       <div class="inner-actions">
         <button class="btn btn-outline" id="bulkModeBtn" onclick="toggleBulkSelectionMode()">Selecionar materiais</button>
         <button class="btn btn-outline bulk-head-actions" id="bulkSelectAllBtn" type="button">Selecionar tudo</button>
+        <button class="btn btn-outline bulk-head-actions" id="bulkDeleteHeadBtn" type="button" style="color:var(--red);border-color:var(--red)" onclick="deleteSelectedMaterials()">Excluir selecionados</button>
         <button class="btn btn-outline" onclick="openQuickMaterialModal()">+ Cadastro rápido</button>
         <button class="btn btn-primary" onclick="openModal()">+ Novo material</button>
       </div>
