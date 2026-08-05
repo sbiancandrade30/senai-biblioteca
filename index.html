@@ -2544,7 +2544,9 @@ function themeDrop(event,discId,targetThemeId){
   const moved=themes.find(t=>t.id===source.themeId); if(!moved) return;
   const rest=themes.filter(t=>t.id!==source.themeId); const idx=rest.findIndex(t=>t.id===targetThemeId);
   rest.splice(Math.max(0,idx),0,moved); rest.forEach((t,i)=>t.ordem=i);
-  salvar(); renderAdminDisc(); showToast('Ordem dos temas atualizada.');
+  salvar();
+  if(currentAdminDiscId) renderAdminDisc(); else renderAdminHome();
+  showToast('Ordem dos temas atualizada.');
 }
 function materialDragEnd(event){ event.currentTarget.classList.remove('dragging'); document.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target')); if(materialDragScrollFrame){cancelAnimationFrame(materialDragScrollFrame);materialDragScrollFrame=0;} }
 function materialCardDragOver(event){ event.preventDefault(); event.stopPropagation(); event.currentTarget.classList.add('drop-target'); if(event.dataTransfer) event.dataTransfer.dropEffect='move'; }
