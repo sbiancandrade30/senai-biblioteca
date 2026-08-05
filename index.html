@@ -2511,14 +2511,23 @@ function salvar(options={}) {
 }
 
 let materialDragUndo=null;
+let materialDragScrollFrame=0;
 function materialDragStart(event,id){
   const m=D.materiais.find(x=>x.id===id); if(!m) return;
   event.dataTransfer.effectAllowed='move';
   event.dataTransfer.setData('text/plain',id);
   event.currentTarget.classList.add('dragging');
 }
-function materialDragEnd(event){ event.currentTarget.classList.remove('dragging'); document.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target')); }
-function materialDragOver(event){ event.preventDefault(); if(event.dataTransfer) event.dataTransfer.dropEffect='move'; event.currentTarget.classList.add('drop-target'); }
+function materialDragEnd(event){ event.currentTarget.classList.remove('dragging'); document.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target')); if(materialDragScrollFrame){cancelAnimationFrame(materialDragScrollFrame);materialDragScrollFrame=0;} }
+function materialDragOver(event){
+  event.preventDefault(); if(event.dataTransfer) event.dataTransfer.dropEffect='move'; event.currentTarget.classList.add('drop-target');
+  const edge=90, y=event.clientY||0, h=window.innerHeight||0;
+  let delta=0; if(y<edge) delta=-Math.max(8,(edge-y)*.28); else if(y>h-edge) delta=Math.max(8,(y-(h-edge))*.28);
+  if(delta && !materialDragScrollFrame){
+    const scroll=()=>{ window.scrollBy(0,delta); materialDragScrollFrame=requestAnimationFrame(scroll); };
+    materialDragScrollFrame=requestAnimationFrame(scroll);
+  } else if(!delta && materialDragScrollFrame){ cancelAnimationFrame(materialDragScrollFrame); materialDragScrollFrame=0; }
+}
 function materialDragEnter(event){ event.preventDefault(); event.currentTarget.classList.add('drop-target'); }
 function materialDragLeave(event){ if(!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.classList.remove('drop-target'); }
 function materialDrop(event,discId,temaId=''){
