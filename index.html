@@ -4054,12 +4054,14 @@ function captureBulkSelectionButtons(event){
   const target=event.target;
   const allBtn=target.closest ? target.closest('#bulkSelectAllBtn') : null;
   const discBtn=target.closest ? target.closest('.bulk-disc-btn') : null;
-  if(!allBtn && !discBtn) return;
+  const deleteBtn=target.closest ? target.closest('#bulkDeleteHeadBtn') : null;
+  if(!allBtn && !discBtn && !deleteBtn) return;
   event.preventDefault();
   event.stopPropagation();
   if(typeof event.stopImmediatePropagation==='function') event.stopImmediatePropagation();
   if(allBtn) bulkSelectAll();
   if(discBtn) bulkSelectSection(discBtn);
+  if(deleteBtn) deleteSelectedMaterials();
 }
 document.addEventListener('click',captureBulkSelectionButtons,true);
 Object.assign(window,{
