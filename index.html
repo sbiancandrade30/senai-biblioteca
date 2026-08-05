@@ -3968,7 +3968,7 @@ function toggleBulkCards(cards){
 }
 function syncSelectedIdsFromChecks(){
   selectedMaterialIds.clear();
-  document.querySelectorAll('#planContent .admin-card[data-material-id]').forEach(card=>{
+  document.querySelectorAll('.admin-card[data-material-id]').forEach(card=>{
     const id=card.dataset.materialId || card.getAttribute('data-material-id');
     const checked=!!card.querySelector('.bulk-check')?.checked;
     card.classList.toggle('selected', checked);
