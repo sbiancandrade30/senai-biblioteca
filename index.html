@@ -4335,7 +4335,9 @@ function planSectionHtml(discId,mats){
     const aAssessment=/^avaliacoes\b/i.test(normalizar(labelTema(a[0])));
     const bAssessment=/^avaliacoes\b/i.test(normalizar(labelTema(b[0])));
     if(aAssessment!==bAssessment) return aAssessment?1:-1;
-    return labelTema(a[0]).localeCompare(labelTema(b[0]),'pt-BR');
+    const ao=temasDaDisc(discId).find(t=>t.id===a[0])?.ordem ?? 999999;
+    const bo=temasDaDisc(discId).find(t=>t.id===b[0])?.ordem ?? 999999;
+    return ao-bo || labelTema(a[0]).localeCompare(labelTema(b[0]),'pt-BR');
   }).map(([temaId,items])=>{
     const assessmentTheme=/^avaliacoes\b/i.test(normalizar(labelTema(temaId)));
     const typeOrder=assessmentTheme
