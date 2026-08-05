@@ -2531,6 +2531,21 @@ function materialDragStart(event,id){
   event.dataTransfer.setData('text/plain',id);
   event.currentTarget.classList.add('dragging');
 }
+function themeDragStart(event,discId,themeId){
+  event.stopPropagation(); event.dataTransfer.effectAllowed='move';
+  event.dataTransfer.setData('application/x-senai-theme',JSON.stringify({discId,themeId}));
+  event.currentTarget.classList.add('dragging');
+}
+function themeDrop(event,discId,targetThemeId){
+  event.preventDefault(); event.stopPropagation();
+  const raw=event.dataTransfer?.getData('application/x-senai-theme'); if(!raw){ materialDrop(event,discId,targetThemeId); return; }
+  const source=JSON.parse(raw); if(source.discId!==discId || source.themeId===targetThemeId) return;
+  const themes=D.temas.filter(t=>t.disciplinaId===discId);
+  const moved=themes.find(t=>t.id===source.themeId); if(!moved) return;
+  const rest=themes.filter(t=>t.id!==source.themeId); const idx=rest.findIndex(t=>t.id===targetThemeId);
+  rest.splice(Math.max(0,idx),0,moved); rest.forEach((t,i)=>t.ordem=i);
+  salvar(); renderAdminDisc(); showToast('Ordem dos temas atualizada.');
+}
 function materialDragEnd(event){ event.currentTarget.classList.remove('dragging'); document.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target')); if(materialDragScrollFrame){cancelAnimationFrame(materialDragScrollFrame);materialDragScrollFrame=0;} }
 function materialCardDragOver(event){ event.preventDefault(); event.stopPropagation(); event.currentTarget.classList.add('drop-target'); if(event.dataTransfer) event.dataTransfer.dropEffect='move'; }
 function materialCardDrop(event,targetId){ event.preventDefault(); event.stopPropagation(); event.currentTarget.classList.remove('drop-target'); const id=event.dataTransfer?.getData('text/plain'); if(id && id!==targetId) reordenarMaterialAntesDe(id,targetId); }
@@ -3538,7 +3553,7 @@ function renderAdminGrouped(list,discId){
       <button class="a-btn danger" onclick="excluirTema('${escJsStr(theme.id)}')">Excluir tema</button>
     </div>` : '';
     const collapsed=isThemeCollapsedAdmin(theme.id||'');
-    return `<section class="theme-section${collapsed?' collapsed':''}" data-drop-disc-id="${escH(discId)}" data-drop-tema-id="${escH(theme.id||'')}" ondragover="materialDragOver(event)" ondragleave="materialDragLeave(event)" ondrop="materialDrop(event,'${escJsStr(discId)}','${escJsStr(theme.id||'')}')">
+    return `<section class="theme-section${collapsed?' collapsed':''}" draggable="true" ondragstart="themeDragStart(event,'${escJsStr(discId)}','${escJsStr(theme.id||'')}')" data-drop-disc-id="${escH(discId)}" data-drop-tema-id="${escH(theme.id||'')}" ondragover="materialDragOver(event)" ondragleave="materialDragLeave(event)" ondrop="themeDrop(event,'${escJsStr(discId)}','${escJsStr(theme.id||'')}')">
       <div class="theme-head clickable" onclick="toggleThemeAdmin('${escJsStr(theme.id||'')}')">
         <div class="theme-title-wrap">
           <button class="theme-toggle-btn" type="button" onclick="event.stopPropagation();toggleThemeAdmin('${escJsStr(theme.id||'')}')">${collapsed?'▸':'▾'}</button>
