@@ -2518,7 +2518,8 @@ function materialDragStart(event,id){
   event.currentTarget.classList.add('dragging');
 }
 function materialDragEnd(event){ event.currentTarget.classList.remove('dragging'); document.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target')); }
-function materialDragOver(event){ event.preventDefault(); event.dataTransfer.dropEffect='move'; event.currentTarget.classList.add('drop-target'); }
+function materialDragOver(event){ event.preventDefault(); if(event.dataTransfer) event.dataTransfer.dropEffect='move'; event.currentTarget.classList.add('drop-target'); }
+function materialDragEnter(event){ event.preventDefault(); event.currentTarget.classList.add('drop-target'); }
 function materialDragLeave(event){ if(!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.classList.remove('drop-target'); }
 function materialDrop(event,discId,temaId=''){
   event.preventDefault(); event.stopPropagation();
@@ -4234,14 +4235,14 @@ function planSectionHtml(discId,mats){
     byTema.get(key).push(m);
   });
   const assessmentsBlock=assessments.length?`
-    <div class="material-group assessment-group" ondragover="materialDragOver(event)" ondragleave="materialDragLeave(event)" ondrop="materialDrop(event,'${escJsStr(discId)}','')">
+    <div class="material-group assessment-group" ondragenter="materialDragEnter(event)" ondragover="materialDragOver(event)" ondragleave="materialDragLeave(event)" ondrop="materialDrop(event,'${escJsStr(discId)}','')">
       <div class="material-group-title"><div class="tipo-dot" style="background:var(--red)"></div>Avaliações e trabalhos gerais</div>
       ${assessments.map(planCardHtml).join('')}
     </div>
   `:'';
   const themeBlocks=[...byTema.entries()].sort((a,b)=>labelTema(a[0]).localeCompare(labelTema(b[0]),'pt-BR')).map(([temaId,items])=>`
-    <div class="material-group" ondragover="materialDragOver(event)" ondragleave="materialDragLeave(event)" ondrop="materialDrop(event,'${escJsStr(discId)}','${escJsStr(temaId)}')">
-      <div class="material-group-title" title="Arraste um material para este tema"><div class="tipo-dot" style="background:var(--accent)"></div>${escH(temaId?labelTema(temaId):'Sem tema')}<span class="drop-hint">Solte aqui para mover</span></div>
+    <div class="material-group" ondragenter="materialDragEnter(event)" ondragover="materialDragOver(event)" ondragleave="materialDragLeave(event)" ondrop="materialDrop(event,'${escJsStr(discId)}','${escJsStr(temaId)}')">
+      <div class="material-group-title" title="Mover material para este tema"><div class="tipo-dot" style="background:var(--accent)"></div>${escH(temaId?labelTema(temaId):'Sem tema')}</div>
       ${items.map(planCardHtml).join('')}
     </div>
   `).join('');
