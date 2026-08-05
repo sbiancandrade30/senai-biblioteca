@@ -4244,8 +4244,9 @@ function isGeneralAssessmentMaterial(m){
   return /\b(prova|trabalho|gabarito|avaliacao|avaliativo|avaliativa)\b/.test(text);
 }
 function planSectionHtml(discId,mats){
-  const assessments=mats.filter(isGeneralAssessmentMaterial);
-  const regular=mats.filter(m=>!isGeneralAssessmentMaterial(m));
+  // O tema escolhido pelo cadastro sempre prevalece, inclusive para avaliações e trabalhos.
+  const assessments=[];
+  const regular=mats;
   const byTema=new Map();
   regular.forEach(m=>{
     const key=m.temaId||'';
