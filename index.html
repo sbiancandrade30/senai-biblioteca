@@ -902,7 +902,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   </div>
 
   <!-- TAB REVISÃO -->
-  <div id="tabArquivo" style="display:none"><div class="library-top"><div><h2>Arquivo de materiais</h2><p>Consulte materiais antigos sem removê-los da Biblioteca.</p></div></div><div class="inner-filters"><input class="search-input" id="archiveSearch" placeholder="Buscar material arquivado..." oninput="renderArchiveTab()"><select class="filter-sel" id="archiveDisc" onchange="renderArchiveTab()"><option value="">Todas as disciplinas</option></select><button class="btn btn-outline" onclick="document.getElementById('archiveSearch').value='';document.getElementById('archiveDisc').value='';renderArchiveTab()">Limpar</button></div><div id="archiveContent"></div></div>
+  <div id="tabArquivo" style="display:none"><div class="library-top"><div><h2>Arquivo de materiais</h2><p>Consulte materiais antigos sem removê-los da Biblioteca.</p></div><div class="inner-actions"><button class="btn btn-outline" onclick="toggleBulkSelectionMode()">Selecionar materiais</button></div></div><div class="summary-row" id="archiveSummary"></div><div class="quick-filter-row"><button class="quick-filter-btn active" onclick="setArchiveFilter('')">Todos</button><button class="quick-filter-btn" onclick="setArchiveFilter('avaliacoes')">Avaliações</button><button class="quick-filter-btn" onclick="setArchiveFilter('review')">A revisar</button><button class="quick-filter-btn" onclick="setArchiveFilter('sem-tema')">Sem tema</button></div><div class="inner-filters"><input class="search-input" id="archiveSearch" placeholder="Buscar no arquivo..." oninput="renderArchiveTab()"><select class="filter-sel" id="archiveDisc" onchange="renderArchiveTab()"><option value="">Todas as disciplinas</option></select><select class="filter-sel" id="archiveTipo" onchange="renderArchiveTab()"><option value="">Todos os tipos</option></select><button class="btn btn-outline" onclick="document.getElementById('archiveSearch').value='';document.getElementById('archiveDisc').value='';document.getElementById('archiveTipo').value='';renderArchiveTab()">Limpar</button></div><div id="archiveContent"></div></div>
   <div id="tabRevisao" style="display:none">
     <div class="library-top">
       <div>
@@ -3481,10 +3481,14 @@ function renderAdminHome(){
   ].filter(Boolean).join('');
   document.getElementById('adminHomeContent').innerHTML = blocks || `<div class="empty"><h3>Nenhuma disciplina/área encontrada.</h3></div>`;
 }
+let archiveQuickFilter='';
+function setArchiveFilter(v){ archiveQuickFilter=v||''; renderArchiveTab(); }
 function renderArchiveTab(){
-  const ds=document.getElementById('archiveDisc'), q=normalizar(document.getElementById('archiveSearch')?.value||'');
+  const ds=document.getElementById('archiveDisc'), ts=document.getElementById('archiveTipo'), q=normalizar(document.getElementById('archiveSearch')?.value||'');
   if(ds && ds.options.length===1) ds.innerHTML='<option value="">Todas as disciplinas</option>'+D.disciplinas.map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`).join('');
-  const disc=ds?.value||''; const mats=D.materiais.filter(m=>isArchived(m)&&(!disc||m.disciplinaId===disc)&&(!q||normalizar(m.titulo+' '+labelTema(m.temaId)+' '+labelDisc(m.disciplinaId)).includes(q)));
+  if(ts && ts.options.length===1) ts.innerHTML='<option value="">Todos os tipos</option>'+tiposOrdenados().map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
+  const disc=ds?.value||'', tipo=ts?.value||''; const mats=D.materiais.filter(m=>isArchived(m)&&(!disc||m.disciplinaId===disc)&&(!tipo||m.tipoId===tipo)&&(!q||normalizar(m.titulo+' '+labelTema(m.temaId)+' '+labelDisc(m.disciplinaId)).includes(q)));
+  const summary=document.getElementById('archiveSummary'); if(summary) summary.innerHTML=[[mats.length,'materiais arquivados'],[new Set(mats.map(m=>m.disciplinaId)).size,'disciplinas/áreas'],[new Set(mats.map(m=>m.temaId).filter(Boolean)).size,'temas']].map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
   const groups={}; mats.forEach(m=>(groups[m.disciplinaId||GERAL_ID]??=[]).push(m));
   document.getElementById('archiveContent').innerHTML=Object.entries(groups).map(([id,list])=>planSectionHtml(id,list)).join('')||'<div class="empty"><h3>Nenhum material arquivado encontrado.</h3></div>';
 }
