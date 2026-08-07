@@ -808,6 +808,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   <div class="tabs">
     <button class="tab-btn active" data-tab="materiais" onclick="setTab('materiais',this)"><span class="tab-full">Materiais</span><span class="tab-short">Materiais</span></button>
     <button class="tab-btn" data-tab="planejamento" onclick="setTab('planejamento',this)"><span class="tab-full">Acervo</span><span class="tab-short">Acervo</span></button>
+    <button class="tab-btn" data-tab="arquivo" onclick="setTab('arquivo',this)"><span class="tab-full">Arquivo</span><span class="tab-short">Arquivo</span></button>
     <button class="tab-btn" onclick="setTab('revisao',this)"><span class="tab-full">Revisão</span><span class="tab-short">Revisão</span></button>
     <button class="tab-btn" onclick="setTab('configuracoes',this)"><span class="tab-full">Configurações</span><span class="tab-short">Config.</span></button>
   </div>
@@ -901,6 +902,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   </div>
 
   <!-- TAB REVISÃO -->
+  <div id="tabArquivo" style="display:none"><div class="library-top"><div><h2>Arquivo de materiais</h2><p>Consulte materiais antigos sem removê-los da Biblioteca.</p></div></div><div class="inner-filters"><input class="search-input" id="archiveSearch" placeholder="Buscar material arquivado..." oninput="renderArchiveTab()"><select class="filter-sel" id="archiveDisc" onchange="renderArchiveTab()"><option value="">Todas as disciplinas</option></select><button class="btn btn-outline" onclick="document.getElementById('archiveSearch').value='';document.getElementById('archiveDisc').value='';renderArchiveTab()">Limpar</button></div><div id="archiveContent"></div></div>
   <div id="tabRevisao" style="display:none">
     <div class="library-top">
       <div>
@@ -3201,10 +3203,12 @@ function setTab(tab, btn){
   btn.classList.add('active');
   document.getElementById('tabMateriais').style.display=tab==='materiais'?'':'none';
   document.getElementById('tabPlanejamento').style.display=tab==='planejamento'?'':'none';
+  document.getElementById('tabArquivo').style.display=tab==='arquivo'?'':'none';
   document.getElementById('tabRevisao').style.display=tab==='revisao'?'':'none';
   document.getElementById('tabConfiguracoes').style.display=tab==='configuracoes'?'':'none';
   if(tab==='materiais') renderAdminHome();
   if(tab==='planejamento') renderPlanTab();
+  if(tab==='arquivo') renderArchiveTab();
   if(tab==='revisao') renderReviewTab();
   if(tab==='configuracoes') renderConfigTab();
   renderBulkActionBar();
@@ -3476,6 +3480,13 @@ function renderAdminHome(){
     renderDiscGroupHtml('Disciplinas/áreas EaD', ead, eadList.length, true, 'admin-sec-ead')
   ].filter(Boolean).join('');
   document.getElementById('adminHomeContent').innerHTML = blocks || `<div class="empty"><h3>Nenhuma disciplina/área encontrada.</h3></div>`;
+}
+function renderArchiveTab(){
+  const ds=document.getElementById('archiveDisc'), q=normalizar(document.getElementById('archiveSearch')?.value||'');
+  if(ds && ds.options.length===1) ds.innerHTML='<option value="">Todas as disciplinas</option>'+D.disciplinas.map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`).join('');
+  const disc=ds?.value||''; const mats=D.materiais.filter(m=>isArchived(m)&&(!disc||m.disciplinaId===disc)&&(!q||normalizar(m.titulo+' '+labelTema(m.temaId)+' '+labelDisc(m.disciplinaId)).includes(q)));
+  const groups={}; mats.forEach(m=>(groups[m.disciplinaId||GERAL_ID]??=[]).push(m));
+  document.getElementById('archiveContent').innerHTML=Object.entries(groups).map(([id,list])=>planSectionHtml(id,list)).join('')||'<div class="empty"><h3>Nenhum material arquivado encontrado.</h3></div>';
 }
 function renderRecentHomeSection(materials){
   const recent=[...materials]
