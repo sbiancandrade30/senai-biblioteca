@@ -343,6 +343,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .theme-body{counter-reset:theme-order}
 .theme-body>.material-group>.material-group-title::before{counter-increment:theme-order;content:counter(theme-order);display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border:1px solid var(--border);border-radius:4px;background:var(--surface2);font-size:10px;font-weight:800;color:var(--text2);letter-spacing:0}
 .theme-body>.material-group>.material-group-title::before{cursor:pointer}
+.theme-add-material{margin-left:auto;border:1px solid var(--border);background:var(--surface);color:var(--accent);border-radius:50%;width:22px;height:22px;line-height:18px;font-size:17px;cursor:pointer}
 .theme-group-actions{margin-left:auto;display:flex;gap:5px;align-items:center}
 .theme-group-action{width:27px;height:27px;padding:0;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text2);cursor:pointer;font-size:15px;line-height:1}
 .theme-group-action:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
@@ -3494,6 +3495,16 @@ function renderArchiveTab(){
   const groups={}; mats.forEach(m=>(groups[m.disciplinaId||GERAL_ID]??=[]).push(m));
   document.getElementById('archiveContent').innerHTML=Object.entries(groups).map(([id,list])=>planSectionHtml(id,list)).join('')||'<div class="empty"><h3>Nenhum material arquivado encontrado.</h3></div>';
 }
+function decorateThemeAddButtons(){
+  document.querySelectorAll('#planContent .material-group-title,#archiveContent .material-group-title').forEach(el=>{
+    if(el.querySelector('.theme-add-material')) return;
+    const name=normalizar(el.textContent.replace(/[↑↓✎✕+]/g,''));
+    const theme=D.temas.find(t=>normalizar(t.nome)===name); if(!theme) return;
+    const b=document.createElement('button'); b.type='button'; b.className='theme-add-material'; b.title='Adicionar material neste tema'; b.textContent='+';
+    b.onclick=e=>{e.stopPropagation();openModal(null,theme.disciplinaId,theme.id)}; el.appendChild(b);
+  });
+}
+new MutationObserver(decorateThemeAddButtons).observe(document.body,{subtree:true,childList:true});
 function renderRecentHomeSection(materials){
   const recent=[...materials]
     .sort((a,b)=>materialRecentTime(b)-materialRecentTime(a) || (b.titulo||'').localeCompare(a.titulo||'','pt-BR'))
