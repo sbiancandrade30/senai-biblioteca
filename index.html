@@ -342,6 +342,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .material-group-title{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:9px}
 .theme-body{counter-reset:theme-order}
 .theme-body>.material-group>.material-group-title::before{counter-increment:theme-order;content:counter(theme-order);display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border:1px solid var(--border);border-radius:4px;background:var(--surface2);font-size:10px;font-weight:800;color:var(--text2);letter-spacing:0}
+.theme-body>.material-group>.material-group-title::before{cursor:pointer}
 .theme-group-actions{margin-left:auto;display:flex;gap:5px;align-items:center}
 .theme-group-action{width:27px;height:27px;padding:0;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text2);cursor:pointer;font-size:15px;line-height:1}
 .theme-group-action:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
@@ -2566,6 +2567,15 @@ function moverTemaNaOrdem(discId,themeId,direction){
   [list[i],list[j]]=[list[j],list[i]]; list.forEach((t,n)=>t.ordem=n);
   salvar(); refreshMaterialViews(); showToast('Ordem do tema atualizada.');
 }
+document.addEventListener('dblclick',function(event){
+  const title=event.target.closest?.('.material-group-title'); if(!title) return;
+  const name=normalizar(title.textContent.replace(/[↑↓✎✕]/g,''));
+  const theme=D.temas.find(t=>normalizar(t.nome)===name); if(!theme) return;
+  const value=Number(prompt('Número deste tema:',theme.ordem??1)); if(!Number.isFinite(value)||value<1) return;
+  const list=D.temas.filter(t=>t.disciplinaId===theme.disciplinaId).sort((a,b)=>(a.ordem??999999)-(b.ordem??999999));
+  const rest=list.filter(t=>t.id!==theme.id); rest.splice(Math.min(value-1,rest.length),0,theme); rest.forEach((t,i)=>t.ordem=i+1);
+  salvar(); refreshMaterialViews(); showToast('Tema reposicionado.');
+});
 function materialDragEnd(event){ event.currentTarget.classList.remove('dragging'); document.querySelectorAll('.drop-target,.theme-drop-before,.theme-drop-after').forEach(el=>el.classList.remove('drop-target','theme-drop-before','theme-drop-after')); if(materialDragScrollFrame){cancelAnimationFrame(materialDragScrollFrame);materialDragScrollFrame=0;} }
 function materialCardDragOver(event){ event.preventDefault(); event.stopPropagation(); event.currentTarget.classList.add('drop-target'); if(event.dataTransfer) event.dataTransfer.dropEffect='move'; }
 function materialCardDrop(event,targetId){ event.preventDefault(); event.stopPropagation(); event.currentTarget.classList.remove('drop-target'); const id=event.dataTransfer?.getData('text/plain'); if(id && id!==targetId) reordenarMaterialAntesDe(id,targetId); }
