@@ -1323,6 +1323,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <label class="form-label">Nome do tema *</label>
         <input type="text" class="form-input" id="temaNome" placeholder="ex: Motores e acionamentos">
       </div>
+      <div class="form-group">
+        <label class="form-label">Ordem do tema</label>
+        <input type="number" min="1" step="1" class="form-input" id="temaOrdem" placeholder="ex: 1">
+        <div class="form-help">Use números menores para os temas que devem aparecer primeiro.</div>
+      </div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-outline" onclick="closeThemeModal()">Cancelar</button>
@@ -2551,6 +2556,13 @@ function themeDrop(event,discId,targetThemeId){
   salvar();
   refreshMaterialViews();
   showToast('Ordem dos temas atualizada.');
+}
+function moverTemaNaOrdem(discId,themeId,direction){
+  const list=D.temas.filter(t=>t.disciplinaId===discId).sort((a,b)=>(a.ordem??999999)-(b.ordem??999999));
+  const i=list.findIndex(t=>t.id===themeId), j=i+direction;
+  if(i<0||j<0||j>=list.length) return;
+  [list[i],list[j]]=[list[j],list[i]]; list.forEach((t,n)=>t.ordem=n);
+  salvar(); refreshMaterialViews(); showToast('Ordem do tema atualizada.');
 }
 function materialDragEnd(event){ event.currentTarget.classList.remove('dragging'); document.querySelectorAll('.drop-target,.theme-drop-before,.theme-drop-after').forEach(el=>el.classList.remove('drop-target','theme-drop-before','theme-drop-after')); if(materialDragScrollFrame){cancelAnimationFrame(materialDragScrollFrame);materialDragScrollFrame=0;} }
 function materialCardDragOver(event){ event.preventDefault(); event.stopPropagation(); event.currentTarget.classList.add('drop-target'); if(event.dataTransfer) event.dataTransfer.dropEffect='move'; }
@@ -4916,17 +4928,19 @@ function openThemeModal(id=null){
   if(!currentAdminDiscId) return showToast('Abra uma disciplina para criar temas.',true);
   document.getElementById('themeModalTitle').textContent=t?'Editar tema':'Novo tema';
   document.getElementById('temaNome').value=t?.nome||'';
+  document.getElementById('temaOrdem').value=t?.ordem??'';
   document.getElementById('themeModalOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('temaNome').focus(),50);
 }
 function closeThemeModal(){ document.getElementById('themeModalOverlay').classList.remove('open'); editingThemeId=null; }
 function salvarTema(){
   const nome=document.getElementById('temaNome').value.trim();
+  const ordemValor=Number(document.getElementById('temaOrdem').value);
   if(!nome){ showToast('Preencha o nome do tema.',true); return; }
   const duplicate=D.temas.some(t=>t.disciplinaId===currentAdminDiscId && normalizar(t.nome)===normalizar(nome) && t.id!==editingThemeId);
   if(duplicate){ showToast('Já existe um tema com esse nome nesta disciplina.',true); return; }
   if(editingThemeId){
-    const t=D.temas.find(x=>x.id===editingThemeId); if(t) t.nome=nome;
+    const t=D.temas.find(x=>x.id===editingThemeId); if(t){ t.nome=nome; if(Number.isFinite(ordemValor)&&ordemValor>0) t.ordem=ordemValor; }
   } else {
     const max=Math.max(0,...temasDaDisc(currentAdminDiscId).map(t=>Number(t.ordem)||0));
     D.temas.push({id:uid('tema'),disciplinaId:currentAdminDiscId,nome,ordem:max+1});
