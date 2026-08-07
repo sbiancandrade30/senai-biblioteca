@@ -346,9 +346,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .theme-add-material{border:1px solid var(--border);background:var(--surface);color:var(--accent);border-radius:6px;width:28px;height:28px;line-height:22px;font-size:18px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
 #modalOverlay .quick-note{display:none}
 #modalOverlay .modal-body{display:flex;flex-direction:column}
-#modalOverlay .modal-body>.form-row:first-of-type{order:-1}
+#modalOverlay .modal-body>.form-row:has(#mDisc){order:0}
+#modalOverlay .modal-body>.form-group:has(#mTitulo){order:1}
 #modalOverlay .modal-body>.form-group:has(#tipoGrid){order:2}
 #modalOverlay .modal-body>.form-group:has(#mLinksList){order:3}
+#modalOverlay .modal-body>details{order:4}
 .theme-group-actions{margin-left:auto;display:flex;gap:5px;align-items:center}
 .theme-group-action{width:27px;height:27px;padding:0;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text2);cursor:pointer;font-size:15px;line-height:1}
 .theme-group-action:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
