@@ -2542,7 +2542,9 @@ function themeDrop(event,discId,targetThemeId){
   const source=JSON.parse(raw); if(source.discId!==discId || source.themeId===targetThemeId) return;
   const themes=D.temas.filter(t=>t.disciplinaId===discId);
   const moved=themes.find(t=>t.id===source.themeId); if(!moved) return;
-  const rest=themes.filter(t=>t.id!==source.themeId); const idx=rest.findIndex(t=>t.id===targetThemeId);
+  const rest=themes.filter(t=>t.id!==source.themeId); let idx=rest.findIndex(t=>t.id===targetThemeId);
+  const box=event.currentTarget.getBoundingClientRect();
+  if((event.clientY||0)>box.top+box.height/2) idx++;
   rest.splice(Math.max(0,idx),0,moved); rest.forEach((t,i)=>t.ordem=i);
   salvar();
   refreshMaterialViews();
