@@ -3487,7 +3487,9 @@ function renderArchiveTab(){
   const ds=document.getElementById('archiveDisc'), ts=document.getElementById('archiveTipo'), q=normalizar(document.getElementById('archiveSearch')?.value||'');
   if(ds && ds.options.length===1) ds.innerHTML='<option value="">Todas as disciplinas</option>'+D.disciplinas.map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`).join('');
   if(ts && ts.options.length===1) ts.innerHTML='<option value="">Todos os tipos</option>'+tiposOrdenados().map(t=>`<option value="${escH(t.id)}">${escH(t.nome)}</option>`).join('');
-  const disc=ds?.value||'', tipo=ts?.value||''; const mats=D.materiais.filter(m=>isArchived(m)&&(!disc||m.disciplinaId===disc)&&(!tipo||m.tipoId===tipo)&&(!q||normalizar(m.titulo+' '+labelTema(m.temaId)+' '+labelDisc(m.disciplinaId)).includes(q)));
+  const disc=ds?.value||'', tipo=ts?.value||'';
+  const mats=D.materiais.filter(m=>isArchived(m)&&(!disc||m.disciplinaId===disc)&&(!tipo||m.tipoId===tipo)&&(!q||normalizar(m.titulo+' '+labelTema(m.temaId)+' '+labelDisc(m.disciplinaId)).includes(q))&&(!archiveQuickFilter||archiveQuickFilter==='avaliacoes'&&/^avaliacoes\b/i.test(normalizar(labelTema(m.temaId)))||archiveQuickFilter==='review'&&needsMaterialReview(m)||archiveQuickFilter==='sem-tema'&&!m.temaId));
+  document.querySelectorAll('#tabArquivo .quick-filter-btn').forEach(btn=>btn.classList.toggle('active',normalizar(btn.textContent)===normalizar(archiveQuickFilter||'todos')));
   const summary=document.getElementById('archiveSummary'); if(summary) summary.innerHTML=[[mats.length,'materiais arquivados'],[new Set(mats.map(m=>m.disciplinaId)).size,'disciplinas/áreas'],[new Set(mats.map(m=>m.temaId).filter(Boolean)).size,'temas']].map(([n,l])=>`<div class="summary-card"><div class="summary-num">${n}</div><div class="summary-label">${l}</div></div>`).join('');
   const groups={}; mats.forEach(m=>(groups[m.disciplinaId||GERAL_ID]??=[]).push(m));
   document.getElementById('archiveContent').innerHTML=Object.entries(groups).map(([id,list])=>planSectionHtml(id,list)).join('')||'<div class="empty"><h3>Nenhum material arquivado encontrado.</h3></div>';
