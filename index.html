@@ -119,6 +119,8 @@ body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at 12% -
 .admin-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;transition:all .15s;margin-bottom:8px;box-shadow:0 1px 0 rgba(21,24,33,.02)}
 .admin-card:hover{border-color:var(--border2);box-shadow:var(--shadow-soft);transform:translateY(-1px)}
 .admin-card[draggable="true"]{cursor:grab}
+.theme-drop-before{box-shadow:inset 0 4px 0 var(--accent)}
+.theme-drop-after{box-shadow:inset 0 -4px 0 var(--accent)}
 .admin-card.dragging{opacity:.48;transform:scale(.99)}
 .drop-target{outline:2px dashed var(--accent);outline-offset:3px;background:var(--accent-bg)!important}
 .drop-hint{font-size:10px;color:var(--accent);font-weight:700;margin-left:auto;white-space:nowrap}
@@ -2550,7 +2552,7 @@ function themeDrop(event,discId,targetThemeId){
   refreshMaterialViews();
   showToast('Ordem dos temas atualizada.');
 }
-function materialDragEnd(event){ event.currentTarget.classList.remove('dragging'); document.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target')); if(materialDragScrollFrame){cancelAnimationFrame(materialDragScrollFrame);materialDragScrollFrame=0;} }
+function materialDragEnd(event){ event.currentTarget.classList.remove('dragging'); document.querySelectorAll('.drop-target,.theme-drop-before,.theme-drop-after').forEach(el=>el.classList.remove('drop-target','theme-drop-before','theme-drop-after')); if(materialDragScrollFrame){cancelAnimationFrame(materialDragScrollFrame);materialDragScrollFrame=0;} }
 function materialCardDragOver(event){ event.preventDefault(); event.stopPropagation(); event.currentTarget.classList.add('drop-target'); if(event.dataTransfer) event.dataTransfer.dropEffect='move'; }
 function materialCardDrop(event,targetId){ event.preventDefault(); event.stopPropagation(); event.currentTarget.classList.remove('drop-target'); const id=event.dataTransfer?.getData('text/plain'); if(id && id!==targetId) reordenarMaterialAntesDe(id,targetId); }
 function reordenarMaterialAntesDe(id,targetId){
@@ -2563,6 +2565,7 @@ function reordenarMaterialAntesDe(id,targetId){
 }
 function materialDragOver(event){
   event.preventDefault(); if(event.dataTransfer) event.dataTransfer.dropEffect='move'; event.currentTarget.classList.add('drop-target');
+  if(event.currentTarget.classList.contains('material-group')){ const r=event.currentTarget.getBoundingClientRect(); event.currentTarget.classList.toggle('theme-drop-before',(event.clientY||0)<r.top+r.height/2); event.currentTarget.classList.toggle('theme-drop-after',(event.clientY||0)>=r.top+r.height/2); }
   const edge=90, y=event.clientY||0, h=window.innerHeight||0;
   let delta=0; if(y<edge) delta=-Math.max(8,(edge-y)*.28); else if(y>h-edge) delta=Math.max(8,(y-(h-edge))*.28);
   if(delta && !materialDragScrollFrame){
