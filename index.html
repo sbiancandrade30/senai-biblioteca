@@ -344,6 +344,9 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .theme-body>.material-group>.material-group-title::before{counter-increment:theme-order;content:counter(theme-order);display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border:1px solid var(--border);border-radius:4px;background:var(--surface2);font-size:10px;font-weight:800;color:var(--text2);letter-spacing:0}
 .theme-body>.material-group>.material-group-title::before{cursor:pointer}
 .theme-add-material{border:1px solid var(--border);background:var(--surface);color:var(--accent);border-radius:6px;width:28px;height:28px;line-height:22px;font-size:18px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+#modalOverlay .quick-note{display:none}
+#modalOverlay .modal-body{display:flex;flex-direction:column}
+#modalOverlay .modal-body>.form-row:first-of-type{order:-1}
 .theme-group-actions{margin-left:auto;display:flex;gap:5px;align-items:center}
 .theme-group-action{width:27px;height:27px;padding:0;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text2);cursor:pointer;font-size:15px;line-height:1}
 .theme-group-action:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
@@ -4727,7 +4730,7 @@ function salvarQuickMaterials(options={}){
     showToast(message);
   }
 }
-function openModal(id=null, preferredDiscId=null){
+function openModal(id=null, preferredDiscId=null, preferredTemaId=null){
   editingMaterialId=id||null;
   const m=id?D.materiais.find(x=>x.id===id):null;
   document.getElementById('modalTitle').textContent=m?'Editar material':'Novo material';
@@ -4770,10 +4773,10 @@ function openModal(id=null, preferredDiscId=null){
   const sel=document.getElementById('mDisc');
   sel.innerHTML=`<option value="${GERAL_ID}">${escH(D.nomeGeral||'Materiais gerais')}</option>`+discsOrdenadas().map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`).join('');
   sel.value=selectedDisc;
-  renderThemeSelectForMaterial(m?.temaId||(!m && selectedDisc===lastMaterialDefaults.disciplinaId ? lastMaterialDefaults.temaId : ''));
+  renderThemeSelectForMaterial(m?.temaId||preferredTemaId||(!m && selectedDisc===lastMaterialDefaults.disciplinaId ? lastMaterialDefaults.temaId : ''));
 
   const tipoSel=m?.tipoId||(!m ? lastMaterialDefaults.tipoId : '')||'';
-  document.getElementById('tipoGrid').innerHTML=tiposOrdenados().map(t=>`
+  document.getElementById('tipoGrid').innerHTML=tiposOrdenados().filter(t=>t.id!=='tipo_slide').map(t=>`
     <div class="tipo-opt${t.id===tipoSel?' sel':''}" onclick="selecionarTipo(this)" data-tipo="${escH(t.id)}">
       <div class="tipo-opt-icon">${escH(t.icone||'📎')}</div><span>${escH(t.nome)}</span>
     </div>`).join('');
@@ -4904,7 +4907,7 @@ function salvarMaterial(options={}){
     openModal(null,disciplinaId);
     document.getElementById('mTema').value=temaId;
     renderThemeSelectForMaterial(temaId);
-    document.getElementById('tipoGrid').innerHTML=tiposOrdenados().map(t=>`
+    document.getElementById('tipoGrid').innerHTML=tiposOrdenados().filter(t=>t.id!=='tipo_slide').map(t=>`
       <div class="tipo-opt${t.id===tipoId?' sel':''}" onclick="selecionarTipo(this)" data-tipo="${escH(t.id)}">
         <div class="tipo-opt-icon">${escH(t.icone||'📎')}</div><span>${escH(t.nome)}</span>
       </div>`).join('');
