@@ -1483,6 +1483,100 @@ function colorAlpha(hex, alpha=.12){
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
+const CURSO_DISCIPLINAS = [
+  { id:'disc_qualidade', nome:'Gestão da Qualidade', modalidade:'presencial' },
+  { id:'disc_praticas', nome:'Práticas Inovadoras', modalidade:'presencial' },
+  { id:'disc_eletromecanica', nome:'Fundamentos da Eletromecânica', modalidade:'presencial' },
+  { id:'disc_tecnologia', nome:'Tecnologia do Plástico', modalidade:'presencial' },
+  { id:'disc_processos', nome:'Processos de Transformação de Termoplásticos e Acabamento', modalidade:'presencial', aliases:['Processos de Transformação de Termoplásticos'] },
+  { id:'disc_ensaios', nome:'Ensaios', modalidade:'presencial' },
+  { id:'disc_sistemas_trabalho', nome:'Sistemas de Trabalho', modalidade:'presencial' },
+  { id:'disc_sst', nome:'Saúde e Segurança do Trabalho', modalidade:'presencial' },
+  { id:'disc_comunicacao', nome:'Fundamentos da Comunicação e Informação', modalidade:'ead' },
+  { id:'disc_relacoes', nome:'Relações Socioprofissionais', modalidade:'ead', aliases:['Relações Socioprofissionais, Cidadania e Ética'] },
+  { id:'disc_planejamento', nome:'Planejamento', modalidade:'ead', aliases:['Planejamento e Organização do Trabalho'] },
+  { id:'disc_raciocinio', nome:'Raciocínio Lógico', modalidade:'ead', aliases:['Raciocínio Lógico e Análise de Dados'] },
+  { id:'disc_digital', nome:'Transformação Digital no Setor Industrial', modalidade:'ead' }
+];
+
+const CURSO_TOPICOS = {
+  'disc_qualidade': [
+    'Conceito e evolução da qualidade', 'Mestres da qualidade', 'Sistema de Gestão da Qualidade',
+    'Família ISO 9000 e ISO 9001', 'Ferramentas da qualidade', 'Custos da qualidade', 'MASP',
+    'Produtividade', 'Melhoria de processos', 'Resistência à mudança', 'WCM – World Class Manufacturing'
+  ],
+  'disc_praticas': [
+    'Conceito de inovação', 'Evolução e linha do tempo da inovação', 'Mercado, cliente e necessidades',
+    'Análise de mercado', 'Geração e seleção de ideias', 'Desenvolvimento de soluções',
+    'Ferramentas para inovação', 'Inovação e melhoria de processos', 'Estudos de caso e exemplos de inovação'
+  ],
+  'disc_eletromecanica': [
+    'Desenho técnico', 'Folha de desenho, leiaute e dimensões', 'Aplicação de linhas em desenhos',
+    'Princípios gerais de representação', 'Escalas', 'Tolerâncias gerais', 'Tolerâncias geométricas',
+    'Sistema de tolerâncias e ajustes', 'Cotagem em desenho técnico', 'Metrologia', 'Máquinas e equipamentos',
+    'Ferramentas', 'Fundamentos de eletricidade', 'Circuitos elétricos', 'Lei de Ohm e Leis de Kirchhoff',
+    'Corrente alternada', 'Dispositivos de proteção', 'Dispositivos de manobra e sinalização',
+    'Acionamentos elétricos', 'Motor trifásico', 'Eletropneumática e eletro-hidropneumática',
+    'Segurança em máquinas e equipamentos'
+  ],
+  'disc_tecnologia': [
+    'História e evolução dos plásticos', 'Mercado dos plásticos', 'Matérias-primas e obtenção dos plásticos',
+    'Monômeros, polímeros e polimerização', 'Celuloide e baquelite', 'Era do petróleo e desenvolvimento dos polímeros',
+    'Tipos e classificação dos plásticos', 'Principais termoplásticos: PE, PET, PVC e PS', 'Propriedades dos plásticos',
+    'Aditivos', 'Cargas e reforços', 'Higroscopicidade', 'Degradação dos polímeros',
+    'Contração e estabilidade dimensional', 'Plásticos biodegradáveis e de fontes renováveis',
+    'Nanotecnologia aplicada aos plásticos', 'Reciclagem e impactos ambientais'
+  ],
+  'disc_processos': [
+    'Introdução aos processos de transformação de termoplásticos', 'Moldagem por compressão', 'Moldagem por injeção',
+    'Extrusão', 'Extrusoras e seus principais componentes', 'Etapas do processo de extrusão', 'Tipos de extrusão',
+    'Parâmetros de processo', 'Zonas da rosca', 'Dosagem e dosador gravimétrico', 'Matriz', 'Filmes tubulares',
+    'Coextrusão', 'Fatores que influenciam o balão e o filme', 'Outros processos de transformação',
+    'Acabamento de peças e produtos plásticos', 'Defeitos e controle do processo'
+  ],
+  'disc_ensaios': ['A confirmar'],
+  'disc_sistemas_trabalho': ['A confirmar'],
+  'disc_sst': ['A confirmar'],
+  'disc_comunicacao': ['A confirmar'],
+  'disc_relacoes': ['A confirmar'],
+  'disc_planejamento': ['A confirmar'],
+  'disc_raciocinio': ['A confirmar'],
+  'disc_digital': ['A confirmar']
+};
+
+function aplicarCurriculoCurso(data) {
+  if (!data || Number(data._curriculumSeedVersion) >= 2) return;
+  if (!Array.isArray(data.disciplinas)) data.disciplinas = [];
+  if (!Array.isArray(data.temas)) data.temas = [];
+
+  const maxOrder = data.disciplinas.reduce((max, d) => Math.max(max, Number(d.ordem) || 0), 0);
+  CURSO_DISCIPLINAS.forEach((spec, index) => {
+    const names = [spec.nome, ...(spec.aliases || [])].map(normalizar);
+    let disciplina = data.disciplinas.find(d => d.id === spec.id || names.includes(normalizar(d.nome)));
+    if (!disciplina) {
+      disciplina = { id:spec.id, nome:spec.nome, ordem:maxOrder + index + 1, modalidade:spec.modalidade };
+      data.disciplinas.push(disciplina);
+    } else {
+      disciplina.nome = spec.nome;
+      disciplina.modalidade = disciplina.modalidade || spec.modalidade;
+    }
+
+    const nomesTemas = CURSO_TOPICOS[spec.id] || ['A confirmar'];
+    nomesTemas.forEach((nome, topicIndex) => {
+      const exists = data.temas.some(t => t.disciplinaId === disciplina.id && normalizar(t.nome) === normalizar(nome));
+      if (!exists) {
+        data.temas.push({
+          id:`${spec.id}_topico_${topicIndex + 1}`,
+          disciplinaId:disciplina.id,
+          nome,
+          ordem:topicIndex + 1
+        });
+      }
+    });
+  });
+  data._curriculumSeedVersion = 2;
+}
+
 function defaults() {
   return {
     versao: 8,
@@ -2451,6 +2545,9 @@ function coerceData(raw) {
     ordem:Number.isFinite(Number(t.ordem))?Number(t.ordem):i+1
   }));
 
+  // Cadastro-base do curso: acrescenta apenas o que ainda não existia.
+  aplicarCurriculoCurso(out);
+
   // Materiais
   out.materiais = out.materiais.map((m,i)=>{
     let disciplinaId = m.disciplinaId || '';
@@ -2535,7 +2632,8 @@ function carregar() {
       return;
     }
   } catch(e) {}
-  D = defaults();
+  D = coerceData(defaults());
+  salvar({mark:false, sync:false});
 }
 function salvar(options={}) {
   if(options.mark!==false) markCloudUpdated();
