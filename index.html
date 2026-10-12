@@ -1545,9 +1545,20 @@ const CURSO_TOPICOS = {
 };
 
 function aplicarCurriculoCurso(data) {
-  if (!data || Number(data._curriculumSeedVersion) >= 2) return;
+  if (!data || Number(data._curriculumSeedVersion) >= 3) return;
   if (!Array.isArray(data.disciplinas)) data.disciplinas = [];
   if (!Array.isArray(data.temas)) data.temas = [];
+
+  // A versão 3 começa a organização do curso do zero, usando somente a lista oficial enviada.
+  if (Number(data._curriculumSeedVersion) < 3) {
+    data.disciplinas = CURSO_DISCIPLINAS.map((spec, index) => ({
+      id:spec.id,
+      nome:spec.nome,
+      ordem:index + 1,
+      modalidade:spec.modalidade
+    }));
+    data.temas = [];
+  }
 
   const maxOrder = data.disciplinas.reduce((max, d) => Math.max(max, Number(d.ordem) || 0), 0);
   CURSO_DISCIPLINAS.forEach((spec, index) => {
@@ -1574,7 +1585,7 @@ function aplicarCurriculoCurso(data) {
       }
     });
   });
-  data._curriculumSeedVersion = 2;
+  data._curriculumSeedVersion = 3;
 }
 
 function defaults() {
