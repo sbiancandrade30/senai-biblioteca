@@ -7042,7 +7042,7 @@ let pastasBusca='';
 function pastasResumo(id){
  const c=D.catalogos?.[id];let necessarios=0,prontos=0;
  if(!c)return {necessarios,prontos};
- const rows=[...temasDaDisc(id).map(t=>({id:'tema:'+t.id,secao:'temas'})),...(c.linhas||[])].filter(r=>!(c.ocultos||[]).includes(r.id));
+ const rows=[...temasDaDisc(id).filter(t=>!(c.linhas||[]).some(r=>r.temaId===t.id)).map(t=>({id:'tema:'+t.id,secao:'temas'})),...(c.linhas||[])].filter(r=>!(c.ocultos||[]).includes(r.id));
  for(const r of rows)for(const t of (r.secao==='temas'?c.tipos:c.avaliacaoTipos)||[]){const v=catalogoSituacao(c.celulas?.[catChave(r.id,t.id)]||{});if(v?.necessario&&v.status!=='na'){necessarios++;if(catConcluido(v))prontos++;}}
  return {necessarios,prontos};
 }
@@ -7071,6 +7071,7 @@ function abrirPasta(id){
  catRender();window.scrollTo({top:0,behavior:'smooth'});
  let bot=document.getElementById('pastasOrganizarTemas');if(!bot){bot=document.createElement('button');bot.id='pastasOrganizarTemas';bot.className='btn btn-outline';bot.textContent='Organizar temas desta disciplina';document.querySelector('#pastasDisc .breadcrumb').append(bot);}bot.onclick=()=>abrirOrganizacao(id);
 }
+
 
 
 // Organização de disciplinas e temas com seleção em lote e desfazer.
@@ -7308,7 +7309,7 @@ function abrirPastaPendente(id,section='temas',only=true){
 }
 function resumoBiblioteca(){
  const pending=[],broken=[],duplicates=[],groups=new Map();
- for(const d of D.disciplinas){const c=D.catalogos?.[d.id];if(!c)continue;const rows=[...temasDaDisc(d.id).map(t=>({id:'tema:'+t.id,nome:c.nomes?.['tema:'+t.id]||t.nome,secao:'temas'})),...(c.linhas||[])].filter(r=>!(c.ocultos||[]).includes(r.id));
+ for(const d of D.disciplinas){const c=D.catalogos?.[d.id];if(!c)continue;const rows=[...temasDaDisc(d.id).filter(t=>!(c.linhas||[]).some(r=>r.temaId===t.id)).map(t=>({id:'tema:'+t.id,nome:c.nomes?.['tema:'+t.id]||t.nome,secao:'temas'})),...(c.linhas||[])].filter(r=>!(c.ocultos||[]).includes(r.id));
  for(const r of rows)for(const t of (r.secao==='temas'?c.tipos:c.avaliacaoTipos)||[]){const v=catalogoSituacao(c.celulas?.[catChave(r.id,t.id)]||{});if(v.necessario&&!catConcluido(v)&&v.status!=='na')pending.push({disc:d.id,discNome:d.nome,tema:r.nome,tipo:t.nome,status:CAT_STATUS[v.status]||'Não informado',secao:r.secao});}}
  for(const m of activeMaterials())for(const link of materialLinks(m)){const url=catUrl(link.link);if(!url){broken.push({m,link});continue;}const key=url;if(!groups.has(key))groups.set(key,new Map());groups.get(key).set(m.id,m);}
  for(const [url,map] of groups)if(map.size>1)duplicates.push({url,materiais:[...map.values()]});
@@ -7330,7 +7331,7 @@ function abrirConferenciaLinks(){
 }
 function sugestoesGabarito(){
  const result=[];
- for(const d of D.disciplinas){const c=D.catalogos?.[d.id];if(!c)continue;const rows=[...temasDaDisc(d.id).map(t=>({id:'tema:'+t.id,nome:t.nome,secao:'temas'})),...(c.linhas||[])].filter(r=>!(c.ocultos||[]).includes(r.id));
+ for(const d of D.disciplinas){const c=D.catalogos?.[d.id];if(!c)continue;const rows=[...temasDaDisc(d.id).filter(t=>!(c.linhas||[]).some(r=>r.temaId===t.id)).map(t=>({id:'tema:'+t.id,nome:t.nome,secao:'temas'})),...(c.linhas||[])].filter(r=>!(c.ocultos||[]).includes(r.id));
  for(const row of rows){const types=(row.secao==='temas'?c.tipos:c.avaliacaoTipos)||[];for(const t of types){const name=normalizar(t.nome);if(name.includes('gabarito'))continue;const kind=['lista','atividade','quiz','jogo','trab','prova'].find(k=>name.includes(k));if(!kind)continue;const v=catalogoSituacao(c.celulas?.[catChave(row.id,t.id)]||{});if(v.status==='na'||!(catConcluido(v)||v.materialId||v.url))continue;
  const answers=types.filter(x=>normalizar(x.nome).includes('gabarito')&&(normalizar(x.nome).includes(kind)||(['quiz','jogo'].includes(kind)&&/quiz|jogo/.test(normalizar(x.nome)))));const ready=answers.some(x=>{const value=catalogoSituacao(c.celulas?.[catChave(row.id,x.id)]||{});return value.status==='pronto'||value.status==='na';});if(!ready)result.push({disc:d.id,discNome:d.nome,nome:row.nome,tipo:t.nome,secao:row.secao});
  }}
@@ -7365,10 +7366,11 @@ const confirmarImportacaoAnterior=confirmarImportacaoPlanilha;
 confirmarImportacaoPlanilha=function(options={}){const list=pendingSheetImport?.novos||[];if(list.some(m=>(!options.skipDuplicates||!m._duplicate)&&materialLinks(m).some(l=>!catUrl(l.link)))){showToast('A planilha contém endereços inválidos. Corrija os links antes de importar.',true);return;}return confirmarImportacaoAnterior(options);};
 
 
+
 let catalogImportSource=null;
 function novoCatalogoVazio(){return {tipos:CAT_TIPOS.map((nome,i)=>({id:'c'+i,nome})),avaliacaoTipos:['Trabalho','Gabarito do trabalho','Prova','Gabarito da prova'].map((nome,i)=>({id:'a'+i,nome})),linhas:[],celulas:{},nomes:{},ocultos:[]};}
 function catalogoPortatil(ids=D.disciplinas.map(d=>d.id)){
- return {schema:'senai-catalogo',version:1,disciplinas:ids.map(id=>{const d=getDisc(id);if(!d)return null;const c=D.catalogos?.[id]||novoCatalogoVazio();const lines=[...temasDaDisc(id).map(t=>({id:'tema:'+t.id,nome:t.nome,secao:'temas'})),...(c.linhas||[])];return {nome:d.nome,modalidade:d.modalidade||'presencial',tipos:c.tipos.map(t=>t.nome),avaliacaoTipos:c.avaliacaoTipos.map(t=>t.nome),linhas:lines.map(r=>({nome:r.nome,rotulo:c.nomes?.[r.id]||'',secao:r.secao,oculto:(c.ocultos||[]).includes(r.id),celulas:(r.secao==='temas'?c.tipos:c.avaliacaoTipos).map(t=>{const raw=c.celulas?.[catChave(r.id,t.id)]||{},v=catalogoSituacao(raw),m=D.materiais.find(m=>m.id===v.materialId);return {tipo:t.nome,status:v.status||'',necessario:!!v.necessario,url:v.url||'',obs:v.obs||'',seguirMaterial:v.seguirMaterial!==false,materialId:m?.id||'',materialTitulo:m?.titulo||'',materialLink:m?materialLinks(m)[0]?.link||'':''};})}))};}).filter(Boolean)};
+ return {schema:'senai-catalogo',version:1,disciplinas:ids.map(id=>{const d=getDisc(id);if(!d)return null;const c=D.catalogos?.[id]||novoCatalogoVazio();const lines=[...temasDaDisc(id).filter(t=>!(c.linhas||[]).some(r=>r.temaId===t.id)).map(t=>({id:'tema:'+t.id,nome:t.nome,secao:'temas'})),...(c.linhas||[])];return {nome:d.nome,modalidade:d.modalidade||'presencial',tipos:c.tipos.map(t=>t.nome),avaliacaoTipos:c.avaliacaoTipos.map(t=>t.nome),linhas:lines.map(r=>({nome:r.nome,rotulo:c.nomes?.[r.id]||'',secao:r.secao,oculto:(c.ocultos||[]).includes(r.id),celulas:(r.secao==='temas'?c.tipos:c.avaliacaoTipos).map(t=>{const raw=c.celulas?.[catChave(r.id,t.id)]||{},v=catalogoSituacao(raw),m=D.materiais.find(m=>m.id===v.materialId);return {tipo:t.nome,status:v.status||'',necessario:!!v.necessario,url:v.url||'',obs:v.obs||'',seguirMaterial:v.seguirMaterial!==false,materialId:m?.id||'',materialTitulo:m?.titulo||'',materialLink:m?materialLinks(m)[0]?.link||'':''};})}))};}).filter(Boolean)};
 }
 function exportarCatalogo(ids){
  const data=catalogoPortatil(ids);
@@ -7445,6 +7447,7 @@ function abrirPreviaCatalogo(filename){
  document.querySelectorAll('#orgDialog select').forEach(s=>s.onchange=render);render();
 }
 
+
 // Situação rápida no controle da pasta; detalhes continuam em um botão próprio.
 const catRenderComDetalhes=catRender;
 catRender=function(){
@@ -7465,9 +7468,76 @@ catRender=function(){
  });
 };
 
+// Um único tema e um único material, apresentados em telas diferentes.
+function garantirTemasUnificados(){
+ let changed=false;
+ for(const [discId,c] of Object.entries(D.catalogos||{})){
+  if(!getDisc(discId))continue;
+  for(const [row,label] of Object.entries(c.nomes||{})){
+   if(!row.startsWith('tema:'))continue;const t=D.temas.find(t=>t.id===row.slice(5)&&t.disciplinaId===discId);
+   if(t&&label&&!D.temas.some(x=>x.id!==t.id&&x.disciplinaId===discId&&normalizar(x.nome)===normalizar(label))){if(t.nome!==label){t.nome=label;changed=true;}delete c.nomes[row];changed=true;}
+  }
+  for(const row of c.linhas||[]){
+   if(row.temaId&&!D.temas.some(t=>t.id===row.temaId)){continue;}
+   let t=D.temas.find(t=>t.id===row.temaId);
+   if(!t){t=D.temas.find(t=>t.disciplinaId===discId&&normalizar(t.nome)===normalizar(row.nome));if(!t){t={id:uid('tema'),nome:row.nome,disciplinaId:discId,ordem:temasDaDisc(discId).length+1};D.temas.push(t);}row.temaId=t.id;changed=true;}
+   if(row.nome!==t.nome){row.nome=t.nome;changed=true;}
+  }
+ }
+ for(const c of Object.values(D.catalogos||{}))for(const [key,value] of Object.entries(c.celulas||{})){if(!value.autoVinculo)continue;const m=D.materiais.find(m=>m.id===value.materialId),[row,col]=JSON.parse(key),themeId=row.startsWith('tema:')?row.slice(5):(c.linhas||[]).find(r=>r.id===row)?.temaId;if(!m||m.temaId!==themeId||m.catalogTipoId!==col){delete value.materialId;delete value.autoVinculo;changed=true;}}
+ for(const m of activeMaterials()){
+  if(!m.temaId||!D.temas.some(t=>t.id===m.temaId&&t.disciplinaId===m.disciplinaId))continue;
+  D.catalogos=D.catalogos||{};if(!D.catalogos[m.disciplinaId]){D.catalogos[m.disciplinaId]=novoCatalogoVazio();changed=true;}const c=D.catalogos[m.disciplinaId],row=(c.linhas||[]).find(r=>r.temaId===m.temaId),types=row?c.avaliacaoTipos:c.tipos;
+  let type=types.find(t=>t.id===m.catalogTipoId)||types.find(t=>tipoCatalogoComparavel(t.nome)===tipoCatalogoComparavel(labelTipo(m.tipoId)));
+  if(!type){type={id:uid('cattipo'),nome:labelTipo(m.tipoId)};types.push(type);changed=true;}
+  if(m.catalogTipoId!==type.id){m.catalogTipoId=type.id;changed=true;}const key=catChave(row?.id||'tema:'+m.temaId,type.id),v=c.celulas[key]||{};
+  if(!v.materialId){c.celulas[key]={...v,materialId:m.id,autoVinculo:true,seguirMaterial:v.seguirMaterial!==false};changed=true;}
+ }
+ return changed;
+}
+const salvarUnificadoAnterior=salvar;
+salvar=function(options={}){garantirTemasUnificados();for(const c of Object.values(D.catalogos||{})){const removed=(c.linhas||[]).filter(r=>r.temaId&&!D.temas.some(t=>t.id===r.temaId));for(const row of removed){for(const key of Object.keys(c.celulas||{}))if(JSON.parse(key)[0]===row.id)delete c.celulas[key];if(c.nomes)delete c.nomes[row.id];}if(removed.length)c.linhas=c.linhas.filter(r=>!removed.includes(r));}return salvarUnificadoAnterior(options);};
+catLinhas=function(){const c=catDados(),evaluations=new Set((c.linhas||[]).map(r=>r.temaId));return [...temasDaDisc(currentAdminDiscId).filter(t=>!evaluations.has(t.id)).map(t=>({id:'tema:'+t.id,nome:t.nome,secao:'temas',temaId:t.id})),...(c.linhas||[]).map(r=>({...r,nome:D.temas.find(t=>t.id===r.temaId)?.nome||r.nome}))].filter(r=>!c.ocultos.includes(r.id));};
+function temaDaCelula(r){return r.startsWith('tema:')?r.slice(5):catDados().linhas.find(x=>x.id===r)?.temaId||'';}
+function tipoCatalogoComparavel(name){const n=normalizar(name);return ({slide:'slides',roteiros:'roteiro','resumo estudo':'resumo de estudo','resumo quadro':'resumo para o quadro','lista de exercicios':'lista de questoes','atividade grupo':'atividade em grupo'})[n]||n;}
+function materiaisDaCelula(r,t){const themeId=temaDaCelula(r);if(!themeId)return [];const c=catDados(),type=[...c.tipos,...c.avaliacaoTipos].find(x=>x.id===t);const raw=c.celulas[catChave(r,t)]||{};return activeMaterials().filter(m=>m.disciplinaId===currentAdminDiscId&&m.temaId===themeId&&(m.id===raw.materialId||m.catalogTipoId===t||(!m.catalogTipoId&&type&&tipoCatalogoComparavel(labelTipo(m.tipoId))===tipoCatalogoComparavel(type.nome))));}
+const catValorUnificadoAnterior=catValor;
+catValor=function(r,t){const raw=catDados().celulas[catChave(r,t)]||{};if(raw.materialId&&D.materiais.some(m=>m.id===raw.materialId))return catValorUnificadoAnterior(r,t);const matches=materiaisDaCelula(r,t);return matches.length===1?catalogoSituacao({...raw,materialId:matches[0].id}):catValorUnificadoAnterior(r,t);};
+const catAcaoUnificadaAnterior=catAcao;
+catAcao=function(event){const b=event.target.closest('[data-cat-action]');if(b?.dataset.catAction==='renomearLinha'){const r=b.dataset.r,theme=D.temas.find(t=>t.id===temaDaCelula(r));if(!theme)return;const value=prompt('Nome do tema em toda a Biblioteca:',theme.nome);if(!value?.trim())return;if(D.temas.some(t=>t.id!==theme.id&&t.disciplinaId===theme.disciplinaId&&normalizar(t.nome)===normalizar(value))){showToast('Já existe um tema com esse nome nesta disciplina.',true);return;}theme.nome=value.trim();delete catDados().nomes[r];salvar();catRender();showToast('Tema atualizado nas Pastas, Materiais e Acervo.');return;}return catAcaoUnificadaAnterior(event);};
+function abrirMateriaisDoTema(discId,themeId){setTab('materiais',document.querySelector('[data-tab="materiais"]'));abrirAdminDisc(discId);document.getElementById('adminMatTema').value=themeId;renderAdminDisc();document.getElementById('adminDiscContent').scrollIntoView({block:'start',behavior:'smooth'});}
+function cadastroUnificado(discId,themeId,typeId){
+ const disc=getDisc(discId),theme=D.temas.find(t=>t.id===themeId);if(!disc||!theme)return;currentAdminDiscId=discId;const c=catDados(),row=(c.linhas||[]).find(r=>r.temaId===themeId),r=row?.id||'tema:'+themeId,types=row?c.avaliacaoTipos:c.tipos,type=types.find(t=>t.id===typeId)||types[0];
+ orgDialog('Adicionar material',`<p class="cat-note">${escH(disc.nome+' / '+theme.nome)}. O cadastro aparecerá nas Pastas, em Materiais e no Acervo.</p><label class="form-label" for="uniTipo">Tipo de material</label><select class="form-input" id="uniTipo">${types.map(t=>`<option value="${escH(t.id)}" ${t.id===type?.id?'selected':''}>${escH(t.nome)}</option>`).join('')}</select><label class="form-label" for="uniTitulo">Título</label><input class="form-input" id="uniTitulo" value="${escH((type?.nome||'Material')+' — '+theme.nome)}" required><label class="form-label" for="uniLink">Link do arquivo (Drive, Canva, vídeo…)</label><input class="form-input" id="uniLink" type="url" placeholder="https://…" required><label class="form-label" for="uniStatus">Situação na pasta</label><select class="form-input" id="uniStatus">${Object.entries(CAT_STATUS).map(([id,label])=>`<option value="${id}">${escH(label)}</option>`).join('')}</select>`,()=>{
+  const title=document.getElementById('uniTitulo').value.trim(),url=catUrl(document.getElementById('uniLink').value),type=types.find(t=>t.id===document.getElementById('uniTipo').value),status=document.getElementById('uniStatus').value;if(!url||!title||!type)throw Error('Preencha título, tipo e um link válido.');
+  const before=JSON.stringify(D);try{let m=D.materiais.find(m=>m.disciplinaId===discId&&m.temaId===themeId&&materialLinks(m).some(l=>catUrl(l.link)===url));
+  if(!m){let tipo=D.tipos.find(t=>tipoCatalogoComparavel(t.nome)===tipoCatalogoComparavel(type.nome));if(!tipo){tipo={id:uid('tipo'),nome:type.nome,icone:'📎',cor:'#2557d6',ordem:D.tipos.length+1};D.tipos.push(tipo);}m={id:uid('mat'),titulo:title,disciplinaId:discId,temaId:themeId,tipoId:tipo.id,catalogTipoId:type.id,links:[{id:uid('lnk'),link:url,titulo:'',origem:detectarOrigem(url),ordem:1}],link:url,descricao:'',statusMaterial:['pronto','imprimir','impresso'].includes(status)?'pronto':status==='producao'?'producao':status==='revisao'?'revisar':'',createdAt:isoNow(),updatedAt:isoNow(),ordem:nextOrderFor(discId,themeId,tipo.id)};D.materiais.push(m);}else m.catalogTipoId=type.id;
+  const key=catChave(r,type.id),old=c.celulas[key]||{};c.celulas[key]={...old,materialId:m.id,...(status?{status,seguirMaterial:false}:{seguirMaterial:old.seguirMaterial!==false})};salvar();melhoriasRefresh();if(catAberto)catRender();showToast('Material disponível em toda a Biblioteca.');}catch(err){D=JSON.parse(before);throw err;}
+ });
+}
+const catRenderUnificadoAnterior=catRender;
+catRender=function(){catRenderUnificadoAnterior();const panel=document.getElementById('catalogoPanel');if(!panel||panel.hidden)return;panel.querySelectorAll('.cat-cell[role="group"]').forEach(box=>{const r=box.dataset.r,t=box.dataset.t,theme=temaDaCelula(r),matches=materiaisDaCelula(r,t);const add=document.createElement('button');add.className='cat-details-button';add.textContent=matches.length?'Ver '+matches.length+' material(is)':'Adicionar material';add.onclick=()=>matches.length?abrirMateriaisDoTema(currentAdminDiscId,theme):cadastroUnificado(currentAdminDiscId,theme,t);box.append(add);});};
+const catAbrirUnificadoAnterior=catAbrirCelula;
+catAbrirCelula=function(r,t){catAbrirUnificadoAnterior(r,t);document.getElementById('catCadastrar').onclick=()=>{document.getElementById('catDialog').close();cadastroUnificado(currentAdminDiscId,temaDaCelula(r),t);};};
+const renderPlanUnificadoAnterior=renderPlanTab;
+renderPlanTab=function(){renderPlanUnificadoAnterior();const host=document.getElementById('planContent'),disc=document.getElementById('planDisc').value,search=normalizar(document.getElementById('planSearch')?.value||'');const empty=D.temas.filter(t=>(!disc||t.disciplinaId===disc)&&!activeMaterials().some(m=>m.temaId===t.id)&&(!search||normalizar(t.nome+' '+labelDisc(t.disciplinaId)).includes(search)));if(!empty.length)return;
+ const section=document.createElement('section');section.className='enh-details';section.innerHTML='<h3>Temas cadastrados — aguardando materiais</h3><p class="cat-note">Estes são os mesmos temas das Pastas. Adicione o primeiro material por aqui.</p>';const grouped=new Map();for(const t of empty){if(!grouped.has(t.disciplinaId))grouped.set(t.disciplinaId,[]);grouped.get(t.disciplinaId).push(t);}for(const [id,themes] of grouped){const details=document.createElement('details');details.className='enh-details';details.open=!!disc||!!search||grouped.size===1;const summary=document.createElement('summary');summary.textContent=labelDisc(id)+' · '+themes.length+' temas';details.append(summary);for(const t of themes){const row=document.createElement('div');row.className='org-row';const text=document.createElement('strong');text.textContent=t.nome;const button=document.createElement('button');button.className='a-btn';button.textContent='Adicionar material';button.onclick=()=>cadastroUnificado(id,t.id);row.append(text,button);details.append(row);}section.append(details);}host.append(section);
+};
+const openModalUnificadoAnterior=openModal;
+openModal=function(...args){openModalUnificadoAnterior(...args);let box=document.getElementById('uniCatalogTypeBox');if(!box){box=document.createElement('div');box.id='uniCatalogTypeBox';box.className='quick-note';document.querySelector('#modalOverlay .modal-body').prepend(box);}const m=D.materiais.find(m=>m.id===args[0]);const update=()=>{const discId=document.getElementById('mDisc').value,c=D.catalogos?.[discId]||novoCatalogoVazio();box.innerHTML='<label class="form-label" for="uniCatalogType">Tipo no controle da pasta</label><select class="form-input" id="uniCatalogType"><option value="">Usar o mesmo tipo escolhido no cadastro</option>'+[...c.tipos,...c.avaliacaoTipos].map(t=>`<option value="${escH(t.id)}" ${m?.catalogTipoId===t.id?'selected':''}>${escH(t.nome)}</option>`).join('')+'</select><p class="cat-note">O material será o mesmo nas Pastas, em Materiais e no Acervo.</p>';};update();document.getElementById('mDisc').addEventListener('change',update,{once:true});};
+const salvarMaterialUnificadoAnterior=salvarMaterial;
+salvarMaterial=function(options={}){const selected=document.getElementById('uniCatalogType')?.value,editing=editingMaterialId,ids=new Set(D.materiais.map(m=>m.id)),before=JSON.stringify(D);salvarMaterialUnificadoAnterior(options);if(JSON.stringify(D)===before)return;const m=editing?D.materiais.find(m=>m.id===editing):D.materiais.find(m=>!ids.has(m.id));if(m&&selected){m.catalogTipoId=selected;salvar();}if(catAberto)catRender();};
+const orgMoveCatalogUnificadoAnterior=orgMoveCatalog;
+orgMoveCatalog=function(theme,sourceId,targetId){const src=D.catalogos?.[sourceId],row=src?.linhas?.find(r=>r.temaId===theme.id),oldTypes=[...(src?.tipos||[]),...(src?.avaliacaoTipos||[])];orgMoveCatalogUnificadoAnterior(theme,sourceId,targetId);const dest=D.catalogos?.[targetId];if(!dest)return;
+ if(row){dest.linhas=dest.linhas||[];dest.linhas.push(row);src.linhas=src.linhas.filter(r=>r!==row);for(const type of src.avaliacaoTipos){const key=catChave(row.id,type.id),value=src.celulas[key];if(!value)continue;let t=dest.avaliacaoTipos.find(t=>normalizar(t.nome)===normalizar(type.nome));if(!t){t={id:uid('cattipo'),nome:type.nome};dest.avaliacaoTipos.push(t);}dest.celulas[catChave(row.id,t.id)]=value;delete src.celulas[key];}}
+ for(const m of D.materiais.filter(m=>m.temaId===theme.id)){const old=oldTypes.find(t=>t.id===m.catalogTipoId);if(old){const type=[...dest.tipos,...dest.avaliacaoTipos].find(t=>normalizar(t.nome)===normalizar(old.nome));if(type)m.catalogTipoId=type.id;}}
+};
+
+
 // INIT
 // ════════════════════════════════════════════════════════
 carregar();
+if(garantirTemasUnificados()) salvar();
 melhoriasBaseline();
 applySharedCloudConfigFromUrl();
 applyBranding();
