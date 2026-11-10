@@ -710,6 +710,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 
 #catalogoPanel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;margin:20px 0 28px;box-shadow:var(--shadow-soft)}
 .cat-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}.cat-head h2{font-size:20px;letter-spacing:-.03em}.cat-head p,.cat-note{font-size:12px;color:var(--text2);line-height:1.6;margin-top:6px}.cat-summary{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:16px;background:var(--accent-bg);border-radius:10px;color:var(--accent)}.cat-summary strong{font-size:21px}.cat-summary span{font-size:12px}.cat-tools{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:16px 0}.cat-tools>.form-input{max-width:340px}.cat-check{display:flex;gap:8px;align-items:center;font-size:12px;line-height:1.5}.cat-check input{accent-color:var(--accent);width:16px;height:16px;flex-shrink:0}.cat-table-wrap{max-height:65vh;overflow:auto;border:1px solid var(--border);border-radius:10px;margin-top:16px}.cat-table{border-collapse:separate;border-spacing:0;width:100%;font-size:12px}.cat-table th,.cat-table td{padding:9px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);vertical-align:top}.cat-table thead th{position:sticky;top:0;background:var(--surface2);z-index:2;min-width:155px;text-align:left}.cat-table th:first-child{position:sticky;left:0;background:var(--surface);min-width:230px;max-width:290px;z-index:1;text-align:left;line-height:1.5}.cat-table thead th:first-child{z-index:3;background:var(--surface2)}.cat-mini{display:flex;gap:10px;margin-top:8px}.cat-mini button{border:0;background:transparent;color:var(--text2);font:inherit;font-size:10px;cursor:pointer;text-decoration:underline}.cat-cell{display:flex;flex-direction:column;gap:5px;min-height:62px;width:100%;min-width:132px;text-align:left;border:1px solid var(--border);background:var(--surface2);border-radius:8px;padding:10px;cursor:pointer;color:var(--text2);font:inherit}.cat-cell:hover{outline:2px solid var(--accent);outline-offset:1px}.cat-cell small{font-size:10px}.cat-pronto{background:var(--green-bg);color:var(--green);border-color:#b4d9c3}.cat-pendente{background:var(--red-bg);color:var(--red);border-color:#efc2c2}.cat-producao{background:var(--accent-bg);color:var(--accent);border-color:#c7d6f5}.cat-revisao{background:var(--amber-bg);color:var(--amber);border-color:#ead3a5}.cat-na{background:var(--surface2);color:var(--text3)}.cat-muted{opacity:.45}.cat-empty{padding:30px!important;text-align:center;color:var(--text2)}#catDialog{border:1px solid var(--border);border-radius:18px;width:min(560px,calc(100vw - 30px));max-height:90vh;overflow:auto;padding:26px;margin:auto;color:var(--text);box-shadow:var(--shadow);font-family:'DM Sans',sans-serif}#catDialog::backdrop{background:rgba(15,23,42,.45)}#catDialog .form-label{margin-top:16px}#catDialog .cat-check{margin-top:16px}#catDialog .cat-head p{font-size:14px}#catDialog a{text-decoration:none}.cat-cell:focus-visible,.cat-mini button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}@media(max-width:650px){#catalogoPanel{padding:14px}.cat-head{flex-direction:column}.cat-summary{gap:8px}.cat-summary span{width:100%}.cat-table th:first-child{min-width:160px;max-width:180px}.cat-table-wrap{max-height:60vh}}
+#tabPastas .pastas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:18px;margin-top:22px}.pasta-card{display:flex;flex-direction:column;align-items:flex-start;gap:12px;min-height:245px;padding:22px;border:1px solid var(--border);border-radius:18px;background:var(--surface);color:var(--text);text-align:left;cursor:pointer;font:inherit;box-shadow:0 2px 6px rgba(21,24,33,.02);transition:transform .15s,border-color .15s}.pasta-card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:var(--shadow-soft)}.pasta-card:focus-visible{outline:3px solid var(--accent);outline-offset:3px}.pasta-card strong{font-size:16px;line-height:1.4}.pasta-icon{color:var(--accent);background:var(--accent-bg);border-radius:12px;padding:10px;display:flex}.pasta-meta{font-size:12px;color:var(--text2);line-height:1.5}.pasta-open{color:var(--accent);font-size:12px;font-weight:700;margin-top:auto}.pasta-progress{height:5px;background:var(--surface2);border-radius:5px;width:100%;overflow:hidden}.pasta-progress>span{display:block;height:100%;background:var(--green);border-radius:5px}#pastasBusca{max-width:500px}#pastasDisc #catalogoPanel{margin-top:12px}@media(max-width:500px){#tabPastas .pastas-grid{grid-template-columns:1fr}.pasta-card{min-height:215px}.tabs{flex-wrap:wrap}}
 
 </style>
 </head>
@@ -819,6 +820,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 <div class="app-body" id="viewAdmin" style="display:none">
   <div class="tabs">
     <button class="tab-btn active" data-tab="materiais" onclick="setTab('materiais',this)"><span class="tab-full">Materiais</span><span class="tab-short">Materiais</span></button>
+    <button class="tab-btn" data-tab="pastas" onclick="setTab('pastas',this)"><span class="tab-full">Pastas</span><span class="tab-short">Pastas</span></button>
     <button class="tab-btn" data-tab="planejamento" onclick="setTab('planejamento',this)"><span class="tab-full">Acervo</span><span class="tab-short">Acervo</span></button>
     <button class="tab-btn" data-tab="arquivo" onclick="setTab('arquivo',this)"><span class="tab-full">Arquivo</span><span class="tab-short">Arquivo</span></button>
     <button class="tab-btn" onclick="setTab('revisao',this)"><span class="tab-full">Revisão</span><span class="tab-short">Revisão</span></button>
@@ -826,6 +828,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   </div>
 
   <!-- TAB MATERIAIS -->
+  <div id="tabPastas" style="display:none"><div id="pastasHome"></div><div id="pastasDisc" style="display:none"><div class="breadcrumb"><button onclick="renderPastasHome()">Pastas</button><span>›</span><span id="pastasNome"></span></div><div id="pastasCatalogoHost"></div></div></div>
   <div id="tabMateriais">
     <div id="adminHome">
       <div class="library-top">
@@ -3561,6 +3564,8 @@ function setTab(tab, btn){
   document.getElementById('tabArquivo').style.display=tab==='arquivo'?'':'none';
   document.getElementById('tabRevisao').style.display=tab==='revisao'?'':'none';
   document.getElementById('tabConfiguracoes').style.display=tab==='configuracoes'?'':'none';
+  document.getElementById('tabPastas').style.display=tab==='pastas'?'':'none';
+  if(tab==='pastas') renderPastasHome();
   if(tab==='materiais') renderAdminHome();
   if(tab==='planejamento') renderPlanTab();
   if(tab==='arquivo') renderArchiveTab();
@@ -5646,7 +5651,7 @@ function salvarDisciplina(){
     const max=Math.max(0,...D.disciplinas.map(d=>Number(d.ordem)||0));
     D.disciplinas.push({id:uid('disc'),nome,ordem:max+1,modalidade});
   }
-  salvar(); closeDiscModal(); renderConfigTab(); renderAdminHome(); showToast(editingDiscId?'Disciplina atualizada!':'Disciplina criada!');
+  salvar(); closeDiscModal(); renderConfigTab(); renderAdminHome(); if(sessionStorage.getItem('mat_admin_tab')==='pastas') renderPastasHome(); showToast(editingDiscId?'Disciplina atualizada!':'Disciplina criada!');
 }
 function excluirDisc(id){
   const d=D.disciplinas.find(x=>x.id===id); if(!d) return;
@@ -6943,6 +6948,9 @@ function catAlternar(){catAberto=!catAberto;catRender();}
 function catRender(){
  let panel=document.getElementById('catalogoPanel');
  if(!panel){panel=document.createElement('section');panel.id='catalogoPanel';document.getElementById('adminDiscContent').before(panel);}
+ const emPastas=sessionStorage.getItem('mat_admin_tab')==='pastas';
+ const host=emPastas?document.getElementById('pastasCatalogoHost'):document.getElementById('adminDiscContent').parentElement;
+ if(emPastas){if(panel.parentElement!==host)host.append(panel);}else if(panel.parentElement!==host)document.getElementById('adminDiscContent').before(panel);
  panel.hidden=!catAberto;
  const bot=document.getElementById('catToggle');if(bot){bot.textContent=catAberto?'Fechar catálogo':'Catálogo da disciplina';bot.setAttribute('aria-expanded',String(catAberto));}
  if(!catAberto)return;
@@ -7004,6 +7012,38 @@ function catAbrirCelula(r,t){
  const necessario=document.getElementById('catNecessario').checked;let status=document.getElementById('catStatus').value;if(necessario&&!status)status='pendente';
  catDados().celulas[catChave(r,t)]={status,necessario:necessario&&status!=='na',url,materialId:document.getElementById('catMaterial').value,obs:document.getElementById('catObs').value.trim()};if(catGuardar()){dialog.close();catRender();showToast('Catálogo salvo.');}};
  dialog.showModal();
+}
+
+// Entrada dedicada no menu: todas as disciplinas, depois o catálogo de cada pasta.
+let pastasBusca='';
+function pastasResumo(id){
+ const c=D.catalogos?.[id];let necessarios=0,prontos=0;
+ if(!c)return {necessarios,prontos};
+ const rows=[...temasDaDisc(id).map(t=>({id:'tema:'+t.id,secao:'temas'})),...(c.linhas||[])].filter(r=>!(c.ocultos||[]).includes(r.id));
+ for(const r of rows)for(const t of (r.secao==='temas'?c.tipos:c.avaliacaoTipos)||[]){const v=c.celulas?.[catChave(r.id,t.id)];if(v?.necessario&&v.status!=='na'){necessarios++;if(v.status==='pronto')prontos++;}}
+ return {necessarios,prontos};
+}
+function renderPastasHome(){
+ document.getElementById('pastasHome').style.display='';document.getElementById('pastasDisc').style.display='none';
+ const home=document.getElementById('pastasHome');
+ home.innerHTML=`<div class="cat-head"><div><h2 style="font-size:26px">Pastas das disciplinas</h2><p>Todas as disciplinas em um só lugar. Abra uma pasta para organizar materiais por tema, trabalhos e provas.</p></div><button class="btn btn-primary" id="pastasNovaDisc">+ Nova disciplina</button></div><div class="cat-tools"><input id="pastasBusca" class="form-input" placeholder="Buscar disciplina…" aria-label="Buscar disciplina nas pastas" value="${escH(pastasBusca)}"><span id="pastasContagem" class="cat-note"></span></div><div class="pastas-grid" id="pastasGrid"></div>`;
+ document.getElementById('pastasNovaDisc').onclick=()=>openDiscModal();
+ const search=document.getElementById('pastasBusca');search.oninput=()=>{pastasBusca=search.value;renderPastasCards();};
+ renderPastasCards();
+}
+function renderPastasCards(){
+ const todas=[...D.disciplinas].sort((a,b)=>(a.ordem||0)-(b.ordem||0)||a.nome.localeCompare(b.nome,'pt-BR'));
+ const list=todas.filter(d=>normalizar(d.nome).includes(normalizar(pastasBusca)));
+ document.getElementById('pastasContagem').textContent=list.length+' de '+todas.length+' disciplinas';
+ const grid=document.getElementById('pastasGrid');
+ grid.innerHTML=list.map(d=>{const r=pastasResumo(d.id),p=r.necessarios?Math.round(r.prontos/r.necessarios*100):0;return `<button class="pasta-card" data-disc="${escH(d.id)}"><span class="pasta-icon" aria-hidden="true"><svg width="32" height="27" viewBox="0 0 32 27" fill="none"><path d="M2 6a3 3 0 0 1 3-3h7l3 4h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V6Z" fill="currentColor" opacity=".18"/><path d="M2 12h28M2 6a3 3 0 0 1 3-3h7l3 4h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V6Z" stroke="currentColor" stroke-width="1.7"/></svg></span><strong>${escH(d.nome)}</strong><span class="pasta-meta">${temasDaDisc(d.id).length} temas · ${d.modalidade==='ead'?'EaD':'Presencial'}</span><span class="pasta-progress" aria-label="${p}% concluído"><span style="width:${p}%"></span></span><span class="pasta-meta">${r.necessarios?r.prontos+' de '+r.necessarios+' necessários prontos':'Sem meta definida · preencha aos poucos'}</span><span class="pasta-open">Abrir pasta →</span></button>`;}).join('')||'<div class="cat-empty">Nenhuma disciplina encontrada.</div>';
+ grid.onclick=e=>{const card=e.target.closest('[data-disc]');if(card)abrirPasta(card.dataset.disc);};
+}
+function abrirPasta(id){
+ const disc=getDisc(id);if(!disc)return;
+ currentAdminDiscId=id;catAberto=true;catSecao='temas';catBusca='';catPendencias=false;
+ document.getElementById('pastasHome').style.display='none';document.getElementById('pastasDisc').style.display='';document.getElementById('pastasNome').textContent=disc.nome;
+ catRender();window.scrollTo({top:0,behavior:'smooth'});
 }
 
 // INIT
