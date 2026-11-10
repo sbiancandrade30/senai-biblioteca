@@ -707,6 +707,10 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   .summary-num{font-size:23px}
 }
 
+
+#catalogoPanel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;margin:20px 0 28px;box-shadow:var(--shadow-soft)}
+.cat-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}.cat-head h2{font-size:20px;letter-spacing:-.03em}.cat-head p,.cat-note{font-size:12px;color:var(--text2);line-height:1.6;margin-top:6px}.cat-summary{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:16px;background:var(--accent-bg);border-radius:10px;color:var(--accent)}.cat-summary strong{font-size:21px}.cat-summary span{font-size:12px}.cat-tools{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:16px 0}.cat-tools>.form-input{max-width:340px}.cat-check{display:flex;gap:8px;align-items:center;font-size:12px;line-height:1.5}.cat-check input{accent-color:var(--accent);width:16px;height:16px;flex-shrink:0}.cat-table-wrap{max-height:65vh;overflow:auto;border:1px solid var(--border);border-radius:10px;margin-top:16px}.cat-table{border-collapse:separate;border-spacing:0;width:100%;font-size:12px}.cat-table th,.cat-table td{padding:9px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);vertical-align:top}.cat-table thead th{position:sticky;top:0;background:var(--surface2);z-index:2;min-width:155px;text-align:left}.cat-table th:first-child{position:sticky;left:0;background:var(--surface);min-width:230px;max-width:290px;z-index:1;text-align:left;line-height:1.5}.cat-table thead th:first-child{z-index:3;background:var(--surface2)}.cat-mini{display:flex;gap:10px;margin-top:8px}.cat-mini button{border:0;background:transparent;color:var(--text2);font:inherit;font-size:10px;cursor:pointer;text-decoration:underline}.cat-cell{display:flex;flex-direction:column;gap:5px;min-height:62px;width:100%;min-width:132px;text-align:left;border:1px solid var(--border);background:var(--surface2);border-radius:8px;padding:10px;cursor:pointer;color:var(--text2);font:inherit}.cat-cell:hover{outline:2px solid var(--accent);outline-offset:1px}.cat-cell small{font-size:10px}.cat-pronto{background:var(--green-bg);color:var(--green);border-color:#b4d9c3}.cat-pendente{background:var(--red-bg);color:var(--red);border-color:#efc2c2}.cat-producao{background:var(--accent-bg);color:var(--accent);border-color:#c7d6f5}.cat-revisao{background:var(--amber-bg);color:var(--amber);border-color:#ead3a5}.cat-na{background:var(--surface2);color:var(--text3)}.cat-muted{opacity:.45}.cat-empty{padding:30px!important;text-align:center;color:var(--text2)}#catDialog{border:1px solid var(--border);border-radius:18px;width:min(560px,calc(100vw - 30px));max-height:90vh;overflow:auto;padding:26px;margin:auto;color:var(--text);box-shadow:var(--shadow);font-family:'DM Sans',sans-serif}#catDialog::backdrop{background:rgba(15,23,42,.45)}#catDialog .form-label{margin-top:16px}#catDialog .cat-check{margin-top:16px}#catDialog .cat-head p{font-size:14px}#catDialog a{text-decoration:none}.cat-cell:focus-visible,.cat-mini button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}@media(max-width:650px){#catalogoPanel{padding:14px}.cat-head{flex-direction:column}.cat-summary{gap:8px}.cat-summary span{width:100%}.cat-table th:first-child{min-width:160px;max-width:180px}.cat-table-wrap{max-height:60vh}}
+
 </style>
 </head>
 <body>
@@ -851,6 +855,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           <div class="inner-toolbar-sub" id="adminDiscSubtitle"></div>
         </div>
         <div class="inner-actions">
+          <button id="catToggle" class="btn btn-primary" onclick="catAlternar()" aria-expanded="false">Catálogo da disciplina</button>
           <button class="btn btn-outline" onclick="openThemeModal()">+ Novo tema</button>
           <button class="btn btn-outline" onclick="baixarModeloPlanilhaMateriais(currentAdminDiscId)">Baixar modelo</button>
           <button class="btn btn-outline" onclick="bulkSheetInput.click()">Importar planilha</button>
@@ -3886,6 +3891,7 @@ function recentCardHtml(m){
   </button>`;
 }
 function abrirAdminDisc(discId){
+  catBusca="";catPendencias=false;
   currentAdminDiscId=discId;
   document.getElementById('adminHome').style.display='none';
   document.getElementById('adminDiscView').style.display='';
@@ -3910,6 +3916,7 @@ function clearAdminDiscFilters(){
   renderAdminDisc();
 }
 function renderAdminDisc(){
+  catRender();
   const disc=getDisc(currentAdminDiscId); if(!disc) return voltarAdminHome();
   document.getElementById('adminBreadcrumbDisc').textContent=disc.nome;
   document.getElementById('adminDiscTitle').textContent=disc.nome;
@@ -6910,6 +6917,95 @@ function showToastWithAction(msg,label,action){
   const btn=document.createElement('button'); btn.type='button'; btn.textContent=label; btn.style.cssText='border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;border-radius:6px;padding:4px 8px;cursor:pointer;font-weight:700';
   btn.onclick=()=>{action();t.remove()}; t.append(text,btn); document.body.appendChild(t); setTimeout(()=>t.remove(),5000);
 }
+
+// Catálogo por disciplina. Dados integrados ao backup e à sincronização da Biblioteca.
+const CAT_TIPOS = ['Capa','Roteiro','Resumo de estudo','Resumo para o quadro','Slides','Esquemas para alunos','Lista de questões','Gabarito da lista','Atividade em grupo','Gabarito da atividade','Quiz / jogo','Gabarito do quiz'];
+const CAT_STATUS = {'':'Não informado',pendente:'Pendente',producao:'Em produção',pronto:'Pronto',revisao:'A revisar',na:'Não se aplica'};
+let catAberto=false, catSecao='temas', catBusca='', catPendencias=false, catEdicao=null;
+function catDados(){
+  if(!D.catalogos || typeof D.catalogos!=='object' || Array.isArray(D.catalogos)) D.catalogos={};
+  const id=currentAdminDiscId;
+  if(!D.catalogos[id]) D.catalogos[id]={tipos:CAT_TIPOS.map((nome,i)=>({id:'c'+i,nome})),avaliacaoTipos:['Trabalho','Gabarito do trabalho','Prova','Gabarito da prova'].map((nome,i)=>({id:'a'+i,nome})),linhas:[],celulas:{},ocultos:[],nomes:{}};
+  const c=D.catalogos[id];
+  c.linhas=c.linhas||[];c.celulas=c.celulas||{};c.ocultos=c.ocultos||[];c.nomes=c.nomes||{};
+  return c;
+}
+function catLinhas(){
+ const c=catDados();
+ const temas=temasDaDisc(currentAdminDiscId).map(t=>({id:'tema:'+t.id,nome:t.nome,secao:'temas'}));
+ return [...temas,...c.linhas].filter(r=>!c.ocultos.includes(r.id)).map(r=>({...r,nome:c.nomes[r.id]||r.nome}));
+}
+function catTipos(){const c=catDados();return catSecao==='temas'?c.tipos:c.avaliacaoTipos;}
+function catChave(r,t){return JSON.stringify([r,t]);}
+function catValor(r,t){return catDados().celulas[catChave(r,t)]||{};}
+function catGuardar(){try{salvar();return true;}catch(e){showToast('Não foi possível salvar. Exporte um backup e confira o espaço do navegador.',true);return false;}}
+function catAlternar(){catAberto=!catAberto;catRender();}
+function catRender(){
+ let panel=document.getElementById('catalogoPanel');
+ if(!panel){panel=document.createElement('section');panel.id='catalogoPanel';document.getElementById('adminDiscContent').before(panel);}
+ panel.hidden=!catAberto;
+ const bot=document.getElementById('catToggle');if(bot){bot.textContent=catAberto?'Fechar catálogo':'Catálogo da disciplina';bot.setAttribute('aria-expanded',String(catAberto));}
+ if(!catAberto)return;
+ const c=catDados(), todos=catLinhas(), tipos=catTipos();
+ const cont={necessarios:0,prontos:0,informados:0};
+ for(const r of todos){const ts=r.secao==='temas'?c.tipos:c.avaliacaoTipos;for(const t of ts){const v=catValor(r.id,t.id);if(v.status)cont.informados++;if(v.necessario&&v.status!=='na'){cont.necessarios++;if(v.status==='pronto')cont.prontos++;}}}
+ let linhas=todos.filter(r=>r.secao===catSecao&&normalizar(r.nome).includes(normalizar(catBusca)));
+ if(catPendencias)linhas=linhas.filter(r=>tipos.some(t=>{const v=catValor(r.id,t.id);return v.necessario&&v.status!=='pronto'&&v.status!=='na';}));
+ panel.innerHTML=`<div class="cat-head"><div><h2>Catálogo da disciplina</h2><p>Organize o que já existe e o que deseja produzir. Clique em uma célula para editar.</p></div><button class="btn btn-outline" data-cat-action="backup">Exportar backup</button></div>
+ <div class="cat-summary"><strong>${cont.necessarios?Math.round(cont.prontos/cont.necessarios*100)+'% concluído':'Sem meta definida'}</strong><span>${cont.prontos} de ${cont.necessarios} materiais necessários prontos</span><span>${cont.informados} situações informadas</span></div>
+ <p class="cat-note">Vazio = ainda não informado. Somente itens marcados como necessários entram no progresso. “Não se aplica” fica fora da meta.</p>
+ <div class="cat-tools"><button class="btn ${catSecao==='temas'?'btn-primary':'btn-outline'}" data-cat-action="temas">Materiais por tema</button><button class="btn ${catSecao==='avaliacoes'?'btn-primary':'btn-outline'}" data-cat-action="avaliacoes">Trabalhos e provas</button><button class="btn btn-outline" data-cat-action="linha">+ ${catSecao==='temas'?'Tema':'Trabalho / prova'}</button><button class="btn btn-outline" data-cat-action="tipo">+ Tipo de material</button><button class="btn btn-outline" data-cat-action="restaurar">Restaurar linhas ocultas</button></div>
+ <div class="cat-tools"><input class="form-input" id="catBusca" aria-label="Buscar tema ou avaliação" placeholder="Buscar tema ou avaliação…" value="${escH(catBusca)}"><label class="cat-check"><input id="catPendencias" type="checkbox" ${catPendencias?'checked':''}> Mostrar apenas pendências necessárias</label></div>
+ <div class="cat-table-wrap" tabindex="0" aria-label="Tabela do catálogo, role para ver todos os tipos"><table class="cat-table"><thead><tr><th scope="col">${catSecao==='temas'?'Tema':'Trabalho / prova'}</th>${tipos.map(t=>`<th scope="col"><span>${escH(t.nome)}</span><div class="cat-mini"><button data-cat-action="renomearTipo" data-t="${escH(t.id)}" aria-label="Renomear ${escH(t.nome)}">Editar</button><button data-cat-action="excluirTipo" data-t="${escH(t.id)}" aria-label="Excluir ${escH(t.nome)}">Excluir</button></div></th>`).join('')}</tr></thead><tbody>${linhas.map(r=>`<tr><th scope="row">${escH(r.nome)}<div class="cat-mini"><button data-cat-action="renomearLinha" data-r="${escH(r.id)}">Editar</button><button data-cat-action="ocultar" data-r="${escH(r.id)}">Ocultar</button></div></th>${tipos.map(t=>{const v=catValor(r.id,t.id);const pend=v.necessario&&v.status!=='pronto'&&v.status!=='na';return `<td><button class="cat-cell cat-${Object.hasOwn(CAT_STATUS,v.status)?v.status:'vazio'} ${catPendencias&&!pend?'cat-muted':''}" data-cat-action="celula" data-r="${escH(r.id)}" data-t="${escH(t.id)}" aria-label="${escH(r.nome+' — '+t.nome+': '+(CAT_STATUS[v.status]||'Não informado'))}"><span>${escH(CAT_STATUS[v.status]||'Não informado')}</span><small>${v.necessario&&v.status!=='na'?'Necessário':'Sem meta'}${v.materialId||v.url?' · Com link':''}</small></button></td>`;}).join('')}</tr>`).join('')||`<tr><td colspan="${tipos.length+1}" class="cat-empty">${catPendencias?'Nenhuma pendência necessária neste filtro.':'Nenhuma linha neste filtro. Adicione um tema ou uma avaliação para começar.'}</td></tr>`}</tbody></table></div>`;
+ panel.onclick=catAcao;
+ document.getElementById('catBusca').oninput=e=>{const pos=e.target.selectionStart;catBusca=e.target.value;catRender();const input=document.getElementById('catBusca');input.focus();input.setSelectionRange(pos,pos);};
+ document.getElementById('catPendencias').onchange=e=>{catPendencias=e.target.checked;catRender();};
+}
+function catAcao(e){
+ const b=e.target.closest('[data-cat-action]');if(!b)return;
+ const a=b.dataset.catAction,c=catDados(),ts=catTipos();
+ if(a==='backup')return exportarDados();
+ if(a==='temas'||a==='avaliacoes'){catSecao=a;catBusca='';return catRender();}
+ if(a==='celula')return catAbrirCelula(b.dataset.r,b.dataset.t);
+ if(a==='linha'){
+  const nome=prompt(catSecao==='temas'?'Nome do tema:':'Nome do trabalho ou prova:');if(!nome?.trim())return;
+  if(catLinhas().some(r=>r.secao===catSecao&&normalizar(r.nome)===normalizar(nome))){showToast('Essa linha já existe.',true);return;}
+  if(catSecao==='temas')D.temas.push({id:uid('tema'),nome:nome.trim(),disciplinaId:currentAdminDiscId,ordem:temasDaDisc(currentAdminDiscId).length+1});
+  else c.linhas.push({id:uid('catlinha'),nome:nome.trim(),secao:'avaliacoes'});
+ }
+ if(a==='tipo'){const nome=prompt('Nome do tipo de material:');if(!nome?.trim())return;if(ts.some(t=>normalizar(t.nome)===normalizar(nome))){showToast('Esse tipo já existe.',true);return;}ts.push({id:uid('cattipo'),nome:nome.trim()});}
+ if(a==='renomearTipo'){const t=ts.find(x=>x.id===b.dataset.t);const nome=prompt('Nome do tipo de material:',t.nome);if(!nome?.trim())return;t.nome=nome.trim();}
+ if(a==='excluirTipo'){const t=ts.find(x=>x.id===b.dataset.t);if(!confirm('Excluir a coluna “'+t.nome+'” e suas informações deste catálogo? Os materiais da Biblioteca serão preservados.'))return;ts.splice(ts.indexOf(t),1);for(const key of Object.keys(c.celulas)){if(JSON.parse(key)[1]===t.id)delete c.celulas[key];}}
+ if(a==='renomearLinha'){const r=catLinhas().find(x=>x.id===b.dataset.r);const nome=prompt('Nome no catálogo:',r.nome);if(!nome?.trim())return;c.nomes[r.id]=nome.trim();}
+ if(a==='ocultar'){if(!confirm('Ocultar esta linha do catálogo? Ela poderá ser restaurada.'))return;c.ocultos.push(b.dataset.r);}
+ if(a==='restaurar')c.ocultos=[];
+ catGuardar();renderAdminDisc();
+}
+function catUrl(raw){try{const u=new URL(raw);return ['https:','http:'].includes(u.protocol)?u.href:'';}catch{return '';}}
+function catAbrirCelula(r,t){
+ catEdicao={r,t,disc:currentAdminDiscId};
+ const v=catValor(r,t),linha=catLinhas().find(x=>x.id===r),tipo=catTipos().find(x=>x.id===t);
+ let dialog=document.getElementById('catDialog');if(!dialog){dialog=document.createElement('dialog');dialog.id='catDialog';document.body.append(dialog);}
+ const mats=matsDaDisc(currentAdminDiscId);
+ dialog.innerHTML=`<form id="catForm"><div class="cat-head"><div><h2>${escH(tipo.nome)}</h2><p>${escH(linha.nome)}</p></div><button type="button" class="btn btn-outline" id="catFechar" aria-label="Fechar edição">Fechar</button></div>
+ <label class="form-label" for="catStatus">Situação</label><select id="catStatus" class="form-input">${Object.entries(CAT_STATUS).map(([id,nome])=>`<option value="${id}" ${v.status===id?'selected':''}>${nome}</option>`).join('')}</select>
+ <label class="cat-check"><input type="checkbox" id="catNecessario" ${v.necessario?'checked':''}> Este material é necessário e deve entrar na meta</label>
+ <p class="cat-note">Marcar como necessário sem definir a situação registra uma pendência. “Não se aplica” não entra no progresso.</p>
+ <label class="form-label" for="catMaterial">Vincular material da Biblioteca</label><select id="catMaterial" class="form-input"><option value="">Nenhum material vinculado</option>${mats.map(m=>`<option value="${escH(m.id)}" ${v.materialId===m.id?'selected':''}>${escH(m.titulo||m.nome||'Sem título')}</option>`).join('')}</select>
+ <label class="form-label" for="catUrl">Link complementar (opcional)</label><input type="url" id="catUrl" class="form-input" placeholder="https://…" value="${escH(v.url||'')}">
+ <label class="form-label" for="catObs">Observações</label><textarea id="catObs" class="form-input" rows="3">${escH(v.obs||'')}</textarea>
+ <div id="catLinks" class="cat-tools"></div><p id="catErro" role="alert" style="color:var(--red)"></p><div class="cat-tools"><button type="button" class="btn btn-outline" id="catLimpar">Limpar célula</button><button type="submit" class="btn btn-primary">Salvar</button></div></form>`;
+ const links=document.getElementById('catLinks');
+ const mostrarLinks=()=>{links.replaceChildren();const m=mats.find(x=>x.id===document.getElementById('catMaterial').value);const fontes=m?materialLinks(m).map((l,i)=>[l.titulo||'Abrir material '+(i+1),l.link]):[];fontes.push(['Abrir link complementar',document.getElementById('catUrl').value]);for(const [label,raw] of fontes){const url=catUrl(raw);if(url){const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.className='btn btn-outline';a.textContent=label;links.append(a);}}};
+ document.getElementById('catMaterial').onchange=mostrarLinks;document.getElementById('catUrl').oninput=mostrarLinks;mostrarLinks();
+ document.getElementById('catFechar').onclick=()=>dialog.close();
+ document.getElementById('catLimpar').onclick=()=>{if(!confirm('Remover a situação, meta, vínculo e observações desta célula?'))return;delete catDados().celulas[catChave(r,t)];if(catGuardar()){dialog.close();catRender();}};
+ document.getElementById('catForm').onsubmit=e=>{e.preventDefault();if(catEdicao.disc!==currentAdminDiscId)return dialog.close();const url=document.getElementById('catUrl').value.trim();if(url&&!catUrl(url)){document.getElementById('catErro').textContent='Use um endereço iniciado por https:// ou http://.';return;}
+ const necessario=document.getElementById('catNecessario').checked;let status=document.getElementById('catStatus').value;if(necessario&&!status)status='pendente';
+ catDados().celulas[catChave(r,t)]={status,necessario:necessario&&status!=='na',url,materialId:document.getElementById('catMaterial').value,obs:document.getElementById('catObs').value.trim()};if(catGuardar()){dialog.close();catRender();showToast('Catálogo salvo.');}};
+ dialog.showModal();
+}
+
 // INIT
 // ════════════════════════════════════════════════════════
 carregar();
