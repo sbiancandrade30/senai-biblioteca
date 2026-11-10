@@ -715,6 +715,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .enh-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}.enh-summary>div{display:flex;flex-direction:column;gap:8px;padding:20px;border:1px solid var(--border);border-radius:14px;background:var(--surface)}.enh-summary strong{font-size:28px;color:var(--accent)}.enh-summary span{font-size:12px;line-height:1.5;color:var(--text2)}.enh-details{margin:15px 0 22px;background:var(--surface);border:1px solid var(--border);padding:16px;border-radius:12px}.enh-details summary{cursor:pointer;font-size:14px;font-weight:700}.enh-pending{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:9px;margin-top:15px}.enh-pending-row{display:flex;flex-direction:column;gap:7px;text-align:left;border:1px solid var(--border);border-radius:10px;padding:14px;background:var(--surface2);font:inherit;cursor:pointer}.enh-pending-row:hover{border-color:var(--accent)}.enh-pending-row span,.enh-pending-row small{font-size:12px;line-height:1.5;color:var(--text2)}.enh-break{overflow-wrap:anywhere;min-width:0}.enh-import-preview{max-height:230px;overflow:auto;border:1px solid var(--border);padding:12px;border-radius:10px;margin-top:12px;font-size:12px;line-height:1.7}#linksDialog{width:min(1040px,calc(100vw - 30px));max-height:90vh;overflow:auto;border:1px solid var(--border);border-radius:18px;padding:25px;margin:auto;color:var(--text);font-family:'DM Sans',sans-serif}#linksDialog::backdrop{background:rgba(15,23,42,.45)}#linksDialog .org-row>div:first-child{min-width:0}#linksDialog a{text-decoration:none}#melhoriasResumo{margin-bottom:32px}#pastasHome .cat-head{flex-wrap:wrap}#tabLixeira .org-row>div:first-child{min-width:0;overflow-wrap:anywhere}#orgDialog .cat-tools>label{flex:1;min-width:120px;font-size:12px}#orgDialog select{margin-top:5px}@media(max-width:650px){#viewAdmin{padding-bottom:170px!important}#viewAdmin .tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}#viewAdmin .tab-btn{min-width:0;white-space:normal;line-height:1.3}.enh-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.enh-summary>div{padding:14px}.enh-pending{grid-template-columns:1fr}#tabLixeira .org-row-actions{padding-left:0}#linksDialog{padding:16px}}
 
 .app-toast{max-width:calc(100vw - 24px);overflow-wrap:anywhere}@media(max-width:650px){.app-toast{bottom:125px!important;left:12px;right:12px!important}}
+.cat-table .cat-cell{cursor:default;min-width:192px}.cat-status-select{width:100%;min-width:174px;padding:9px 7px;border:1px solid var(--border2);border-radius:7px;background:var(--surface);color:inherit;font:inherit;cursor:pointer}.cat-details-button{align-self:flex-start;border:0;background:transparent;color:var(--accent);text-decoration:underline;font:inherit;font-size:11px;cursor:pointer;padding:4px 0}.cat-imprimir{background:var(--amber-bg);color:var(--amber);border-color:#ead3a5}.cat-impresso{background:var(--green-bg);color:var(--green);border-color:#b4d9c3}.cat-status-select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 </style>
 </head>
@@ -6938,7 +6939,8 @@ function showToastWithAction(msg,label,action){
 
 // Catálogo por disciplina. Dados integrados ao backup e à sincronização da Biblioteca.
 const CAT_TIPOS = ['Capa','Roteiro','Resumo de estudo','Resumo para o quadro','Slides','Esquemas para alunos','Lista de questões','Gabarito da lista','Atividade em grupo','Gabarito da atividade','Quiz / jogo','Gabarito do quiz'];
-const CAT_STATUS = {'':'Não informado',pendente:'Pendente',producao:'Em produção',pronto:'Pronto',revisao:'A revisar',na:'Não se aplica'};
+const CAT_STATUS = {'':'Não informado',pendente:'Não iniciado',producao:'Em produção',imprimir:'Feito — falta imprimir',pronto:'Feito',impresso:'Feito e impresso',revisao:'A revisar',na:'Não se aplica'};
+function catConcluido(v){return v.status==='pronto'||v.status==='impresso';}
 let catAberto=false, catSecao='temas', catBusca='', catPendencias=false, catEdicao=null;
 function catDados(){
   if(!D.catalogos || typeof D.catalogos!=='object' || Array.isArray(D.catalogos)) D.catalogos={};
@@ -6970,15 +6972,15 @@ function catRender(){
  if(!catAberto)return;
  const c=catDados(), todos=catLinhas(), tipos=catTipos();
  const cont={necessarios:0,prontos:0,informados:0};
- for(const r of todos){const ts=r.secao==='temas'?c.tipos:c.avaliacaoTipos;for(const t of ts){const v=catValor(r.id,t.id);if(v.status)cont.informados++;if(v.necessario&&v.status!=='na'){cont.necessarios++;if(v.status==='pronto')cont.prontos++;}}}
+ for(const r of todos){const ts=r.secao==='temas'?c.tipos:c.avaliacaoTipos;for(const t of ts){const v=catValor(r.id,t.id);if(v.status)cont.informados++;if(v.necessario&&v.status!=='na'){cont.necessarios++;if(catConcluido(v))cont.prontos++;}}}
  let linhas=todos.filter(r=>r.secao===catSecao&&normalizar(r.nome).includes(normalizar(catBusca)));
- if(catPendencias)linhas=linhas.filter(r=>tipos.some(t=>{const v=catValor(r.id,t.id);return v.necessario&&v.status!=='pronto'&&v.status!=='na';}));
- panel.innerHTML=`<div class="cat-head"><div><h2>Catálogo da disciplina</h2><p>Organize o que já existe e o que deseja produzir. Clique em uma célula para editar.</p></div><button class="btn btn-outline" data-cat-action="backup">Exportar backup</button></div>
+ if(catPendencias)linhas=linhas.filter(r=>tipos.some(t=>{const v=catValor(r.id,t.id);return v.necessario&&!catConcluido(v)&&v.status!=='na';}));
+ panel.innerHTML=`<div class="cat-head"><div><h2>Catálogo da disciplina</h2><p>Escolha a situação diretamente na tabela. Use “Detalhes” para links, observações e metas.</p></div><button class="btn btn-outline" data-cat-action="backup">Exportar backup</button></div>
  <div class="cat-summary"><strong>${cont.necessarios?Math.round(cont.prontos/cont.necessarios*100)+'% concluído':'Sem meta definida'}</strong><span>${cont.prontos} de ${cont.necessarios} materiais necessários prontos</span><span>${cont.informados} situações informadas</span></div>
  <p class="cat-note">Vazio = ainda não informado. Somente itens marcados como necessários entram no progresso. “Não se aplica” fica fora da meta.</p>
  <div class="cat-tools"><button class="btn ${catSecao==='temas'?'btn-primary':'btn-outline'}" data-cat-action="temas">Materiais por tema</button><button class="btn ${catSecao==='avaliacoes'?'btn-primary':'btn-outline'}" data-cat-action="avaliacoes">Trabalhos e provas</button><button class="btn btn-outline" data-cat-action="linha">+ ${catSecao==='temas'?'Tema':'Trabalho / prova'}</button><button class="btn btn-outline" data-cat-action="tipo">+ Tipo de material</button><button class="btn btn-outline" data-cat-action="restaurar">Restaurar linhas ocultas</button><button class="btn btn-outline" data-cat-action="exportar">Exportar catálogo</button><button class="btn btn-outline" data-cat-action="importar">Importar catálogo</button></div>
  <div class="cat-tools"><input class="form-input" id="catBusca" aria-label="Buscar tema ou avaliação" placeholder="Buscar tema ou avaliação…" value="${escH(catBusca)}"><label class="cat-check"><input id="catPendencias" type="checkbox" ${catPendencias?'checked':''}> Mostrar apenas pendências necessárias</label></div>
- <div class="cat-table-wrap" tabindex="0" aria-label="Tabela do catálogo, role para ver todos os tipos"><table class="cat-table"><thead><tr><th scope="col">${catSecao==='temas'?'Tema':'Trabalho / prova'}</th>${tipos.map(t=>`<th scope="col"><span>${escH(t.nome)}</span><div class="cat-mini"><button data-cat-action="renomearTipo" data-t="${escH(t.id)}" aria-label="Renomear ${escH(t.nome)}">Editar</button><button data-cat-action="excluirTipo" data-t="${escH(t.id)}" aria-label="Excluir ${escH(t.nome)}">Excluir</button></div></th>`).join('')}</tr></thead><tbody>${linhas.map(r=>`<tr><th scope="row">${escH(r.nome)}<div class="cat-mini"><button data-cat-action="renomearLinha" data-r="${escH(r.id)}">Editar</button><button data-cat-action="ocultar" data-r="${escH(r.id)}">Ocultar</button></div></th>${tipos.map(t=>{const v=catValor(r.id,t.id);const pend=v.necessario&&v.status!=='pronto'&&v.status!=='na';return `<td><button class="cat-cell cat-${Object.hasOwn(CAT_STATUS,v.status)?v.status:'vazio'} ${catPendencias&&!pend?'cat-muted':''}" data-cat-action="celula" data-r="${escH(r.id)}" data-t="${escH(t.id)}" aria-label="${escH(r.nome+' — '+t.nome+': '+(CAT_STATUS[v.status]||'Não informado'))}"><span>${escH(CAT_STATUS[v.status]||'Não informado')}</span><small>${v.necessario&&v.status!=='na'?'Necessário':'Sem meta'}${v.materialId||v.url?' · Com link':''}</small></button></td>`;}).join('')}</tr>`).join('')||`<tr><td colspan="${tipos.length+1}" class="cat-empty">${catPendencias?'Nenhuma pendência necessária neste filtro.':'Nenhuma linha neste filtro. Adicione um tema ou uma avaliação para começar.'}</td></tr>`}</tbody></table></div>`;
+ <div class="cat-table-wrap" tabindex="0" aria-label="Tabela do catálogo, role para ver todos os tipos"><table class="cat-table"><thead><tr><th scope="col">${catSecao==='temas'?'Tema':'Trabalho / prova'}</th>${tipos.map(t=>`<th scope="col"><span>${escH(t.nome)}</span><div class="cat-mini"><button data-cat-action="renomearTipo" data-t="${escH(t.id)}" aria-label="Renomear ${escH(t.nome)}">Editar</button><button data-cat-action="excluirTipo" data-t="${escH(t.id)}" aria-label="Excluir ${escH(t.nome)}">Excluir</button></div></th>`).join('')}</tr></thead><tbody>${linhas.map(r=>`<tr><th scope="row">${escH(r.nome)}<div class="cat-mini"><button data-cat-action="renomearLinha" data-r="${escH(r.id)}">Editar</button><button data-cat-action="ocultar" data-r="${escH(r.id)}">Ocultar</button></div></th>${tipos.map(t=>{const v=catValor(r.id,t.id);const pend=v.necessario&&!catConcluido(v)&&v.status!=='na';return `<td><button class="cat-cell cat-${Object.hasOwn(CAT_STATUS,v.status)?v.status:'vazio'} ${catPendencias&&!pend?'cat-muted':''}" data-cat-action="celula" data-r="${escH(r.id)}" data-t="${escH(t.id)}" aria-label="${escH(r.nome+' — '+t.nome+': '+(CAT_STATUS[v.status]||'Não informado'))}"><span>${escH(CAT_STATUS[v.status]||'Não informado')}</span><small>${v.necessario&&v.status!=='na'?'Necessário':'Sem meta'}${v.materialId||v.url?' · Com link':''}</small></button></td>`;}).join('')}</tr>`).join('')||`<tr><td colspan="${tipos.length+1}" class="cat-empty">${catPendencias?'Nenhuma pendência necessária neste filtro.':'Nenhuma linha neste filtro. Adicione um tema ou uma avaliação para começar.'}</td></tr>`}</tbody></table></div>`;
  panel.onclick=catAcao;
  document.getElementById('catBusca').oninput=e=>{const pos=e.target.selectionStart;catBusca=e.target.value;catRender();const input=document.getElementById('catBusca');input.focus();input.setSelectionRange(pos,pos);};
  document.getElementById('catPendencias').onchange=e=>{catPendencias=e.target.checked;catRender();};
@@ -7034,13 +7036,14 @@ function catAbrirCelula(r,t){
  dialog.showModal();
 }
 
+
 // Entrada dedicada no menu: todas as disciplinas, depois o catálogo de cada pasta.
 let pastasBusca='';
 function pastasResumo(id){
  const c=D.catalogos?.[id];let necessarios=0,prontos=0;
  if(!c)return {necessarios,prontos};
  const rows=[...temasDaDisc(id).map(t=>({id:'tema:'+t.id,secao:'temas'})),...(c.linhas||[])].filter(r=>!(c.ocultos||[]).includes(r.id));
- for(const r of rows)for(const t of (r.secao==='temas'?c.tipos:c.avaliacaoTipos)||[]){const v=catalogoSituacao(c.celulas?.[catChave(r.id,t.id)]||{});if(v?.necessario&&v.status!=='na'){necessarios++;if(v.status==='pronto')prontos++;}}
+ for(const r of rows)for(const t of (r.secao==='temas'?c.tipos:c.avaliacaoTipos)||[]){const v=catalogoSituacao(c.celulas?.[catChave(r.id,t.id)]||{});if(v?.necessario&&v.status!=='na'){necessarios++;if(catConcluido(v))prontos++;}}
  return {necessarios,prontos};
 }
 function renderPastasHome(){
@@ -7068,6 +7071,7 @@ function abrirPasta(id){
  catRender();window.scrollTo({top:0,behavior:'smooth'});
  let bot=document.getElementById('pastasOrganizarTemas');if(!bot){bot=document.createElement('button');bot.id='pastasOrganizarTemas';bot.className='btn btn-outline';bot.textContent='Organizar temas desta disciplina';document.querySelector('#pastasDisc .breadcrumb').append(bot);}bot.onclick=()=>abrirOrganizacao(id);
 }
+
 
 // Organização de disciplinas e temas com seleção em lote e desfazer.
 let orgScope='disciplinas',orgDisc='',orgSearch='',orgSelected=new Set(),orgUndo=null;
@@ -7260,7 +7264,7 @@ function catalogoSituacao(v){
  const out={...v},m=v.materialId?D.materiais.find(x=>x.id===v.materialId):null;
  if(v.materialId&&!m){out._aviso='Material não encontrado';return out;}
  if(m){const mapped=m.archived?'revisao':({pronto:'pronto',producao:'producao',revisar:'revisao',substituir:'revisao'})[m.statusMaterial];out._materialStatus=mapped||'';
- if(v.status==='na')return out;
+ if(['na','imprimir','impresso'].includes(v.status))return out;
  if(v.seguirMaterial!==false&&mapped){out.status=mapped;out._automatico=true;}
  else if(mapped&&v.status&&mapped!==v.status)out._aviso='Situações diferentes';
  if(m.archived)out._aviso='Material arquivado';}
@@ -7305,7 +7309,7 @@ function abrirPastaPendente(id,section='temas',only=true){
 function resumoBiblioteca(){
  const pending=[],broken=[],duplicates=[],groups=new Map();
  for(const d of D.disciplinas){const c=D.catalogos?.[d.id];if(!c)continue;const rows=[...temasDaDisc(d.id).map(t=>({id:'tema:'+t.id,nome:c.nomes?.['tema:'+t.id]||t.nome,secao:'temas'})),...(c.linhas||[])].filter(r=>!(c.ocultos||[]).includes(r.id));
- for(const r of rows)for(const t of (r.secao==='temas'?c.tipos:c.avaliacaoTipos)||[]){const v=catalogoSituacao(c.celulas?.[catChave(r.id,t.id)]||{});if(v.necessario&&v.status!=='pronto'&&v.status!=='na')pending.push({disc:d.id,discNome:d.nome,tema:r.nome,tipo:t.nome,status:CAT_STATUS[v.status]||'Não informado',secao:r.secao});}}
+ for(const r of rows)for(const t of (r.secao==='temas'?c.tipos:c.avaliacaoTipos)||[]){const v=catalogoSituacao(c.celulas?.[catChave(r.id,t.id)]||{});if(v.necessario&&!catConcluido(v)&&v.status!=='na')pending.push({disc:d.id,discNome:d.nome,tema:r.nome,tipo:t.nome,status:CAT_STATUS[v.status]||'Não informado',secao:r.secao});}}
  for(const m of activeMaterials())for(const link of materialLinks(m)){const url=catUrl(link.link);if(!url){broken.push({m,link});continue;}const key=url;if(!groups.has(key))groups.set(key,new Map());groups.get(key).set(m.id,m);}
  for(const [url,map] of groups)if(map.size>1)duplicates.push({url,materiais:[...map.values()]});
  return {pending,broken,duplicates};
@@ -7327,7 +7331,7 @@ function abrirConferenciaLinks(){
 function sugestoesGabarito(){
  const result=[];
  for(const d of D.disciplinas){const c=D.catalogos?.[d.id];if(!c)continue;const rows=[...temasDaDisc(d.id).map(t=>({id:'tema:'+t.id,nome:t.nome,secao:'temas'})),...(c.linhas||[])].filter(r=>!(c.ocultos||[]).includes(r.id));
- for(const row of rows){const types=(row.secao==='temas'?c.tipos:c.avaliacaoTipos)||[];for(const t of types){const name=normalizar(t.nome);if(name.includes('gabarito'))continue;const kind=['lista','atividade','quiz','jogo','trab','prova'].find(k=>name.includes(k));if(!kind)continue;const v=catalogoSituacao(c.celulas?.[catChave(row.id,t.id)]||{});if(v.status==='na'||!(v.status==='pronto'||v.materialId||v.url))continue;
+ for(const row of rows){const types=(row.secao==='temas'?c.tipos:c.avaliacaoTipos)||[];for(const t of types){const name=normalizar(t.nome);if(name.includes('gabarito'))continue;const kind=['lista','atividade','quiz','jogo','trab','prova'].find(k=>name.includes(k));if(!kind)continue;const v=catalogoSituacao(c.celulas?.[catChave(row.id,t.id)]||{});if(v.status==='na'||!(catConcluido(v)||v.materialId||v.url))continue;
  const answers=types.filter(x=>normalizar(x.nome).includes('gabarito')&&(normalizar(x.nome).includes(kind)||(['quiz','jogo'].includes(kind)&&/quiz|jogo/.test(normalizar(x.nome)))));const ready=answers.some(x=>{const value=catalogoSituacao(c.celulas?.[catChave(row.id,x.id)]||{});return value.status==='pronto'||value.status==='na';});if(!ready)result.push({disc:d.id,discNome:d.nome,nome:row.nome,tipo:t.nome,secao:row.secao});
  }}
  }return result;
@@ -7360,6 +7364,7 @@ professorOnlyJs=function(){let script=professorOnlyJsAnterior();const start=scri
 const confirmarImportacaoAnterior=confirmarImportacaoPlanilha;
 confirmarImportacaoPlanilha=function(options={}){const list=pendingSheetImport?.novos||[];if(list.some(m=>(!options.skipDuplicates||!m._duplicate)&&materialLinks(m).some(l=>!catUrl(l.link)))){showToast('A planilha contém endereços inválidos. Corrija os links antes de importar.',true);return;}return confirmarImportacaoAnterior(options);};
 
+
 let catalogImportSource=null;
 function novoCatalogoVazio(){return {tipos:CAT_TIPOS.map((nome,i)=>({id:'c'+i,nome})),avaliacaoTipos:['Trabalho','Gabarito do trabalho','Prova','Gabarito da prova'].map((nome,i)=>({id:'a'+i,nome})),linhas:[],celulas:{},nomes:{},ocultos:[]};}
 function catalogoPortatil(ids=D.disciplinas.map(d=>d.id)){
@@ -7389,7 +7394,7 @@ async function prepararImportacaoCatalogo(file){
 function normalizarStatusCatalogo(raw,legend){
  const text=raw===true?'1':raw===false?'0':String(raw??'').trim(),n=normalizar(text);if(!text||n==='nao informado')return '';
  if(legend&&Object.hasOwn(legend,text))return legend[text];
- if(n==='pronto'||n==='concluido')return 'pronto';if(n==='pendente')return 'pendente';if(n==='em producao'||n==='producao')return 'producao';if(n==='a revisar'||n==='revisao'||n==='revisar')return 'revisao';if(n==='nao se aplica'||n==='na')return 'na';throw Error('Situação não reconhecida: '+text);
+ if(n==='imprimir'||n==='feito falta imprimir')return 'imprimir';if(n==='impresso'||n==='feito e impresso')return 'impresso';if(n==='pronto'||n==='concluido'||n==='feito')return 'pronto';if(n==='pendente'||n==='nao iniciado')return 'pendente';if(n==='em producao'||n==='producao')return 'producao';if(n==='a revisar'||n==='revisao'||n==='revisar')return 'revisao';if(n==='nao se aplica'||n==='na')return 'na';throw Error('Situação não reconhecida: '+text);
 }
 function tabelasParaCatalogo(source,legend){
  const data={schema:'senai-catalogo',version:1,disciplinas:[]};let total=0;
@@ -7439,6 +7444,26 @@ function abrirPreviaCatalogo(filename){
  const render=()=>{try{const {stats:s,preview}=prepare();document.getElementById('catImportPreview').innerHTML=`<div class="org-bulk"><strong>${s.disciplinas} novas disciplinas · ${s.temas} novos temas · ${s.celulas} células a atualizar</strong></div><p class="cat-note">${s.tipos} novos tipos. ${s.vinculosPendentes} vínculos não encontrados: os links serão preservados para vincular depois.</p><div class="enh-import-preview">${preview.map(p=>`<p>${escH(p.disc+' / '+p.tema+' / '+p.tipo+' → '+p.status)}</p>`).join('')||'<p>Nenhuma célula a atualizar. A estrutura de temas e tipos ainda pode ser adicionada.</p>'}</div>`;document.getElementById('orgConfirm').disabled=false;document.getElementById('orgError').textContent='';}catch(err){document.getElementById('orgConfirm').disabled=true;document.getElementById('orgError').textContent=err.message;}};
  document.querySelectorAll('#orgDialog select').forEach(s=>s.onchange=render);render();
 }
+
+// Situação rápida no controle da pasta; detalhes continuam em um botão próprio.
+const catRenderComDetalhes=catRender;
+catRender=function(){
+ catRenderComDetalhes();const panel=document.getElementById('catalogoPanel');if(!panel||panel.hidden)return;
+ panel.querySelectorAll('button.cat-cell[data-cat-action="celula"]').forEach(old=>{
+  const r=old.dataset.r,t=old.dataset.t,v=catValor(r,t),box=document.createElement('div');box.className=old.className;box.setAttribute('role','group');box.dataset.r=r;box.dataset.t=t;
+  const select=document.createElement('select');select.className='cat-status-select';select.setAttribute('aria-label',old.getAttribute('aria-label'));select.dataset.r=r;select.dataset.t=t;
+  for(const [value,label] of Object.entries(CAT_STATUS)){const option=document.createElement('option');option.value=value;option.textContent=label;select.append(option);}select.value=v.status||'';
+  const details=document.createElement('button');details.type='button';details.className='cat-details-button';details.textContent='Detalhes';details.dataset.catAction='celula';details.dataset.r=r;details.dataset.t=t;details.setAttribute('aria-label','Detalhes: '+old.getAttribute('aria-label'));
+  box.append(select);for(const small of [...old.querySelectorAll('small')])box.append(small);box.append(details);old.replaceWith(box);
+  select.onchange=()=>{
+   const cells=catDados().celulas,key=catChave(r,t),before=cells[key],table=panel.querySelector('.cat-table-wrap'),scroll={left:table.scrollLeft,top:table.scrollTop};
+   cells[key]={...(before||{}),status:select.value,seguirMaterial:false};
+   if(!catGuardar()){if(before===undefined)delete cells[key];else cells[key]=before;select.value=v.status||'';return;}
+   catRender();const next=panel.querySelector('.cat-table-wrap');next.scrollLeft=scroll.left;next.scrollTop=scroll.top;
+   const focus=[...panel.querySelectorAll('.cat-status-select')].find(x=>x.dataset.r===r&&x.dataset.t===t);focus?.focus({preventScroll:true});
+  };
+ });
+};
 
 // INIT
 // ════════════════════════════════════════════════════════
