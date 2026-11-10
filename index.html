@@ -716,6 +716,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 
 .app-toast{max-width:calc(100vw - 24px);overflow-wrap:anywhere}@media(max-width:650px){.app-toast{bottom:125px!important;left:12px;right:12px!important}}
 .cat-table .cat-cell{cursor:default;min-width:192px}.cat-status-select{width:100%;min-width:174px;padding:9px 7px;border:1px solid var(--border2);border-radius:7px;background:var(--surface);color:inherit;font:inherit;cursor:pointer}.cat-details-button{align-self:flex-start;border:0;background:transparent;color:var(--accent);text-decoration:underline;font:inherit;font-size:11px;cursor:pointer;padding:4px 0}.cat-imprimir{background:var(--amber-bg);color:var(--amber);border-color:#ead3a5}.cat-impresso{background:var(--green-bg);color:var(--green);border-color:#b4d9c3}.cat-status-select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cat-table-wrap.cat-responsive{overflow:visible;max-height:none;border:0;border-radius:0}.cat-compact-tools{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.cat-type-management{padding:12px 0;margin-bottom:12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)}.cat-type-management>summary{cursor:pointer}.cat-type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px;margin-top:12px}.cat-type-item{padding:10px;border:1px solid var(--border);border-radius:8px}.cat-topic-list{display:grid;gap:12px;min-width:0}.cat-topic{border:1px solid var(--border);border-radius:12px;background:var(--surface);min-width:0;overflow:hidden}.cat-topic>summary{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:16px;cursor:pointer;list-style:none;background:var(--surface2)}.cat-topic>summary::-webkit-details-marker{display:none}.cat-topic>summary::before{content:'›';font-size:22px;color:var(--accent);flex-shrink:0}.cat-topic[open]>summary::before{transform:rotate(90deg)}.cat-topic>summary strong{flex:1;font-size:14px;line-height:1.45;overflow-wrap:anywhere}.cat-topic-count{font-size:11px;color:var(--text2);white-space:nowrap}.cat-topic-body{padding:14px;min-width:0}.cat-topic-actions{margin:0 0 12px}.cat-topic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,205px),1fr));gap:10px;min-width:0}.cat-responsive .cat-cell{min-width:0;width:100%;padding:11px;gap:7px}.cat-responsive .cat-status-select{min-width:0;width:100%;font-size:12px;padding:8px}.cat-material-label{font-size:12px;font-weight:700;line-height:1.4}.cat-cell-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:auto}.cat-cell-actions .cat-details-button{font-size:11px}.cat-responsive .cat-cell:hover{outline:none}.cat-responsive .cat-cell:focus-within{outline:2px solid var(--accent);outline-offset:1px}@media(max-width:500px){.cat-topic>summary{align-items:flex-start;flex-wrap:wrap;padding:12px}.cat-topic-count{margin-left:22px}.cat-topic-body{padding:10px}.cat-topic-grid{grid-template-columns:1fr}}
 
 </style>
 </head>
@@ -7533,6 +7534,32 @@ orgMoveCatalog=function(theme,sourceId,targetId){const src=D.catalogos?.[sourceI
  for(const m of D.materiais.filter(m=>m.temaId===theme.id)){const old=oldTypes.find(t=>t.id===m.catalogTipoId);if(old){const type=[...dest.tipos,...dest.avaliacaoTipos].find(t=>normalizar(t.nome)===normalizar(old.nome));if(type)m.catalogTipoId=type.id;}}
 };
 
+
+// Tópicos em blocos responsivos, sem rolagem horizontal.
+const catTopicosAbertos=new Map();
+const catRenderGradeAnterior=catRender;
+catRender=function(){
+ catRenderGradeAnterior();const panel=document.getElementById('catalogoPanel');if(!panel||panel.hidden)return;
+ const wrap=panel.querySelector('.cat-table-wrap'),table=wrap?.querySelector('table');if(!table)return;
+ const scope=currentAdminDiscId+':'+catSecao,headers=[...table.querySelectorAll('thead th')].slice(1),rows=[...table.querySelectorAll('tbody tr')].filter(r=>r.querySelector('.cat-cell'));
+ const tools=document.createElement('div');tools.className='cat-compact-tools';
+ const topics=document.createElement('div');topics.className='cat-topic-list';
+ const management=document.createElement('details');management.className='cat-type-management';const managementTitle=document.createElement('summary');managementTitle.textContent='Editar tipos de material';management.append(managementTitle);const managementGrid=document.createElement('div');managementGrid.className='cat-type-grid';
+ for(const th of headers){const item=document.createElement('div');item.className='cat-type-item';const name=document.createElement('strong');name.textContent=th.querySelector('span')?.textContent||'';item.append(name);const actions=th.querySelector('.cat-mini');if(actions)item.append(actions);managementGrid.append(item);}management.append(managementGrid);
+ rows.forEach((tr,index)=>{
+  const first=tr.querySelector('th'),cells=[...tr.querySelectorAll('td .cat-cell')],id=cells[0].dataset.r,key=scope+':'+id,details=document.createElement('details');details.className='cat-topic';details.dataset.row=id;
+  details.open=catTopicosAbertos.has(key)?catTopicosAbertos.get(key):index===0;
+  const summary=document.createElement('summary'),title=document.createElement('strong');title.textContent=first.childNodes[0]?.textContent?.trim()||'';const count=document.createElement('span');count.className='cat-topic-count';const values=cells.map(c=>catValor(c.dataset.r,c.dataset.t));count.textContent=values.filter(catConcluido).length+' feitos · '+cells.length+' tipos';summary.append(title,count);details.append(summary);
+  const body=document.createElement('div');body.className='cat-topic-body';const actions=first.querySelector('.cat-mini');if(actions){actions.classList.add('cat-topic-actions');body.append(actions);}
+  const grid=document.createElement('div');grid.className='cat-topic-grid';cells.forEach((cell,i)=>{const label=document.createElement('label');label.className='cat-material-label';label.textContent=headers[i]?.querySelector('span')?.textContent||'';const select=cell.querySelector('select');if(select){select.id='cat-select-'+index+'-'+i;label.htmlFor=select.id;}cell.prepend(label);
+   for(const small of cell.querySelectorAll('small')){if(small.textContent==='Sem meta')small.remove();else small.textContent=small.textContent.replace('Sem meta · ','');}
+   const links=document.createElement('div');links.className='cat-cell-actions';for(const b of [...cell.querySelectorAll('button')])links.append(b);cell.append(links);grid.append(cell);
+  });body.append(grid);details.append(body);details.addEventListener('toggle',()=>catTopicosAbertos.set(key,details.open));topics.append(details);
+ });
+ for(const [text,open] of [['Expandir tópicos',true],['Recolher tópicos',false]]){const button=document.createElement('button');button.className='btn btn-outline';button.textContent=text;button.onclick=()=>{topics.querySelectorAll('.cat-topic').forEach(d=>{catTopicosAbertos.set(scope+':'+d.dataset.row,open);d.open=open;});};tools.append(button);}
+ if(!rows.length){const empty=document.createElement('p');empty.className='cat-empty';empty.textContent=table.querySelector('tbody')?.textContent||'Nenhum tópico neste filtro.';topics.append(empty);}
+ wrap.replaceChildren(tools,management,topics);wrap.classList.add('cat-responsive');wrap.removeAttribute('tabindex');wrap.setAttribute('aria-label','Controle dos tópicos e materiais');
+};
 
 // INIT
 // ════════════════════════════════════════════════════════
