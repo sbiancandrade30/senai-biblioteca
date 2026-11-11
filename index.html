@@ -719,6 +719,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 .cat-table-wrap.cat-responsive{overflow:visible;max-height:none;border:0;border-radius:0}.cat-compact-tools{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.cat-type-management{padding:12px 0;margin-bottom:12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)}.cat-type-management>summary{cursor:pointer}.cat-type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px;margin-top:12px}.cat-type-item{padding:10px;border:1px solid var(--border);border-radius:8px}.cat-topic-list{display:grid;gap:12px;min-width:0}.cat-topic{border:1px solid var(--border);border-radius:12px;background:var(--surface);min-width:0;overflow:hidden}.cat-topic>summary{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:16px;cursor:pointer;list-style:none;background:var(--surface2)}.cat-topic>summary::-webkit-details-marker{display:none}.cat-topic>summary::before{content:'›';font-size:22px;color:var(--accent);flex-shrink:0}.cat-topic[open]>summary::before{transform:rotate(90deg)}.cat-topic>summary strong{flex:1;font-size:14px;line-height:1.45;overflow-wrap:anywhere}.cat-topic-count{font-size:11px;color:var(--text2);white-space:nowrap}.cat-topic-body{padding:14px;min-width:0}.cat-topic-actions{margin:0 0 12px}.cat-topic-grid{display:grid;grid-template-columns:repeat(auto-fill,min(100%,148px));gap:7px;min-width:0}.cat-responsive .cat-cell{min-width:0;width:100%;padding:7px;gap:4px}.cat-responsive .cat-status-select{min-width:0;width:100%;font-size:11px;padding:5px 3px}.cat-material-label{font-size:12px;font-weight:700;line-height:1.4}.cat-cell-actions{display:flex;gap:2px 8px;flex-wrap:wrap;align-items:center;margin-top:auto}.cat-cell-actions .cat-details-button{font-size:11px}.cat-responsive .cat-cell:hover{outline:none}.cat-responsive .cat-cell:focus-within{outline:2px solid var(--accent);outline-offset:1px}@media(max-width:500px){.cat-topic>summary{align-items:flex-start;flex-wrap:wrap;padding:12px}.cat-topic-count{margin-left:22px}.cat-topic-body{padding:8px}.cat-topic-grid{grid-template-columns:repeat(auto-fill,min(100%,138px))}}
 
 .cat-topic .cat-topic-actions{flex-wrap:wrap;gap:6px 10px}.cat-topic .cat-topic-actions button{white-space:normal}.cat-topic .cat-topic-actions button:disabled{cursor:default}
+.tab-btn[hidden],#adminSubnav[hidden]{display:none}#adminSubnav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}#adminSubnav .btn[aria-current=page]{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}#tabPlanejamento #planSummary{display:none}#planContent>.empty .btn{margin-top:14px}
 
 </style>
 </head>
@@ -827,17 +828,18 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 <!-- CORPO ADMIN -->
 <div class="app-body" id="viewAdmin" style="display:none">
   <div class="tabs">
-    <button class="tab-btn active" data-tab="materiais" onclick="setTab('materiais',this)"><span class="tab-full">Materiais</span><span class="tab-short">Materiais</span></button>
+    <button class="tab-btn active" data-tab="materiais" onclick="setTab('materiais',this)"><span class="tab-full">Biblioteca</span><span class="tab-short">Biblioteca</span></button>
     <button class="tab-btn" data-tab="pastas" onclick="setTab('pastas',this)"><span class="tab-full">Pastas</span><span class="tab-short">Pastas</span></button>
-    <button class="tab-btn" data-tab="planejamento" onclick="setTab('planejamento',this)"><span class="tab-full">Acervo</span><span class="tab-short">Acervo</span></button>
+    <button class="tab-btn" hidden data-tab="planejamento" onclick="setTab('planejamento',this)"><span class="tab-full">Acervo</span><span class="tab-short">Acervo</span></button>
     <button class="tab-btn" data-tab="organizar" onclick="setTab('organizar',this)"><span class="tab-full">Organizar</span><span class="tab-short">Organizar</span></button>
-    <button class="tab-btn" data-tab="arquivo" onclick="setTab('arquivo',this)"><span class="tab-full">Arquivo</span><span class="tab-short">Arquivo</span></button>
-    <button class="tab-btn" data-tab="lixeira" onclick="setTab('lixeira',this)"><span class="tab-full">Lixeira</span><span class="tab-short">Lixeira</span></button>
+    <button class="tab-btn" hidden data-tab="arquivo" onclick="setTab('arquivo',this)"><span class="tab-full">Arquivo</span><span class="tab-short">Arquivo</span></button>
+    <button class="tab-btn" hidden data-tab="lixeira" onclick="setTab('lixeira',this)"><span class="tab-full">Lixeira</span><span class="tab-short">Lixeira</span></button>
     <button class="tab-btn" data-tab="revisao" onclick="setTab('revisao',this)"><span class="tab-full">Pendências</span><span class="tab-short">Pendências</span></button>
-    <button class="tab-btn" onclick="setTab('configuracoes',this)"><span class="tab-full">Configurações</span><span class="tab-short">Config.</span></button>
+    <button class="tab-btn" data-tab="configuracoes" onclick="setTab('configuracoes',this)"><span class="tab-full">Configurações</span><span class="tab-short">Config.</span></button>
   </div>
 
   <!-- TAB MATERIAIS -->
+  <nav id="adminSubnav" aria-label="Opções da seção" hidden></nav>
   <div id="tabLixeira" style="display:none"></div>
   <div id="tabOrganizar" style="display:none"></div>
   <div id="tabPastas" style="display:none"><div id="pastasHome"></div><div id="pastasDisc" style="display:none"><div class="breadcrumb"><button onclick="renderPastasHome()">Pastas</button><span>›</span><span id="pastasNome"></span></div><div id="pastasCatalogoHost"></div></div></div>
@@ -898,8 +900,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   <div id="tabPlanejamento" style="display:none">
     <div class="library-top">
       <div>
-        <h2 id="pageTitleAcervo">Banco de materiais</h2>
-        <p id="pageSubAcervo">Consulte todo o acervo por disciplina, tema, tipo e status. A organização aqui é reutilizável e não depende de uma turma ou aula específica.</p>
+        <h2 id="pageTitleAcervo">Buscar materiais</h2>
+        <p id="pageSubAcervo">Busque arquivos cadastrados em todas as disciplinas e filtre por tipo ou situação.</p>
       </div>
       <div class="inner-actions">
         <button class="btn btn-outline" id="bulkModeBtn" onclick="toggleBulkSelectionMode()">Selecionar materiais</button>
@@ -918,7 +920,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
     </div>
     <button class="mobile-filter-toggle" type="button" onclick="togglePlanMobileFilters()">Filtros avançados</button>
     <div class="inner-filters">
-      <input class="search-input" type="text" id="planSearch" placeholder="Buscar no banco de materiais..." oninput="renderPlanTab()">
+      <input class="search-input" type="text" id="planSearch" placeholder="Buscar por título, tema ou disciplina…" oninput="renderPlanTab()">
       <select class="filter-sel" id="planCourse" onchange="renderPlanTab()" style="display:none"><option value="">Todos os usos</option></select>
       <select class="filter-sel" id="planDisc" onchange="renderPlanTab()"><option value="">Todas as disciplinas</option></select>
       <select class="filter-sel" id="planTipo" onchange="renderPlanTab()"><option value="">Todos os tipos</option></select>
@@ -1856,8 +1858,8 @@ function defaults() {
         subtitle: 'Acompanhe o tamanho da biblioteca e entre em uma disciplina/área para ver materiais, temas e detalhes. A Biblioteca continua independente de turmas específicas.'
       },
       acervo: {
-        title: 'Banco de materiais',
-        subtitle: 'Consulte todo o acervo por disciplina, tema, tipo e status. A organização aqui é reutilizável e não depende de uma turma ou aula específica.'
+        title: 'Buscar materiais',
+        subtitle: 'Busque arquivos cadastrados em todas as disciplinas e filtre por tipo ou situação.'
       },
       revisao: {
         title: 'Revisão de materiais',
@@ -7556,10 +7558,6 @@ const catRenderUnificadoAnterior=catRender;
 catRender=function(){catRenderUnificadoAnterior();const panel=document.getElementById('catalogoPanel');if(!panel||panel.hidden)return;panel.querySelectorAll('.cat-cell[role="group"]').forEach(box=>{const r=box.dataset.r,t=box.dataset.t,theme=temaDaCelula(r),matches=materiaisDaCelula(r,t);const add=document.createElement('button');add.className='cat-details-button';add.textContent=matches.length?'Ver '+matches.length+' material(is)':'Adicionar material';add.onclick=()=>matches.length?abrirMateriaisDoTema(currentAdminDiscId,theme):cadastroUnificado(currentAdminDiscId,theme,t);box.append(add);});};
 const catAbrirUnificadoAnterior=catAbrirCelula;
 catAbrirCelula=function(r,t){catAbrirUnificadoAnterior(r,t);document.getElementById('catCadastrar').onclick=()=>{document.getElementById('catDialog').close();cadastroUnificado(currentAdminDiscId,temaDaCelula(r),t);};};
-const renderPlanUnificadoAnterior=renderPlanTab;
-renderPlanTab=function(){renderPlanUnificadoAnterior();const host=document.getElementById('planContent'),disc=document.getElementById('planDisc').value,search=normalizar(document.getElementById('planSearch')?.value||'');const empty=D.temas.filter(t=>(!disc||t.disciplinaId===disc)&&!activeMaterials().some(m=>m.temaId===t.id)&&(!search||normalizar(t.nome+' '+labelDisc(t.disciplinaId)).includes(search)));if(!empty.length)return;
- const section=document.createElement('section');section.className='enh-details';section.innerHTML='<h3>Temas cadastrados — aguardando materiais</h3><p class="cat-note">Estes são os mesmos temas das Pastas. Adicione o primeiro material por aqui.</p>';const grouped=new Map();for(const t of empty){if(!grouped.has(t.disciplinaId))grouped.set(t.disciplinaId,[]);grouped.get(t.disciplinaId).push(t);}for(const [id,themes] of grouped){const details=document.createElement('details');details.className='enh-details';details.open=!!disc||!!search||grouped.size===1;const summary=document.createElement('summary');summary.textContent=labelDisc(id)+' · '+themes.length+' temas';details.append(summary);for(const t of themes){const row=document.createElement('div');row.className='org-row';const text=document.createElement('strong');text.textContent=t.nome;const button=document.createElement('button');button.className='a-btn';button.textContent='Adicionar material';button.onclick=()=>cadastroUnificado(id,t.id);row.append(text,button);details.append(row);}section.append(details);}host.append(section);
-};
 const openModalUnificadoAnterior=openModal;
 openModal=function(...args){openModalUnificadoAnterior(...args);let box=document.getElementById('uniCatalogTypeBox');if(!box){box=document.createElement('div');box.id='uniCatalogTypeBox';box.className='quick-note';document.querySelector('#modalOverlay .modal-body').prepend(box);}const m=D.materiais.find(m=>m.id===args[0]);const update=()=>{const discId=document.getElementById('mDisc').value,c=D.catalogos?.[discId]||novoCatalogoVazio();box.innerHTML='<label class="form-label" for="uniCatalogType">Tipo no controle da pasta</label><select class="form-input" id="uniCatalogType"><option value="">Usar o mesmo tipo escolhido no cadastro</option>'+[...c.tipos,...c.avaliacaoTipos].filter(t=>tipoDisponivelNoTema(t,document.getElementById("mTema").value)).map(t=>`<option value="${escH(t.id)}" ${m?.catalogTipoId===t.id?'selected':''}>${escH(t.nome)}</option>`).join('')+'</select><p class="cat-note">O material será o mesmo nas Pastas, em Materiais e no Acervo.</p>';};update();document.getElementById('mDisc').addEventListener('change',update,{once:true});};
 const salvarMaterialUnificadoAnterior=salvarMaterial;
@@ -7569,6 +7567,7 @@ orgMoveCatalog=function(theme,sourceId,targetId){const src=D.catalogos?.[sourceI
  if(row){dest.linhas=dest.linhas||[];dest.linhas.push(row);src.linhas=src.linhas.filter(r=>r!==row);for(const type of src.avaliacaoTipos){const key=catChave(row.id,type.id),value=src.celulas[key];if(!value)continue;let t=dest.avaliacaoTipos.find(t=>t.somenteTema===type.somenteTema&&normalizar(t.nome)===normalizar(type.nome));if(!t){t=type.somenteTema?{...type}:{id:uid('cattipo'),nome:type.nome};dest.avaliacaoTipos.push(t);}dest.celulas[catChave(row.id,t.id)]=value;delete src.celulas[key];}}
  for(const m of D.materiais.filter(m=>m.temaId===theme.id)){const old=oldTypes.find(t=>t.id===m.catalogTipoId);if(old){const type=[...dest.tipos,...dest.avaliacaoTipos].find(t=>t.somenteTema===old.somenteTema&&normalizar(t.nome)===normalizar(old.nome));if(type)m.catalogTipoId=type.id;}}
 };
+
 
 
 
@@ -7739,6 +7738,63 @@ function moverMaterialDaPasta(material){
  });
 }
 
+
+const gruposDaNavegacao = {
+ biblioteca: {
+  principal: 'materiais',
+  opcoes: {materiais:'Disciplinas e temas',planejamento:'Buscar materiais'}
+ },
+ organizacao: {
+  principal: 'organizar',
+  opcoes: {organizar:'Disciplinas e temas',arquivo:'Arquivados',lixeira:'Lixeira'}
+ }
+};
+
+const setTabAnterior = setTab;
+setTab = function(tab, button){
+ const anterior = sessionStorage.getItem('mat_admin_tab');
+ setTabAnterior(tab, button);
+ const group = Object.values(gruposDaNavegacao).find(item=>Object.hasOwn(item.opcoes,tab));
+ const active = document.querySelector('.tab-btn[data-tab="'+(group?.principal||tab)+'"]');
+ for(const item of document.querySelectorAll('#viewAdmin .tab-btn')){
+  item.classList.toggle('active',item===active);
+  if(item===active)item.setAttribute('aria-current','page');
+  else item.removeAttribute('aria-current');
+ }
+ const submenu = document.getElementById('adminSubnav');
+ submenu.hidden = !group;
+ submenu.replaceChildren();
+ if(group)for(const [key,label] of Object.entries(group.opcoes)){
+  const item = document.createElement('button');
+  item.type = 'button';
+  item.className = 'btn btn-outline';
+  item.textContent = label;
+  if(key===tab)item.setAttribute('aria-current','page');
+  item.onclick=()=>setTab(key,document.querySelector('.tab-btn[data-tab="'+key+'"]'));
+  submenu.append(item);
+ }
+ if(anterior!==tab)window.scrollTo(0,0);
+};
+
+const renderBuscaBiblioteca = renderPlanTab;
+renderPlanTab = function(){
+ renderBuscaBiblioteca();
+ const empty = document.querySelector('#planContent > .empty');
+ if(!empty)return;
+ const hasMaterials = activeMaterials().length>0;
+ empty.querySelector('h3').textContent = hasMaterials
+  ? 'Nenhum material corresponde à busca'
+  : 'A biblioteca ainda está sem materiais ativos';
+ empty.querySelector('p').textContent = hasMaterials
+  ? 'Experimente outro termo ou limpe os filtros.'
+  : 'Abra uma disciplina para cadastrar o primeiro material.';
+ const button = document.createElement('button');
+ button.type = 'button';
+ button.className = 'btn btn-outline';
+ button.textContent = hasMaterials?'Limpar filtros':'Abrir disciplinas';
+ button.onclick = hasMaterials?clearPlanFilters:()=>setTab('materiais',document.querySelector('.tab-btn[data-tab="materiais"]'));
+ empty.append(button);
+};
 
 // INIT
 // ════════════════════════════════════════════════════════
