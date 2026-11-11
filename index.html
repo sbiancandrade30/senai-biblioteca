@@ -349,11 +349,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 #modalOverlay .modal-body>.form-row:has(#mDisc){order:0}
 #modalOverlay .modal-body>.form-group:has(#mTitulo){order:1}
 #modalOverlay .modal-body>.form-group:has(#tipoGrid){order:2}
-#modalOverlay .modal-body>.form-group:has(#mLinksList){order:4}
-#modalOverlay .modal-body>.form-group:has(#mDesc){order:3}
-#modalOverlay .planner-material-context{order:-1;margin-bottom:10px;font-size:12px;color:var(--text2)}
-#modalOverlay .planner-material-context[hidden]{display:none}
-#modalOverlay .modal-body>details{order:5}
+#modalOverlay .modal-body>.form-group:has(#mLinksList){order:3}
+#modalOverlay .modal-body>details{order:4}
 .theme-group-actions{margin-left:auto;display:flex;gap:5px;align-items:center}
 .theme-group-action{width:27px;height:27px;padding:0;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text2);cursor:pointer;font-size:15px;line-height:1}
 .theme-group-action:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
@@ -719,7 +716,8 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 
 .app-toast{max-width:calc(100vw - 24px);overflow-wrap:anywhere}@media(max-width:650px){.app-toast{bottom:125px!important;left:12px;right:12px!important}}
 .cat-table .cat-cell{cursor:default;min-width:192px}.cat-status-select{width:100%;min-width:174px;padding:9px 7px;border:1px solid var(--border2);border-radius:7px;background:var(--surface);color:inherit;font:inherit;cursor:pointer}.cat-details-button{align-self:flex-start;border:0;background:transparent;color:var(--accent);text-decoration:underline;font:inherit;font-size:11px;cursor:pointer;padding:4px 0}.cat-imprimir{background:var(--amber-bg);color:var(--amber);border-color:#ead3a5}.cat-impresso{background:var(--green-bg);color:var(--green);border-color:#b4d9c3}.cat-status-select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.cat-table-wrap.cat-responsive{overflow:visible;max-height:none;border:0;border-radius:0}.cat-compact-tools{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.cat-type-management{padding:12px 0;margin-bottom:12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)}.cat-type-management>summary{cursor:pointer}.cat-type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px;margin-top:12px}.cat-type-item{padding:10px;border:1px solid var(--border);border-radius:8px}.cat-topic-list{display:grid;gap:12px;min-width:0}.cat-topic{border:1px solid var(--border);border-radius:12px;background:var(--surface);min-width:0;overflow:hidden}.cat-topic>summary{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:16px;cursor:pointer;list-style:none;background:var(--surface2)}.cat-topic>summary::-webkit-details-marker{display:none}.cat-topic>summary::before{content:'›';font-size:22px;color:var(--accent);flex-shrink:0}.cat-topic[open]>summary::before{transform:rotate(90deg)}.cat-topic>summary strong{flex:1;font-size:14px;line-height:1.45;overflow-wrap:anywhere}.cat-topic-count{font-size:11px;color:var(--text2);white-space:nowrap}.cat-topic-body{padding:14px;min-width:0}.cat-topic-actions{margin:0 0 12px}.cat-topic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,205px),1fr));gap:10px;min-width:0}.cat-responsive .cat-cell{min-width:0;width:100%;padding:11px;gap:7px}.cat-responsive .cat-status-select{min-width:0;width:100%;font-size:12px;padding:8px}.cat-material-label{font-size:12px;font-weight:700;line-height:1.4}.cat-cell-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:auto}.cat-cell-actions .cat-details-button{font-size:11px}.cat-responsive .cat-cell:hover{outline:none}.cat-responsive .cat-cell:focus-within{outline:2px solid var(--accent);outline-offset:1px}@media(max-width:500px){.cat-topic>summary{align-items:flex-start;flex-wrap:wrap;padding:12px}.cat-topic-count{margin-left:22px}.cat-topic-body{padding:10px}.cat-topic-grid{grid-template-columns:1fr}}
+.cat-table-wrap.cat-responsive{overflow:visible;max-height:none;border:0;border-radius:0}.cat-compact-tools{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.cat-type-management{padding:12px 0;margin-bottom:12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)}.cat-type-management>summary{cursor:pointer}.cat-type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px;margin-top:12px}.cat-type-item{padding:10px;border:1px solid var(--border);border-radius:8px}.cat-topic-list{display:grid;gap:12px;min-width:0}.cat-topic{border:1px solid var(--border);border-radius:12px;background:var(--surface);min-width:0;overflow:hidden}.cat-topic>summary{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:16px;cursor:pointer;list-style:none;background:var(--surface2)}.cat-topic>summary::-webkit-details-marker{display:none}.cat-topic>summary::before{content:'›';font-size:22px;color:var(--accent);flex-shrink:0}.cat-topic[open]>summary::before{transform:rotate(90deg)}.cat-topic>summary strong{flex:1;font-size:14px;line-height:1.45;overflow-wrap:anywhere}.cat-topic-count{font-size:11px;color:var(--text2);white-space:nowrap}.cat-topic-body{padding:14px;min-width:0}.cat-topic-actions{margin:0 0 12px}.cat-topic-grid{display:grid;grid-template-columns:repeat(auto-fill,min(100%,148px));gap:7px;min-width:0}.cat-responsive .cat-cell{min-width:0;width:100%;padding:7px;gap:4px}.cat-responsive .cat-status-select{min-width:0;width:100%;font-size:11px;padding:5px 3px}.cat-material-label{font-size:12px;font-weight:700;line-height:1.4}.cat-cell-actions{display:flex;gap:2px 8px;flex-wrap:wrap;align-items:center;margin-top:auto}.cat-cell-actions .cat-details-button{font-size:11px}.cat-responsive .cat-cell:hover{outline:none}.cat-responsive .cat-cell:focus-within{outline:2px solid var(--accent);outline-offset:1px}@media(max-width:500px){.cat-topic>summary{align-items:flex-start;flex-wrap:wrap;padding:12px}.cat-topic-count{margin-left:22px}.cat-topic-body{padding:8px}.cat-topic-grid{grid-template-columns:repeat(auto-fill,min(100%,138px))}}
+
 
 </style>
 </head>
@@ -1195,7 +1193,6 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       <button class="close-btn" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="planner-material-context" id="mPlannerContext" role="status" hidden></div>
       <div class="quick-note">
         Para cadastrar sem complicar, preencha o link e escolha a disciplina/área. Título, tema e tipo podem ser ajustados agora ou revisados depois.
       </div>
@@ -1204,16 +1201,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <input type="text" class="form-input" id="mTitulo" placeholder="opcional: ex: Aula 3 — Contato de Selo">
       </div>
       <div class="form-group">
-        <label class="form-label">Links de acesso <span class="help-tip" tabindex="0" data-tip="Cole o link principal do material. Você pode adicionar Canva, Drive, YouTube, Forms ou outros links no mesmo cadastro.">?</span></label>
+        <label class="form-label">Links de acesso * <span class="help-tip" tabindex="0" data-tip="Cole o link principal do material. Você pode adicionar Canva, Drive, YouTube, Forms ou outros links no mesmo cadastro.">?</span></label>
         <div id="mLinksList" class="link-editor"></div>
         <button type="button" class="btn btn-outline add-link-btn" onclick="addMaterialLinkRow()">+ Adicionar outro link</button>
         <button type="button" class="btn btn-outline add-link-btn" onclick="openQuickMaterialModal(document.getElementById('mDisc').value)">Colar vários links separados</button>
         <div style="font-size:11px;color:var(--text3);margin-top:7px">Um mesmo material pode reunir vários acessos, como slide no Canva, PDF no Drive e vídeo no YouTube. A plataforma é detectada automaticamente se você não preencher.</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="mDesc">Descrição / texto da atividade</label>
-        <textarea class="form-input" id="mDesc" rows="4"></textarea>
-        <label class="check-line"><input type="checkbox" id="mTextMaterial"> Salvar como material em texto</label>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -1273,6 +1265,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         </div>
       </details>
       <div style="display:none">
+        <textarea id="mDesc"></textarea>
         <input type="number" id="mOrdem">
         <input type="text" id="mAulaModulo">
         <select id="mModalidadeMaterial"><option value=""></option><option value="presencial"></option><option value="ead"></option><option value="ambos"></option></select>
@@ -2855,7 +2848,6 @@ function coerceData(raw) {
       temaId:m.temaId||'',
       tipoId,
       descricao:m.descricao||'',
-      textMaterial:m.textMaterial===true,
       internalNotes:String(m.internalNotes||m.notaInterna||m.observacaoInterna||'').trim(),
       createdAt:normalizeDateValue(m.createdAt||m.criadoEm||m.dataCriacao||m.dataCadastro||''),
       updatedAt:normalizeDateValue(m.updatedAt||m.uploadedAt||m.dataUpload||m.dataAtualizacao||m.ultimoUpload||''),
@@ -3371,7 +3363,6 @@ function abrirApp(){
   renderConfigTab();
   renderBulkActionBar();
   startCloudAutoSync();
-  openPendingPlannerMaterial();
 }
 
 function visualizarComoProfessor(){
@@ -3797,7 +3788,7 @@ function profCardHtml(m, showContext=false){
         ${showContext && context?`<div class="mat-context-path">${escH(context)}</div>`:''}
         <div class="mat-badges">
           <span class="mat-tipo-badge" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.nome)}</span>
-          ${links.length?`<span class="mat-source-badge">${links.length} link${links.length!==1?'s':''}</span>`:`<span class="mat-source-badge">${m.textMaterial?'Em texto':'Sem link'}</span>`}
+          ${links.length?`<span class="mat-source-badge">${links.length} link${links.length!==1?'s':''}</span>`:'<span class="mat-source-badge">Sem link</span>'}
         </div>
       </div>
     </div>
@@ -4054,7 +4045,7 @@ function materialCompletionTasks(m){
   const tipoId=m?.tipoId||'';
   const tipoOk=!!tipoId && D.tipos.some(t=>t.id===tipoId);
   if(!String(m?.titulo||'').trim()) tasks.push('Preencher o título do material.');
-  if(!links.length && !(m?.textMaterial && String(m.descricao||'').trim())) tasks.push('Adicionar pelo menos um link ou arquivo de acesso.');
+  if(!links.length) tasks.push('Adicionar pelo menos um link ou arquivo de acesso.');
   if(links.length>1 && links.some(l=>!String(l.titulo||'').trim())) tasks.push('Nomear os links para o professor saber o que abre em cada botão.');
   if(!tipoOk) tasks.push('Escolher o tipo do material, como slide, atividade, prova, gabarito, vídeo ou outro.');
   if(!discId) tasks.push('Escolher a disciplina/área onde o material deve ficar.');
@@ -5112,67 +5103,13 @@ function salvarQuickMaterials(options={}){
     showToast(message);
   }
 }
-let pendingPlannerMaterial=null;
-let plannerMaterialDraftOpen=false;
-let plannerMaterialDraftTopic='';
-function readPlannerMaterialDraft(){
-  const params=new URLSearchParams(location.hash.slice(1));
-  if(!params.has('planner_draft'))return;
-  try{
-    const raw=params.get('planner_draft');
-    if(raw.length>12000)throw Error('Rascunho muito grande.');
-    const draft=JSON.parse(raw);
-    if(draft?.v!==1 || typeof draft.title!=='string' || !draft.title.trim() ||
-       typeof draft.discipline!=='string' || !draft.discipline.trim())throw Error('Rascunho inválido.');
-    const text=(key,max)=>typeof draft[key]==='string'?draft[key].trim().slice(0,max):'';
-    pendingPlannerMaterial={title:text('title',300),description:text('description',6000),discipline:text('discipline',300),disciplineId:text('disciplineId',200),topic:text('topic',300),topicId:text('topicId',200)};
-  }catch(_){showToast('Não consegui abrir o rascunho do Planner.',true);}
-  try{history.replaceState(history.state,'',location.pathname+location.search);}catch(_){}
-}
-function openPendingPlannerMaterial(){
-  if(sessionStorage.getItem('mat_mode')!=='admin'||!pendingPlannerMaterial)return;
-  const draft=pendingPlannerMaterial;
-  pendingPlannerMaterial=null;
-  const disciplineName=normalizar(draft.discipline);
-  const aliases={
-    'processos de transformacao de termoplasticos e acabamento':'processos de transformacao de termoplasticos',
-    'relacoes socioprofissionais':'relacoes socioprofissionais cidadania e etica',
-    'planejamento':'planejamento e organizacao do trabalho',
-    'raciocinio logico':'raciocinio logico e analise de dados'
-  };
-  const discipline=D.disciplinas.find(d=>d.id===draft.disciplineId)||
-    D.disciplinas.find(d=>normalizar(d.nome)===disciplineName||normalizar(d.nome)===aliases[disciplineName]||aliases[normalizar(d.nome)]===disciplineName);
-  const themes=discipline?temasDaDisc(discipline.id):[];
-  const topic=themes.find(t=>t.id===draft.topicId)||themes.find(t=>normalizar(t.nome)===normalizar(draft.topic));
-  openModal(null,discipline?.id,topic?.id);
-  plannerMaterialDraftOpen=true;
-  plannerMaterialDraftTopic=draft.topic;
-  document.getElementById('modalTitle').textContent='Material do Planner';
-  const discSelect=document.getElementById('mDisc');
-  if(!discipline){discSelect.prepend(new Option('Selecione a disciplina',''));discSelect.value='';}
-  renderThemeSelectForMaterial(topic?.id||'');
-  document.getElementById('mTitulo').value=draft.title;
-  document.getElementById('mDesc').value=draft.description;
-  document.getElementById('mTextMaterial').checked=!!draft.description;
-  const activity=D.tipos.find(t=>normalizar(t.nome)==='atividade');
-  document.querySelectorAll('#tipoGrid .tipo-opt').forEach(el=>el.classList.toggle('sel',el.dataset.tipo===activity?.id));
-  const context=document.getElementById('mPlannerContext');
-  context.hidden=false;
-  context.textContent=!discipline?'Escolha a disciplina para '+draft.discipline+(draft.topic?' e confira o tema '+draft.topic+'.':'.'):
-    draft.topic&&!topic?'O tema '+draft.topic+' não foi encontrado nesta disciplina. Selecione ou crie o tema antes de salvar.':'Confira a disciplina e o tema antes de salvar.';
-}
 function openModal(id=null, preferredDiscId=null, preferredTemaId=null){
-  plannerMaterialDraftOpen=false;
-  plannerMaterialDraftTopic='';
   editingMaterialId=id||null;
   const m=id?D.materiais.find(x=>x.id===id):null;
   document.getElementById('modalTitle').textContent=m?'Editar material':'Novo material';
   renderContextosDatalist();
   document.getElementById('mTitulo').value=m?.titulo||'';
   document.getElementById('mDesc').value=m?.descricao||'';
-  document.getElementById('mTextMaterial').checked=!!m?.textMaterial;
-  document.getElementById('mPlannerContext').hidden=true;
-  document.getElementById('mPlannerContext').textContent='';
   document.getElementById('mInternalNotes').value=m?.internalNotes||'';
   document.getElementById('mOrdem').value=m?.ordem||'';
   document.getElementById('mFixado').checked=!!m?.fixado;
@@ -5278,13 +5215,10 @@ function resolveTipoSelection(currentTipoId){
 function salvarMaterial(options={}){
   let titulo=document.getElementById('mTitulo').value.trim();
   const links=collectModalLinks();
-  const disciplineValue=document.getElementById('mDisc').value;
-  if(plannerMaterialDraftOpen&&(!disciplineValue||(disciplineValue!==GERAL_ID&&!D.disciplinas.some(d=>d.id===disciplineValue)))){showToast('Escolha a disciplina do material.',true);return;}
-  const disciplinaId=disciplineValue||GERAL_ID;
+  const disciplinaId=document.getElementById('mDisc').value||GERAL_ID;
   let temaId='';
   let tipoId=document.querySelector('.tipo-opt.sel')?.dataset.tipo||'';
   const descricao=document.getElementById('mDesc').value.trim();
-  const textMaterial=document.getElementById('mTextMaterial').checked;
   const internalNotes=document.getElementById('mInternalNotes').value.trim();
   const cursoTurma=document.getElementById('mCursoTurma').value.trim();
   const unidadeCurricular=document.getElementById('mUnidadeCurricular').value.trim();
@@ -5310,45 +5244,34 @@ function salvarMaterial(options={}){
   const fixado=document.getElementById('mFixado').checked;
   const hiddenProfessor=document.getElementById('mHiddenProfessor').checked;
   let ordem=Number(document.getElementById('mOrdem').value);
-  if(textMaterial&&(!titulo||!descricao)){showToast('Informe o título e o texto da atividade.',true);return;}
-  if(!links.length&&!textMaterial){ showToast('Adicione pelo menos um link de acesso.',true); return document.querySelector('.link-url-input')?.focus(); }
-  if(plannerMaterialDraftOpen&&plannerMaterialDraftTopic){
-    const chosen=document.getElementById('mTema').value;
-    if(chosen!=='__new__'&&!temasDaDisc(disciplinaId).some(t=>t.id===chosen)){
-      showToast('Selecione ou crie o tema para este material.',true);return;
-    }
-  }
-  const previousData=structuredClone(D);
+  if(!links.length){ showToast('Adicione pelo menos um link de acesso.',true); return document.querySelector('.link-url-input')?.focus(); }
   temaId=resolveThemeSelection('mTema','mNewTema',disciplinaId,'');
   if(temaId===null) return;
   tipoId=resolveTipoSelection(tipoId);
   const autoTitle=!titulo;
   const autoType=!tipoId;
   if(autoTitle) titulo=guessTitleFromLinks(links);
-  if(autoType) tipoId=links.length?guessTypeIdFromLinks(links):D.tipos.find(t=>normalizar(t.nome)==='atividade')?.id||'';
+  if(autoType) tipoId=guessTypeIdFromLinks(links);
   if(!temaId) temaId=suggestThemeIdForText(`${titulo} ${links.map(l=>`${l.link} ${l.origem} ${l.titulo}`).join(' ')}`,disciplinaId);
   if(autoTitle || autoType){
     const tag=ensureReviewTag('Revisar cadastro');
     if(tag && !reviewTags.includes(tag)) reviewTags.push(tag);
   }
-  if(!tipoId){D=previousData;showToast('Não consegui identificar um tipo. Selecione um tipo para salvar.',true);return;}
-  if(plannerMaterialDraftOpen&&!editingMaterialId&&D.materiais.some(m=>!m.archived&&m.disciplinaId===disciplinaId&&m.temaId===temaId&&normalizar(m.titulo)===normalizar(titulo)&&String(m.descricao||'').trim()===descricao&&JSON.stringify(materialLinks(m).map(l=>l.link))===JSON.stringify(links.map(l=>l.link)))){
-    D=previousData;showToast('Este material já está cadastrado neste tema.',true);return;
-  }
+  if(!tipoId){ showToast('Não consegui identificar um tipo. Selecione um tipo para salvar.',true); return; }
   if(!Number.isFinite(ordem)||ordem<=0) ordem=nextOrderFor(disciplinaId,temaId,tipoId);
   const principal=links[0]||{link:'',origem:''};
   const existing=editingMaterialId?D.materiais.find(x=>x.id===editingMaterialId):null;
   const now=isoNow();
   const createdAt=existing?.createdAt || now;
   const updatedAt=now;
-  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,textMaterial,internalNotes,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,readiness,reviewTags,reviewChecklist,checklist,ordem,fixado,hiddenProfessor,archived:!!existing?.archived,archivedAt:existing?.archivedAt||''};
+  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,internalNotes,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,readiness,reviewTags,reviewChecklist,checklist,ordem,fixado,hiddenProfessor,archived:!!existing?.archived,archivedAt:existing?.archivedAt||''};
   const wasEditing=Boolean(editingMaterialId);
   if(editingMaterialId){
     const idx=D.materiais.findIndex(x=>x.id===editingMaterialId);
     if(idx>=0) D.materiais[idx]=mat; else D.materiais.push(mat);
   } else D.materiais.push(mat);
-  try{salvar();}catch(error){D=previousData;showToast('Não foi possível salvar no navegador. O formulário continua aberto.',true);return;}
   lastMaterialDefaults={disciplinaId,temaId,tipoId};
+  salvar();
   if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); } else renderAdminHome();
   if(document.getElementById('tabPlanejamento')?.style.display !== 'none') renderPlanTab();
   if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
@@ -7644,7 +7567,6 @@ catRender=function(){
 carregar();
 if(garantirTemasUnificados()) salvar();
 melhoriasBaseline();
-readPlannerMaterialDraft();
 applySharedCloudConfigFromUrl();
 applyBranding();
 window.addEventListener('beforeunload',saveLibraryViewState);
