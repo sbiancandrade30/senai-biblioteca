@@ -349,8 +349,11 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 #modalOverlay .modal-body>.form-row:has(#mDisc){order:0}
 #modalOverlay .modal-body>.form-group:has(#mTitulo){order:1}
 #modalOverlay .modal-body>.form-group:has(#tipoGrid){order:2}
-#modalOverlay .modal-body>.form-group:has(#mLinksList){order:3}
-#modalOverlay .modal-body>details{order:4}
+#modalOverlay .modal-body>.form-group:has(#mLinksList){order:4}
+#modalOverlay .modal-body>.form-group:has(#mDesc){order:3}
+#modalOverlay .planner-material-context{order:-1;margin-bottom:10px;font-size:12px;color:var(--text2)}
+#modalOverlay .planner-material-context[hidden]{display:none}
+#modalOverlay .modal-body>details{order:5}
 .theme-group-actions{margin-left:auto;display:flex;gap:5px;align-items:center}
 .theme-group-action{width:27px;height:27px;padding:0;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text2);cursor:pointer;font-size:15px;line-height:1}
 .theme-group-action:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
@@ -707,17 +710,6 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
   .summary-num{font-size:23px}
 }
 
-
-#catalogoPanel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;margin:20px 0 28px;box-shadow:var(--shadow-soft)}
-.cat-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}.cat-head h2{font-size:20px;letter-spacing:-.03em}.cat-head p,.cat-note{font-size:12px;color:var(--text2);line-height:1.6;margin-top:6px}.cat-summary{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:16px;background:var(--accent-bg);border-radius:10px;color:var(--accent)}.cat-summary strong{font-size:21px}.cat-summary span{font-size:12px}.cat-tools{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:16px 0}.cat-tools>.form-input{max-width:340px}.cat-check{display:flex;gap:8px;align-items:center;font-size:12px;line-height:1.5}.cat-check input{accent-color:var(--accent);width:16px;height:16px;flex-shrink:0}.cat-table-wrap{max-height:65vh;overflow:auto;border:1px solid var(--border);border-radius:10px;margin-top:16px}.cat-table{border-collapse:separate;border-spacing:0;width:100%;font-size:12px}.cat-table th,.cat-table td{padding:9px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);vertical-align:top}.cat-table thead th{position:sticky;top:0;background:var(--surface2);z-index:2;min-width:155px;text-align:left}.cat-table th:first-child{position:sticky;left:0;background:var(--surface);min-width:230px;max-width:290px;z-index:1;text-align:left;line-height:1.5}.cat-table thead th:first-child{z-index:3;background:var(--surface2)}.cat-mini{display:flex;gap:10px;margin-top:8px}.cat-mini button{border:0;background:transparent;color:var(--text2);font:inherit;font-size:10px;cursor:pointer;text-decoration:underline}.cat-cell{display:flex;flex-direction:column;gap:5px;min-height:62px;width:100%;min-width:132px;text-align:left;border:1px solid var(--border);background:var(--surface2);border-radius:8px;padding:10px;cursor:pointer;color:var(--text2);font:inherit}.cat-cell:hover{outline:2px solid var(--accent);outline-offset:1px}.cat-cell small{font-size:10px}.cat-pronto{background:var(--green-bg);color:var(--green);border-color:#b4d9c3}.cat-pendente{background:var(--red-bg);color:var(--red);border-color:#efc2c2}.cat-producao{background:var(--accent-bg);color:var(--accent);border-color:#c7d6f5}.cat-revisao{background:var(--amber-bg);color:var(--amber);border-color:#ead3a5}.cat-na{background:var(--surface2);color:var(--text3)}.cat-muted{opacity:.45}.cat-empty{padding:30px!important;text-align:center;color:var(--text2)}#catDialog{border:1px solid var(--border);border-radius:18px;width:min(560px,calc(100vw - 30px));max-height:90vh;overflow:auto;padding:26px;margin:auto;color:var(--text);box-shadow:var(--shadow);font-family:'DM Sans',sans-serif}#catDialog::backdrop{background:rgba(15,23,42,.45)}#catDialog .form-label{margin-top:16px}#catDialog .cat-check{margin-top:16px}#catDialog .cat-head p{font-size:14px}#catDialog a{text-decoration:none}.cat-cell:focus-visible,.cat-mini button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}@media(max-width:650px){#catalogoPanel{padding:14px}.cat-head{flex-direction:column}.cat-summary{gap:8px}.cat-summary span{width:100%}.cat-table th:first-child{min-width:160px;max-width:180px}.cat-table-wrap{max-height:60vh}}
-#tabPastas .pastas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:18px;margin-top:22px}.pasta-card{display:flex;flex-direction:column;align-items:flex-start;gap:12px;min-height:245px;padding:22px;border:1px solid var(--border);border-radius:18px;background:var(--surface);color:var(--text);text-align:left;cursor:pointer;font:inherit;box-shadow:0 2px 6px rgba(21,24,33,.02);transition:transform .15s,border-color .15s}.pasta-card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:var(--shadow-soft)}.pasta-card:focus-visible{outline:3px solid var(--accent);outline-offset:3px}.pasta-card strong{font-size:16px;line-height:1.4}.pasta-icon{color:var(--accent);background:var(--accent-bg);border-radius:12px;padding:10px;display:flex}.pasta-meta{font-size:12px;color:var(--text2);line-height:1.5}.pasta-open{color:var(--accent);font-size:12px;font-weight:700;margin-top:auto}.pasta-progress{height:5px;background:var(--surface2);border-radius:5px;width:100%;overflow:hidden}.pasta-progress>span{display:block;height:100%;background:var(--green);border-radius:5px}#pastasBusca{max-width:500px}#pastasDisc #catalogoPanel{margin-top:12px}@media(max-width:500px){#tabPastas .pastas-grid{grid-template-columns:1fr}.pasta-card{min-height:215px}.tabs{flex-wrap:wrap}}
-.org-list{margin:18px 0}.org-select-all{display:flex;align-items:center;gap:12px;padding:14px;font-weight:600;font-size:13px}.org-row{display:flex;justify-content:space-between;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px;margin-bottom:9px}.org-row-label{display:flex;align-items:center;gap:14px;flex:1;min-width:0;cursor:pointer}.org-row-label>span{display:flex;flex-direction:column;gap:5px;min-width:0}.org-row strong{font-size:14px;line-height:1.5;overflow-wrap:anywhere}.org-row small{color:var(--text2);font-size:12px}.org-list input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent);flex-shrink:0}.org-selected{border-color:var(--accent);background:var(--accent-bg)}.org-row-actions{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}.org-bulk{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px;background:var(--accent-bg);border:1px solid var(--border);border-radius:12px}.org-bulk strong{font-size:13px;margin-right:auto}.org-danger{color:var(--red)!important}#tabOrganizar .cat-tools>.form-input{max-width:440px}button:disabled{opacity:.45;cursor:not-allowed}#orgDialog{border:1px solid var(--border);border-radius:18px;width:min(600px,calc(100vw - 30px));padding:26px;margin:auto;max-height:90vh;overflow:auto;color:var(--text);font-family:'DM Sans',sans-serif}#orgDialog::backdrop{background:rgba(15,23,42,.45)}#orgDialog .form-label{margin-top:18px}#orgDialog .cat-check{margin-top:18px}#orgError{margin-top:12px;font-size:12px}@media(max-width:750px){.org-row{flex-direction:column;align-items:stretch}.org-row-actions{padding-left:32px}.org-bulk .btn{flex:1}.org-bulk strong{width:100%}}
-.enh-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}.enh-summary>div{display:flex;flex-direction:column;gap:8px;padding:20px;border:1px solid var(--border);border-radius:14px;background:var(--surface)}.enh-summary strong{font-size:28px;color:var(--accent)}.enh-summary span{font-size:12px;line-height:1.5;color:var(--text2)}.enh-details{margin:15px 0 22px;background:var(--surface);border:1px solid var(--border);padding:16px;border-radius:12px}.enh-details summary{cursor:pointer;font-size:14px;font-weight:700}.enh-pending{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:9px;margin-top:15px}.enh-pending-row{display:flex;flex-direction:column;gap:7px;text-align:left;border:1px solid var(--border);border-radius:10px;padding:14px;background:var(--surface2);font:inherit;cursor:pointer}.enh-pending-row:hover{border-color:var(--accent)}.enh-pending-row span,.enh-pending-row small{font-size:12px;line-height:1.5;color:var(--text2)}.enh-break{overflow-wrap:anywhere;min-width:0}.enh-import-preview{max-height:230px;overflow:auto;border:1px solid var(--border);padding:12px;border-radius:10px;margin-top:12px;font-size:12px;line-height:1.7}#linksDialog{width:min(1040px,calc(100vw - 30px));max-height:90vh;overflow:auto;border:1px solid var(--border);border-radius:18px;padding:25px;margin:auto;color:var(--text);font-family:'DM Sans',sans-serif}#linksDialog::backdrop{background:rgba(15,23,42,.45)}#linksDialog .org-row>div:first-child{min-width:0}#linksDialog a{text-decoration:none}#melhoriasResumo{margin-bottom:32px}#pastasHome .cat-head{flex-wrap:wrap}#tabLixeira .org-row>div:first-child{min-width:0;overflow-wrap:anywhere}#orgDialog .cat-tools>label{flex:1;min-width:120px;font-size:12px}#orgDialog select{margin-top:5px}@media(max-width:650px){#viewAdmin{padding-bottom:170px!important}#viewAdmin .tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}#viewAdmin .tab-btn{min-width:0;white-space:normal;line-height:1.3}.enh-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.enh-summary>div{padding:14px}.enh-pending{grid-template-columns:1fr}#tabLixeira .org-row-actions{padding-left:0}#linksDialog{padding:16px}}
-
-.app-toast{max-width:calc(100vw - 24px);overflow-wrap:anywhere}@media(max-width:650px){.app-toast{bottom:125px!important;left:12px;right:12px!important}}
-.cat-table .cat-cell{cursor:default;min-width:192px}.cat-status-select{width:100%;min-width:174px;padding:9px 7px;border:1px solid var(--border2);border-radius:7px;background:var(--surface);color:inherit;font:inherit;cursor:pointer}.cat-details-button{align-self:flex-start;border:0;background:transparent;color:var(--accent);text-decoration:underline;font:inherit;font-size:11px;cursor:pointer;padding:4px 0}.cat-imprimir{background:var(--amber-bg);color:var(--amber);border-color:#ead3a5}.cat-impresso{background:var(--green-bg);color:var(--green);border-color:#b4d9c3}.cat-status-select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.cat-table-wrap.cat-responsive{overflow:visible;max-height:none;border:0;border-radius:0}.cat-compact-tools{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.cat-type-management{padding:12px 0;margin-bottom:12px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)}.cat-type-management>summary{cursor:pointer}.cat-type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px;margin-top:12px}.cat-type-item{padding:10px;border:1px solid var(--border);border-radius:8px}.cat-topic-list{display:grid;gap:12px;min-width:0}.cat-topic{border:1px solid var(--border);border-radius:12px;background:var(--surface);min-width:0;overflow:hidden}.cat-topic>summary{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:16px;cursor:pointer;list-style:none;background:var(--surface2)}.cat-topic>summary::-webkit-details-marker{display:none}.cat-topic>summary::before{content:'›';font-size:22px;color:var(--accent);flex-shrink:0}.cat-topic[open]>summary::before{transform:rotate(90deg)}.cat-topic>summary strong{flex:1;font-size:14px;line-height:1.45;overflow-wrap:anywhere}.cat-topic-count{font-size:11px;color:var(--text2);white-space:nowrap}.cat-topic-body{padding:14px;min-width:0}.cat-topic-actions{margin:0 0 12px}.cat-topic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,205px),1fr));gap:10px;min-width:0}.cat-responsive .cat-cell{min-width:0;width:100%;padding:11px;gap:7px}.cat-responsive .cat-status-select{min-width:0;width:100%;font-size:12px;padding:8px}.cat-material-label{font-size:12px;font-weight:700;line-height:1.4}.cat-cell-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:auto}.cat-cell-actions .cat-details-button{font-size:11px}.cat-responsive .cat-cell:hover{outline:none}.cat-responsive .cat-cell:focus-within{outline:2px solid var(--accent);outline-offset:1px}@media(max-width:500px){.cat-topic>summary{align-items:flex-start;flex-wrap:wrap;padding:12px}.cat-topic-count{margin-left:22px}.cat-topic-body{padding:10px}.cat-topic-grid{grid-template-columns:1fr}}
-
 </style>
 </head>
 <body>
@@ -826,19 +818,13 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
 <div class="app-body" id="viewAdmin" style="display:none">
   <div class="tabs">
     <button class="tab-btn active" data-tab="materiais" onclick="setTab('materiais',this)"><span class="tab-full">Materiais</span><span class="tab-short">Materiais</span></button>
-    <button class="tab-btn" data-tab="pastas" onclick="setTab('pastas',this)"><span class="tab-full">Pastas</span><span class="tab-short">Pastas</span></button>
     <button class="tab-btn" data-tab="planejamento" onclick="setTab('planejamento',this)"><span class="tab-full">Acervo</span><span class="tab-short">Acervo</span></button>
-    <button class="tab-btn" data-tab="organizar" onclick="setTab('organizar',this)"><span class="tab-full">Organizar</span><span class="tab-short">Organizar</span></button>
     <button class="tab-btn" data-tab="arquivo" onclick="setTab('arquivo',this)"><span class="tab-full">Arquivo</span><span class="tab-short">Arquivo</span></button>
-    <button class="tab-btn" data-tab="lixeira" onclick="setTab('lixeira',this)"><span class="tab-full">Lixeira</span><span class="tab-short">Lixeira</span></button>
-    <button class="tab-btn" data-tab="revisao" onclick="setTab('revisao',this)"><span class="tab-full">Pendências</span><span class="tab-short">Pendências</span></button>
+    <button class="tab-btn" onclick="setTab('revisao',this)"><span class="tab-full">Revisão</span><span class="tab-short">Revisão</span></button>
     <button class="tab-btn" onclick="setTab('configuracoes',this)"><span class="tab-full">Configurações</span><span class="tab-short">Config.</span></button>
   </div>
 
   <!-- TAB MATERIAIS -->
-  <div id="tabLixeira" style="display:none"></div>
-  <div id="tabOrganizar" style="display:none"></div>
-  <div id="tabPastas" style="display:none"><div id="pastasHome"></div><div id="pastasDisc" style="display:none"><div class="breadcrumb"><button onclick="renderPastasHome()">Pastas</button><span>›</span><span id="pastasNome"></span></div><div id="pastasCatalogoHost"></div></div></div>
   <div id="tabMateriais">
     <div id="adminHome">
       <div class="library-top">
@@ -868,8 +854,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
           <div class="inner-toolbar-sub" id="adminDiscSubtitle"></div>
         </div>
         <div class="inner-actions">
-          <button id="catToggle" class="btn btn-primary" onclick="catAlternar()" aria-expanded="false">Catálogo da disciplina</button>
-          <button class="btn btn-outline" onclick="abrirOrganizacao(currentAdminDiscId)">Organizar temas</button><button class="btn btn-outline" onclick="openThemeModal()">+ Novo tema</button>
+          <button class="btn btn-outline" onclick="openThemeModal()">+ Novo tema</button>
           <button class="btn btn-outline" onclick="baixarModeloPlanilhaMateriais(currentAdminDiscId)">Baixar modelo</button>
           <button class="btn btn-outline" onclick="bulkSheetInput.click()">Importar planilha</button>
           <button class="btn btn-outline" onclick="openQuickMaterialModal(currentAdminDiscId)">+ Cadastro rápido</button>
@@ -1192,6 +1177,7 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
       <button class="close-btn" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
+      <div class="planner-material-context" id="mPlannerContext" role="status" hidden></div>
       <div class="quick-note">
         Para cadastrar sem complicar, preencha o link e escolha a disciplina/área. Título, tema e tipo podem ser ajustados agora ou revisados depois.
       </div>
@@ -1200,11 +1186,16 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         <input type="text" class="form-input" id="mTitulo" placeholder="opcional: ex: Aula 3 — Contato de Selo">
       </div>
       <div class="form-group">
-        <label class="form-label">Links de acesso * <span class="help-tip" tabindex="0" data-tip="Cole o link principal do material. Você pode adicionar Canva, Drive, YouTube, Forms ou outros links no mesmo cadastro.">?</span></label>
+        <label class="form-label">Links de acesso <span class="help-tip" tabindex="0" data-tip="Cole o link principal do material. Você pode adicionar Canva, Drive, YouTube, Forms ou outros links no mesmo cadastro.">?</span></label>
         <div id="mLinksList" class="link-editor"></div>
         <button type="button" class="btn btn-outline add-link-btn" onclick="addMaterialLinkRow()">+ Adicionar outro link</button>
         <button type="button" class="btn btn-outline add-link-btn" onclick="openQuickMaterialModal(document.getElementById('mDisc').value)">Colar vários links separados</button>
         <div style="font-size:11px;color:var(--text3);margin-top:7px">Um mesmo material pode reunir vários acessos, como slide no Canva, PDF no Drive e vídeo no YouTube. A plataforma é detectada automaticamente se você não preencher.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="mDesc">Descrição / texto da atividade</label>
+        <textarea class="form-input" id="mDesc" rows="4"></textarea>
+        <label class="check-line"><input type="checkbox" id="mTextMaterial"> Salvar como material em texto</label>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -1264,7 +1255,6 @@ textarea.form-input{resize:vertical;min-height:70px;line-height:1.5}
         </div>
       </details>
       <div style="display:none">
-        <textarea id="mDesc"></textarea>
         <input type="number" id="mOrdem">
         <input type="text" id="mAulaModulo">
         <select id="mModalidadeMaterial"><option value=""></option><option value="presencial"></option><option value="ead"></option><option value="ambos"></option></select>
@@ -2847,6 +2837,7 @@ function coerceData(raw) {
       temaId:m.temaId||'',
       tipoId,
       descricao:m.descricao||'',
+      textMaterial:m.textMaterial===true,
       internalNotes:String(m.internalNotes||m.notaInterna||m.observacaoInterna||'').trim(),
       createdAt:normalizeDateValue(m.createdAt||m.criadoEm||m.dataCriacao||m.dataCadastro||''),
       updatedAt:normalizeDateValue(m.updatedAt||m.uploadedAt||m.dataUpload||m.dataAtualizacao||m.ultimoUpload||''),
@@ -3235,7 +3226,7 @@ function searchMatchesMaterial(m, search, includeInternal=false){
 function filterMats(list, {search='', tipoId='', temaId='', revisao='', includeInternal=false}={}){
   return sortMats(list.filter(m=>{
     if (tipoId && m.tipoId!==tipoId) return false;
-    if (temaId==='__semtema__' ? !!m.temaId : temaId && (m.temaId||'')!==temaId) return false;
+    if (temaId && (m.temaId||'')!==temaId) return false;
     if (revisao==='review' && !needsMaterialReview(m)) return false;
     if (revisao==='stale' && !isMaterialStale(m)) return false;
     if (revisao==='ready' && needsMaterialReview(m)) return false;
@@ -3362,6 +3353,7 @@ function abrirApp(){
   renderConfigTab();
   renderBulkActionBar();
   startCloudAutoSync();
+  openPendingPlannerMaterial();
 }
 
 function visualizarComoProfessor(){
@@ -3574,12 +3566,6 @@ function setTab(tab, btn){
   document.getElementById('tabArquivo').style.display=tab==='arquivo'?'':'none';
   document.getElementById('tabRevisao').style.display=tab==='revisao'?'':'none';
   document.getElementById('tabConfiguracoes').style.display=tab==='configuracoes'?'':'none';
-  document.getElementById('tabPastas').style.display=tab==='pastas'?'':'none';
-  if(tab==='pastas') renderPastasHome();
-  document.getElementById('tabOrganizar').style.display=tab==='organizar'?'':'none';
-  if(tab==='organizar') renderOrganizar();
-  document.getElementById('tabLixeira').style.display=tab==='lixeira'?'':'none';
-  if(tab==='lixeira') renderLixeira();
   if(tab==='materiais') renderAdminHome();
   if(tab==='planejamento') renderPlanTab();
   if(tab==='arquivo') renderArchiveTab();
@@ -3743,7 +3729,7 @@ function renderProfessorDisc(){
   const tipoId=document.getElementById('profDiscTipo').value;
   let temaId=document.getElementById('profDiscTema').value;
   const revisao=document.getElementById('profDiscRevisao').value;
-  const list=filterMats(base,{search,tipoId,temaId:temaId,revisao});
+  const list=filterMats(base,{search,tipoId,temaId:temaId==='__semtema__'?'':temaId,revisao});
   document.getElementById('professorDiscContent').innerHTML=renderProfessorGrouped(list, disc.id);
 }
 function renderProfessorGrouped(list, discId){
@@ -3787,7 +3773,7 @@ function profCardHtml(m, showContext=false){
         ${showContext && context?`<div class="mat-context-path">${escH(context)}</div>`:''}
         <div class="mat-badges">
           <span class="mat-tipo-badge" style="background:${tipoBg(tipo.id)};color:${tipoCor(tipo.id)}">${escH(tipo.nome)}</span>
-          ${links.length?`<span class="mat-source-badge">${links.length} link${links.length!==1?'s':''}</span>`:'<span class="mat-source-badge">Sem link</span>'}
+          ${links.length?`<span class="mat-source-badge">${links.length} link${links.length!==1?'s':''}</span>`:`<span class="mat-source-badge">${m.textMaterial?'Em texto':'Sem link'}</span>`}
         </div>
       </div>
     </div>
@@ -3910,7 +3896,6 @@ function recentCardHtml(m){
   </button>`;
 }
 function abrirAdminDisc(discId){
-  catBusca="";catPendencias=false;
   currentAdminDiscId=discId;
   document.getElementById('adminHome').style.display='none';
   document.getElementById('adminDiscView').style.display='';
@@ -3935,7 +3920,6 @@ function clearAdminDiscFilters(){
   renderAdminDisc();
 }
 function renderAdminDisc(){
-  catRender();
   const disc=getDisc(currentAdminDiscId); if(!disc) return voltarAdminHome();
   document.getElementById('adminBreadcrumbDisc').textContent=disc.nome;
   document.getElementById('adminDiscTitle').textContent=disc.nome;
@@ -3952,7 +3936,7 @@ function renderAdminDisc(){
     if(visibilidade==='admin') return !!m.hiddenProfessor;
     return true;
   });
-  const list=filterMats(visibleBase,{search,tipoId,temaId:temaId,revisao,includeInternal:true});
+  const list=filterMats(visibleBase,{search,tipoId,temaId:temaId==='__semtema__'?'':temaId,revisao,includeInternal:true});
   document.getElementById('adminDiscContent').innerHTML=renderShelfOverview(base)+renderAdminGrouped(list,disc.id);
 }
 function renderShelfOverview(base){
@@ -4044,7 +4028,7 @@ function materialCompletionTasks(m){
   const tipoId=m?.tipoId||'';
   const tipoOk=!!tipoId && D.tipos.some(t=>t.id===tipoId);
   if(!String(m?.titulo||'').trim()) tasks.push('Preencher o título do material.');
-  if(!links.length) tasks.push('Adicionar pelo menos um link ou arquivo de acesso.');
+  if(!links.length && !(m?.textMaterial && String(m.descricao||'').trim())) tasks.push('Adicionar pelo menos um link ou arquivo de acesso.');
   if(links.length>1 && links.some(l=>!String(l.titulo||'').trim())) tasks.push('Nomear os links para o professor saber o que abre em cada botão.');
   if(!tipoOk) tasks.push('Escolher o tipo do material, como slide, atividade, prova, gabarito, vídeo ou outro.');
   if(!discId) tasks.push('Escolher a disciplina/área onde o material deve ficar.');
@@ -4248,7 +4232,7 @@ function materialDetailHtml(m){
     materialDetailLine('Datas', dates.join(' | '))
   ].filter(Boolean).join('');
   const linksHtml=links.length?links.map((l,idx)=>`
-    <a class="material-detail-link" href="${escH(catUrl(l.link)||'#')}" target="_blank" rel="noopener">
+    <a class="material-detail-link" href="${escH(l.link)}" target="_blank" rel="noopener">
       <div class="material-detail-link-main">
         <div class="material-detail-link-title">${escH(tituloLink(l,idx))}</div>
         <div class="material-detail-link-url">${escH(origemLink(l))} · ${escH(l.link)}</div>
@@ -4346,7 +4330,7 @@ function markMaterialReady(id){
 }
 function adminCardHtml(m){
   const tipo=getTipo(m.tipoId);
-  const linkPills=materialLinks(m).map((l,idx)=>`<a class="admin-link-pill" href="${escH(catUrl(l.link)||'#')}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ ${escH(tituloLink(l,idx))}</a>`).join('');
+  const linkPills=materialLinks(m).map((l,idx)=>`<a class="admin-link-pill" href="${escH(l.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ ${escH(tituloLink(l,idx))}</a>`).join('');
   const selected=selectedMaterialIds.has(m.id);
   return `<div class="admin-card card-clickable${m.fixado?' pinned':''}${selected?' selected':''}" ${materialCardAttrs(m.id)}>
     <label class="bulk-selector" onclick="event.stopPropagation()">
@@ -4946,7 +4930,7 @@ function handleMaterialLinksPaste(event,input){
   input.value=links[0];
   const originInput=row?.querySelector('.link-origin-input');
   if(originInput && !originInput.value) originInput.value=detectarOrigem(links[0]);
-  links.slice(1).forEach(link=>addMaterialLinkRow({titulo:title,link,origem:detectarOrigem(link)}));
+  links.slice(1).forEach(link=>addMaterialLinkRow({titulo,link,origem:detectarOrigem(link)}));
   showToast(`${links.length} links adicionados.`);
 }
 function removeMaterialLinkRow(btn){
@@ -5102,13 +5086,67 @@ function salvarQuickMaterials(options={}){
     showToast(message);
   }
 }
+let pendingPlannerMaterial=null;
+let plannerMaterialDraftOpen=false;
+let plannerMaterialDraftTopic='';
+function readPlannerMaterialDraft(){
+  const params=new URLSearchParams(location.hash.slice(1));
+  if(!params.has('planner_draft'))return;
+  try{
+    const raw=params.get('planner_draft');
+    if(raw.length>12000)throw Error('Rascunho muito grande.');
+    const draft=JSON.parse(raw);
+    if(draft?.v!==1 || typeof draft.title!=='string' || !draft.title.trim() ||
+       typeof draft.discipline!=='string' || !draft.discipline.trim())throw Error('Rascunho inválido.');
+    const text=(key,max)=>typeof draft[key]==='string'?draft[key].trim().slice(0,max):'';
+    pendingPlannerMaterial={title:text('title',300),description:text('description',6000),discipline:text('discipline',300),disciplineId:text('disciplineId',200),topic:text('topic',300),topicId:text('topicId',200)};
+  }catch(_){showToast('Não consegui abrir o rascunho do Planner.',true);}
+  try{history.replaceState(history.state,'',location.pathname+location.search);}catch(_){}
+}
+function openPendingPlannerMaterial(){
+  if(sessionStorage.getItem('mat_mode')!=='admin'||!pendingPlannerMaterial)return;
+  const draft=pendingPlannerMaterial;
+  pendingPlannerMaterial=null;
+  const disciplineName=normalizar(draft.discipline);
+  const aliases={
+    'processos de transformacao de termoplasticos e acabamento':'processos de transformacao de termoplasticos',
+    'relacoes socioprofissionais':'relacoes socioprofissionais cidadania e etica',
+    'planejamento':'planejamento e organizacao do trabalho',
+    'raciocinio logico':'raciocinio logico e analise de dados'
+  };
+  const discipline=D.disciplinas.find(d=>d.id===draft.disciplineId)||
+    D.disciplinas.find(d=>normalizar(d.nome)===disciplineName||normalizar(d.nome)===aliases[disciplineName]||aliases[normalizar(d.nome)]===disciplineName);
+  const themes=discipline?temasDaDisc(discipline.id):[];
+  const topic=themes.find(t=>t.id===draft.topicId)||themes.find(t=>normalizar(t.nome)===normalizar(draft.topic));
+  openModal(null,discipline?.id,topic?.id);
+  plannerMaterialDraftOpen=true;
+  plannerMaterialDraftTopic=draft.topic;
+  document.getElementById('modalTitle').textContent='Material do Planner';
+  const discSelect=document.getElementById('mDisc');
+  if(!discipline){discSelect.prepend(new Option('Selecione a disciplina',''));discSelect.value='';}
+  renderThemeSelectForMaterial(topic?.id||'');
+  document.getElementById('mTitulo').value=draft.title;
+  document.getElementById('mDesc').value=draft.description;
+  document.getElementById('mTextMaterial').checked=!!draft.description;
+  const activity=D.tipos.find(t=>normalizar(t.nome)==='atividade');
+  document.querySelectorAll('#tipoGrid .tipo-opt').forEach(el=>el.classList.toggle('sel',el.dataset.tipo===activity?.id));
+  const context=document.getElementById('mPlannerContext');
+  context.hidden=false;
+  context.textContent=!discipline?'Escolha a disciplina para '+draft.discipline+(draft.topic?' e confira o tema '+draft.topic+'.':'.'):
+    draft.topic&&!topic?'O tema '+draft.topic+' não foi encontrado nesta disciplina. Selecione ou crie o tema antes de salvar.':'Confira a disciplina e o tema antes de salvar.';
+}
 function openModal(id=null, preferredDiscId=null, preferredTemaId=null){
+  plannerMaterialDraftOpen=false;
+  plannerMaterialDraftTopic='';
   editingMaterialId=id||null;
   const m=id?D.materiais.find(x=>x.id===id):null;
   document.getElementById('modalTitle').textContent=m?'Editar material':'Novo material';
   renderContextosDatalist();
   document.getElementById('mTitulo').value=m?.titulo||'';
   document.getElementById('mDesc').value=m?.descricao||'';
+  document.getElementById('mTextMaterial').checked=!!m?.textMaterial;
+  document.getElementById('mPlannerContext').hidden=true;
+  document.getElementById('mPlannerContext').textContent='';
   document.getElementById('mInternalNotes').value=m?.internalNotes||'';
   document.getElementById('mOrdem').value=m?.ordem||'';
   document.getElementById('mFixado').checked=!!m?.fixado;
@@ -5214,10 +5252,13 @@ function resolveTipoSelection(currentTipoId){
 function salvarMaterial(options={}){
   let titulo=document.getElementById('mTitulo').value.trim();
   const links=collectModalLinks();
-  const disciplinaId=document.getElementById('mDisc').value||GERAL_ID;
+  const disciplineValue=document.getElementById('mDisc').value;
+  if(plannerMaterialDraftOpen&&(!disciplineValue||(disciplineValue!==GERAL_ID&&!D.disciplinas.some(d=>d.id===disciplineValue)))){showToast('Escolha a disciplina do material.',true);return;}
+  const disciplinaId=disciplineValue||GERAL_ID;
   let temaId='';
   let tipoId=document.querySelector('.tipo-opt.sel')?.dataset.tipo||'';
   const descricao=document.getElementById('mDesc').value.trim();
+  const textMaterial=document.getElementById('mTextMaterial').checked;
   const internalNotes=document.getElementById('mInternalNotes').value.trim();
   const cursoTurma=document.getElementById('mCursoTurma').value.trim();
   const unidadeCurricular=document.getElementById('mUnidadeCurricular').value.trim();
@@ -5243,34 +5284,45 @@ function salvarMaterial(options={}){
   const fixado=document.getElementById('mFixado').checked;
   const hiddenProfessor=document.getElementById('mHiddenProfessor').checked;
   let ordem=Number(document.getElementById('mOrdem').value);
-  if(!links.length){ showToast('Adicione pelo menos um link de acesso.',true); return document.querySelector('.link-url-input')?.focus(); }
+  if(textMaterial&&(!titulo||!descricao)){showToast('Informe o título e o texto da atividade.',true);return;}
+  if(!links.length&&!textMaterial){ showToast('Adicione pelo menos um link de acesso.',true); return document.querySelector('.link-url-input')?.focus(); }
+  if(plannerMaterialDraftOpen&&plannerMaterialDraftTopic){
+    const chosen=document.getElementById('mTema').value;
+    if(chosen!=='__new__'&&!temasDaDisc(disciplinaId).some(t=>t.id===chosen)){
+      showToast('Selecione ou crie o tema para este material.',true);return;
+    }
+  }
+  const previousData=structuredClone(D);
   temaId=resolveThemeSelection('mTema','mNewTema',disciplinaId,'');
   if(temaId===null) return;
   tipoId=resolveTipoSelection(tipoId);
   const autoTitle=!titulo;
   const autoType=!tipoId;
   if(autoTitle) titulo=guessTitleFromLinks(links);
-  if(autoType) tipoId=guessTypeIdFromLinks(links);
+  if(autoType) tipoId=links.length?guessTypeIdFromLinks(links):D.tipos.find(t=>normalizar(t.nome)==='atividade')?.id||'';
   if(!temaId) temaId=suggestThemeIdForText(`${titulo} ${links.map(l=>`${l.link} ${l.origem} ${l.titulo}`).join(' ')}`,disciplinaId);
   if(autoTitle || autoType){
     const tag=ensureReviewTag('Revisar cadastro');
     if(tag && !reviewTags.includes(tag)) reviewTags.push(tag);
   }
-  if(!tipoId){ showToast('Não consegui identificar um tipo. Selecione um tipo para salvar.',true); return; }
+  if(!tipoId){D=previousData;showToast('Não consegui identificar um tipo. Selecione um tipo para salvar.',true);return;}
+  if(plannerMaterialDraftOpen&&!editingMaterialId&&D.materiais.some(m=>!m.archived&&m.disciplinaId===disciplinaId&&m.temaId===temaId&&normalizar(m.titulo)===normalizar(titulo)&&String(m.descricao||'').trim()===descricao&&JSON.stringify(materialLinks(m).map(l=>l.link))===JSON.stringify(links.map(l=>l.link)))){
+    D=previousData;showToast('Este material já está cadastrado neste tema.',true);return;
+  }
   if(!Number.isFinite(ordem)||ordem<=0) ordem=nextOrderFor(disciplinaId,temaId,tipoId);
   const principal=links[0]||{link:'',origem:''};
   const existing=editingMaterialId?D.materiais.find(x=>x.id===editingMaterialId):null;
   const now=isoNow();
   const createdAt=existing?.createdAt || now;
   const updatedAt=now;
-  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,internalNotes,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,readiness,reviewTags,reviewChecklist,checklist,ordem,fixado,hiddenProfessor,archived:!!existing?.archived,archivedAt:existing?.archivedAt||''};
+  const mat={id:editingMaterialId||uid('mat'),titulo,link:principal.link,origem:principal.origem,links,disciplinaId,temaId,tipoId,descricao,textMaterial,internalNotes,createdAt,updatedAt,cursoTurma,unidadeCurricular,aulaModulo,capacidadeCompetencia,conhecimento,modalidadeMaterial,statusMaterial,readiness,reviewTags,reviewChecklist,checklist,ordem,fixado,hiddenProfessor,archived:!!existing?.archived,archivedAt:existing?.archivedAt||''};
   const wasEditing=Boolean(editingMaterialId);
   if(editingMaterialId){
     const idx=D.materiais.findIndex(x=>x.id===editingMaterialId);
     if(idx>=0) D.materiais[idx]=mat; else D.materiais.push(mat);
   } else D.materiais.push(mat);
+  try{salvar();}catch(error){D=previousData;showToast('Não foi possível salvar no navegador. O formulário continua aberto.',true);return;}
   lastMaterialDefaults={disciplinaId,temaId,tipoId};
-  salvar();
   if(currentAdminDiscId){ renderAdminDiscSelectors(); renderAdminDisc(); } else renderAdminHome();
   if(document.getElementById('tabPlanejamento')?.style.display !== 'none') renderPlanTab();
   if(document.getElementById('tabRevisao')?.style.display !== 'none') renderReviewTab();
@@ -5665,7 +5717,7 @@ function salvarDisciplina(){
     const max=Math.max(0,...D.disciplinas.map(d=>Number(d.ordem)||0));
     D.disciplinas.push({id:uid('disc'),nome,ordem:max+1,modalidade});
   }
-  salvar(); closeDiscModal(); renderConfigTab(); renderAdminHome(); if(sessionStorage.getItem('mat_admin_tab')==='pastas') renderPastasHome(); showToast(editingDiscId?'Disciplina atualizada!':'Disciplina criada!');
+  salvar(); closeDiscModal(); renderConfigTab(); renderAdminHome(); showToast(editingDiscId?'Disciplina atualizada!':'Disciplina criada!');
 }
 function excluirDisc(id){
   const d=D.disciplinas.find(x=>x.id===id); if(!d) return;
@@ -6064,7 +6116,6 @@ function renderImportPreview(){
 }
 function cancelarImportacaoPlanilha(){
   if(pendingSheetImport?.snapshot) D=coerceData(JSON.parse(pendingSheetImport.snapshot));
-  if(pendingSheetImport?.snapshot) D=coerceData(JSON.parse(pendingSheetImport.snapshot));
   pendingSheetImport=null;
   document.getElementById('importPreviewModalOverlay').classList.remove('open');
 }
@@ -6336,14 +6387,14 @@ async function syncToCloud(manual=false){
       if(attempt>0) await wait(700);
       confirmed=await fetchCloudSnapshot();
       if(confirmed && confirmed.error) break;
-      if(sameCloudPayload(confirmed,JSON.parse(payload))) break;
+      if(updatedMs(confirmed) >= localUpdated) break;
     }
     if(confirmed && confirmed.error){
       setSyncBadge('error','Chave inválida');
       if(manual) showToast('A chave da nuvem não confere com o Apps Script.',true);
       return;
     }
-    if(!sameCloudPayload(confirmed,JSON.parse(payload))){
+    if(updatedMs(confirmed) < localUpdated){
       setSyncBadge('error','Envio não confirmado');
       if(manual) showToast('Envio ainda não confirmou. Se isso continuar, atualize o código do Apps Script para a versão que salva o JSON em partes. A cópia local continua salva.',true);
       return;
@@ -6495,11 +6546,10 @@ async function gerarVersaoProfessor(){
 
   try{
     const professorData = {
-      versao:D.versao, nomeCurso:D.nomeCurso, nomeGeral:D.nomeGeral,
-      reviewStaleDays:D.reviewStaleDays, tipos:D.tipos, disciplinas:D.disciplinas, temas:D.temas,
+      ...D,
       materiais: D.materiais
         .filter(isProfessorVisible)
-        .map(({internalNotes,linkChecks,hiddenProfessor,archived,archivedAt,...material})=>material)
+        .map(({internalNotes,hiddenProfessor,archived,archivedAt,...material})=>material)
     };
 
     const publicMeta = {
@@ -6511,7 +6561,7 @@ async function gerarVersaoProfessor(){
 
     const cssText=(document.querySelector('style')?.textContent || '').replace(/<\/style/gi,'<\\/style');
     const fonts=document.querySelector('link[href*="fonts.googleapis"]')?.outerHTML || '';
-    const safeProfessorData=JSON.stringify(await protegerProfessor(professorData,senha)).replace(/</g,'\\u003c');
+    const safeProfessorData=JSON.stringify(professorData).replace(/</g,'\\u003c');
     const safeProfessorPassword=JSON.stringify(senha).replace(/</g,'\\u003c');
     const safeMeta=JSON.stringify(publicMeta).replace(/</g,'\\u003c');
     const name='materiais_'+(D.nomeCurso||'professor').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,48)+'.html';
@@ -6634,7 +6684,8 @@ ${fonts}
   </div>
 </div>
 <script>
-const PROFESSOR_ENCRYPTED=${safeProfessorData};
+const PROFESSOR_DATA=${safeProfessorData};
+const PROFESSOR_PASSWORD=${safeProfessorPassword};
 const PUBLIC_META=${safeMeta};
 const GERAL_ID='geral';
 let DATA=null;
@@ -6699,7 +6750,7 @@ function sourceBadges(m){return origens(m).map(o=>'<span class="mat-source-badge
 function materialDetailLine(label,value){const text=String(value||'').trim();return text?'<div class="pedagogy-line"><strong>'+escH(label)+':</strong> '+escH(text)+'</div>':''}
 function materialDetailHtml(m){
   const t=tipo(m.tipoId), th=tema(m.temaId), dl=links(m);
-  const linksHtml=dl.length?dl.map((l,i)=>'<a class="material-detail-link" href="'+escH(safeProfessorUrl(l.link))+'" target="_blank" rel="noopener"><div class="material-detail-link-main"><div class="material-detail-link-title">'+escH(tituloLink(l,i))+'</div><div class="material-detail-link-url">'+escH(origemLink(l))+' · '+escH(l.link)+'</div></div><span class="material-detail-link-action">Abrir</span></a>').join(''):'<div class="empty" style="padding:14px"><h3>Nenhum link cadastrado.</h3></div>';
+  const linksHtml=dl.length?dl.map((l,i)=>'<a class="material-detail-link" href="'+escH(l.link)+'" target="_blank" rel="noopener"><div class="material-detail-link-main"><div class="material-detail-link-title">'+escH(tituloLink(l,i))+'</div><div class="material-detail-link-url">'+escH(origemLink(l))+' · '+escH(l.link)+'</div></div><span class="material-detail-link-action">Abrir</span></a>').join(''):'<div class="empty" style="padding:14px"><h3>Nenhum link cadastrado.</h3></div>';
   const info=[
     materialDetailLine('Disciplina/área',disc(m.disciplinaId)?.nome||''),
     materialDetailLine('Tema',th?.nome||''),
@@ -6730,7 +6781,7 @@ function pedagogyText(m){return [m.cursoTurma,m.unidadeCurricular,m.aulaModulo,m
 function pedagogyMeta(m){const chips=[];if(m.createdAt)chips.push('Criado: '+formatDateTime(m.createdAt));if(m.updatedAt)chips.push('Atualizado: '+formatDateTime(m.updatedAt));if(m.cursoTurma)chips.push('Curso/área: '+m.cursoTurma);if(m.unidadeCurricular)chips.push('UC: '+m.unidadeCurricular);if(m.aulaModulo)chips.push('Referência: '+m.aulaModulo);const mod=modalidadeMaterialLabel(m.modalidadeMaterial);if(mod)chips.push(mod);const rb=reviewBadge(m);const st=statusMaterialLabel(m.statusMaterial);if(st&&!rb)chips.push('Status: '+st);const rd=readinessLabel(m.readiness);if(rd)chips.push('Prontidão: '+rd);const chipHtml=chips.map(c=>'<span class="pedagogy-pill">'+escH(c)+'</span>').join('');const lines=[];if(m.capacidadeCompetencia)lines.push('<div class="pedagogy-line"><strong>Capacidade:</strong> '+escH(m.capacidadeCompetencia)+'</div>');if(m.conhecimento)lines.push('<div class="pedagogy-line"><strong>Conhecimento:</strong> '+escH(m.conhecimento)+'</div>');const checks=checklistLabels(m);if(checks.length)lines.push('<div class="pedagogy-line"><strong>Checklist:</strong> '+escH(checks.join(', '))+'</div>');const tags=materialReviewTags(m);if(tags.length)lines.push('<div class="pedagogy-line"><strong>Etiquetas:</strong> '+escH(tags.join(', '))+'</div>');return chipHtml||rb||lines.length?'<div class="pedagogy-meta">'+rb+chipHtml+'</div>'+lines.join(''):''}
 function searchable(m){return norm([m.titulo,m.descricao,links(m).map((l,i)=>tituloLink(l,i)+' '+origemLink(l)+' '+l.link).join(' '),disc(m.disciplinaId)?.nome,tema(m.temaId)?.nome,tipo(m.tipoId)?.nome,pedagogyText(m),m.fixado?'fixado destaque':''].join(' '))}
 function matchesSearch(m,search){const terms=norm(search).split(/\s+/).filter(Boolean);if(!terms.length)return true;const hay=searchable(m);return terms.every(t=>hay.includes(t))}
-function filtered(list,{search='',tipoId='',temaId='',revisao=''}={}){return sortM(list.filter(m=>{if(tipoId&&m.tipoId!==tipoId)return false;if(temaId==='__semtema__'?!!m.temaId:temaId&&(m.temaId||'')!==temaId)return false;if(revisao==='review'&&!needsMaterialReview(m))return false;if(revisao==='stale'&&!isMaterialStale(m))return false;if(revisao==='ready'&&needsMaterialReview(m))return false;if(!matchesSearch(m,search))return false;return true}))}
+function filtered(list,{search='',tipoId='',temaId='',revisao=''}={}){return sortM(list.filter(m=>{if(tipoId&&m.tipoId!==tipoId)return false;if(temaId&&(m.temaId||'')!==temaId)return false;if(revisao==='review'&&!needsMaterialReview(m))return false;if(revisao==='stale'&&!isMaterialStale(m))return false;if(revisao==='ready'&&needsMaterialReview(m))return false;if(!matchesSearch(m,search))return false;return true}))}
 function bg(id){return colorAlpha(tipo(id).cor,.12)}
 function cor(id){return tipo(id).cor||'#888888'}
 const collapsedProfessorOnlyThemes=new Set();
@@ -6895,7 +6946,7 @@ function renderSelectorsProfessorOnly(){
 }
 function renderDiscProfessorOnly(){
   const search=document.getElementById('profDiscSearch').value;const tipoId=document.getElementById('profDiscTipo').value;const temaSel=document.getElementById('profDiscTema').value;const revisao=document.getElementById('profDiscRevisao').value;
-  const base=mats(currentDisc);const list=filtered(base,{search,tipoId,temaId:temaSel,revisao});
+  const base=mats(currentDisc);const list=filtered(base,{search,tipoId,temaId:temaSel==='__semtema__'?'':temaSel,revisao});
   document.getElementById('profDiscSubtitle').textContent=list.length+' material'+(list.length!==1?'is':'')+' exibido'+(list.length!==1?'s':'');
   const el=document.getElementById('professorDiscContent');
   if(!list.length){el.innerHTML='<div class="empty"><h3>Nenhum material encontrado.</h3><p>Ajuste os filtros ou escolha outra disciplina.</p></div>';return}
@@ -6912,7 +6963,7 @@ function cardMat(m){
   const context=[disc(m.disciplinaId)?.nome,th?.nome].filter(Boolean).join(' · ');
   return '<article class="mat-card card-clickable" data-id="'+escH(m.id)+'" onclick="showProfessorMaterialDetail(this.dataset.id)" role="button" tabindex="0"><div class="mat-card-top"><div class="mat-icon" style="background:'+bg(m.tipoId)+'">'+escH(t.icone||'📎')+'</div><div><div class="mat-title">'+escH(m.titulo)+'</div>'+(context?'<div class="mat-context-path">'+escH(context)+'</div>':'')+'<div class="mat-badges"><span class="mat-tipo-badge" style="background:'+bg(m.tipoId)+';color:'+cor(m.tipoId)+'">'+escH(t.nome)+'</span><span class="mat-source-badge">'+dl.length+' link'+(dl.length!==1?'s':'')+'</span></div></div></div></article>';
 }
-function showToast(msg,err){const t=document.createElement('div');t.className='app-toast';t.style.cssText='position:fixed;bottom:24px;right:24px;background:'+(err?'var(--red)':'var(--text)')+';color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)}
+function showToast(msg,err){const t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;right:24px;background:'+(err?'var(--red)':'var(--text)')+';color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.2)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)}
 applyLogoProfessorOnly();
 try{
   const session=sessionStorage.getItem('mat_prof_secure_session');
@@ -6924,648 +6975,23 @@ try{
 }
 `; }
 function showToast(msg, err){
-  const t=document.createElement('div');t.className='app-toast';
+  const t=document.createElement('div');
   t.style.cssText=`position:fixed;bottom:24px;right:24px;background:${err?'var(--red)':'var(--text)'};color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;animation:fadeInUp .2s;box-shadow:0 4px 20px rgba(0,0,0,.2)`;
   t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
 }
 
 // ════════════════════════════════════════════════════════
 function showToastWithAction(msg,label,action){
-  const t=document.createElement('div');t.className='app-toast';
+  const t=document.createElement('div');
   t.style.cssText='position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:10px 14px 10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;animation:fadeInUp .2s;box-shadow:0 4px 20px rgba(0,0,0,.2);display:flex;align-items:center;gap:12px';
   const text=document.createElement('span'); text.textContent=msg;
   const btn=document.createElement('button'); btn.type='button'; btn.textContent=label; btn.style.cssText='border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;border-radius:6px;padding:4px 8px;cursor:pointer;font-weight:700';
   btn.onclick=()=>{action();t.remove()}; t.append(text,btn); document.body.appendChild(t); setTimeout(()=>t.remove(),5000);
 }
-
-// Catálogo por disciplina. Dados integrados ao backup e à sincronização da Biblioteca.
-const CAT_TIPOS = ['Capa','Roteiro','Resumo de estudo','Resumo para o quadro','Slides','Esquemas para alunos','Lista de questões','Gabarito da lista','Atividade em grupo','Gabarito da atividade','Quiz / jogo','Gabarito do quiz'];
-const CAT_STATUS = {'':'Não informado',pendente:'Não iniciado',producao:'Em produção',imprimir:'Feito — falta imprimir',pronto:'Feito',impresso:'Feito e impresso',revisao:'A revisar',na:'Não se aplica'};
-function catConcluido(v){return v.status==='pronto'||v.status==='impresso';}
-let catAberto=false, catSecao='temas', catBusca='', catPendencias=false, catEdicao=null;
-function catDados(){
-  if(!D.catalogos || typeof D.catalogos!=='object' || Array.isArray(D.catalogos)) D.catalogos={};
-  const id=currentAdminDiscId;
-  if(!D.catalogos[id]) D.catalogos[id]={tipos:CAT_TIPOS.map((nome,i)=>({id:'c'+i,nome})),avaliacaoTipos:['Trabalho','Gabarito do trabalho','Prova','Gabarito da prova'].map((nome,i)=>({id:'a'+i,nome})),linhas:[],celulas:{},ocultos:[],nomes:{}};
-  const c=D.catalogos[id];
-  c.linhas=c.linhas||[];c.celulas=c.celulas||{};c.ocultos=c.ocultos||[];c.nomes=c.nomes||{};
-  return c;
-}
-function catLinhas(){
- const c=catDados();
- const temas=temasDaDisc(currentAdminDiscId).map(t=>({id:'tema:'+t.id,nome:t.nome,secao:'temas'}));
- return [...temas,...c.linhas].filter(r=>!c.ocultos.includes(r.id)).map(r=>({...r,nome:c.nomes[r.id]||r.nome}));
-}
-function catTipos(){const c=catDados();return catSecao==='temas'?c.tipos:c.avaliacaoTipos;}
-function catChave(r,t){return JSON.stringify([r,t]);}
-function catValor(r,t){return catDados().celulas[catChave(r,t)]||{};}
-function catGuardar(){try{salvar();return true;}catch(e){showToast('Não foi possível salvar. Exporte um backup e confira o espaço do navegador.',true);return false;}}
-function catAlternar(){catAberto=!catAberto;catRender();}
-function catRender(){
- if(!currentAdminDiscId||!getDisc(currentAdminDiscId))return;
- let panel=document.getElementById('catalogoPanel');
- if(!panel){panel=document.createElement('section');panel.id='catalogoPanel';document.getElementById('adminDiscContent').before(panel);}
- const emPastas=sessionStorage.getItem('mat_admin_tab')==='pastas';
- const host=emPastas?document.getElementById('pastasCatalogoHost'):document.getElementById('adminDiscContent').parentElement;
- if(emPastas){if(panel.parentElement!==host)host.append(panel);}else if(panel.parentElement!==host)document.getElementById('adminDiscContent').before(panel);
- panel.hidden=!catAberto;
- const bot=document.getElementById('catToggle');if(bot){bot.textContent=catAberto?'Fechar catálogo':'Catálogo da disciplina';bot.setAttribute('aria-expanded',String(catAberto));}
- if(!catAberto)return;
- const c=catDados(), todos=catLinhas(), tipos=catTipos();
- const cont={necessarios:0,prontos:0,informados:0};
- for(const r of todos){const ts=r.secao==='temas'?c.tipos:c.avaliacaoTipos;for(const t of ts){const v=catValor(r.id,t.id);if(v.status)cont.informados++;if(v.necessario&&v.status!=='na'){cont.necessarios++;if(catConcluido(v))cont.prontos++;}}}
- let linhas=todos.filter(r=>r.secao===catSecao&&normalizar(r.nome).includes(normalizar(catBusca)));
- if(catPendencias)linhas=linhas.filter(r=>tipos.some(t=>{const v=catValor(r.id,t.id);return v.necessario&&!catConcluido(v)&&v.status!=='na';}));
- panel.innerHTML=`<div class="cat-head"><div><h2>Catálogo da disciplina</h2><p>Escolha a situação diretamente na tabela. Use “Detalhes” para links, observações e metas.</p></div><button class="btn btn-outline" data-cat-action="backup">Exportar backup</button></div>
- <div class="cat-summary"><strong>${cont.necessarios?Math.round(cont.prontos/cont.necessarios*100)+'% concluído':'Sem meta definida'}</strong><span>${cont.prontos} de ${cont.necessarios} materiais necessários prontos</span><span>${cont.informados} situações informadas</span></div>
- <p class="cat-note">Vazio = ainda não informado. Somente itens marcados como necessários entram no progresso. “Não se aplica” fica fora da meta.</p>
- <div class="cat-tools"><button class="btn ${catSecao==='temas'?'btn-primary':'btn-outline'}" data-cat-action="temas">Materiais por tema</button><button class="btn ${catSecao==='avaliacoes'?'btn-primary':'btn-outline'}" data-cat-action="avaliacoes">Trabalhos e provas</button><button class="btn btn-outline" data-cat-action="linha">+ ${catSecao==='temas'?'Tema':'Trabalho / prova'}</button><button class="btn btn-outline" data-cat-action="tipo">+ Tipo de material</button><button class="btn btn-outline" data-cat-action="restaurar">Restaurar linhas ocultas</button><button class="btn btn-outline" data-cat-action="exportar">Exportar catálogo</button><button class="btn btn-outline" data-cat-action="importar">Importar catálogo</button></div>
- <div class="cat-tools"><input class="form-input" id="catBusca" aria-label="Buscar tema ou avaliação" placeholder="Buscar tema ou avaliação…" value="${escH(catBusca)}"><label class="cat-check"><input id="catPendencias" type="checkbox" ${catPendencias?'checked':''}> Mostrar apenas pendências necessárias</label></div>
- <div class="cat-table-wrap" tabindex="0" aria-label="Tabela do catálogo, role para ver todos os tipos"><table class="cat-table"><thead><tr><th scope="col">${catSecao==='temas'?'Tema':'Trabalho / prova'}</th>${tipos.map(t=>`<th scope="col"><span>${escH(t.nome)}</span><div class="cat-mini"><button data-cat-action="renomearTipo" data-t="${escH(t.id)}" aria-label="Renomear ${escH(t.nome)}">Editar</button><button data-cat-action="excluirTipo" data-t="${escH(t.id)}" aria-label="Excluir ${escH(t.nome)}">Excluir</button></div></th>`).join('')}</tr></thead><tbody>${linhas.map(r=>`<tr><th scope="row">${escH(r.nome)}<div class="cat-mini"><button data-cat-action="renomearLinha" data-r="${escH(r.id)}">Editar</button><button data-cat-action="ocultar" data-r="${escH(r.id)}">Ocultar</button></div></th>${tipos.map(t=>{const v=catValor(r.id,t.id);const pend=v.necessario&&!catConcluido(v)&&v.status!=='na';return `<td><button class="cat-cell cat-${Object.hasOwn(CAT_STATUS,v.status)?v.status:'vazio'} ${catPendencias&&!pend?'cat-muted':''}" data-cat-action="celula" data-r="${escH(r.id)}" data-t="${escH(t.id)}" aria-label="${escH(r.nome+' — '+t.nome+': '+(CAT_STATUS[v.status]||'Não informado'))}"><span>${escH(CAT_STATUS[v.status]||'Não informado')}</span><small>${v.necessario&&v.status!=='na'?'Necessário':'Sem meta'}${v.materialId||v.url?' · Com link':''}</small></button></td>`;}).join('')}</tr>`).join('')||`<tr><td colspan="${tipos.length+1}" class="cat-empty">${catPendencias?'Nenhuma pendência necessária neste filtro.':'Nenhuma linha neste filtro. Adicione um tema ou uma avaliação para começar.'}</td></tr>`}</tbody></table></div>`;
- panel.onclick=catAcao;
- document.getElementById('catBusca').oninput=e=>{const pos=e.target.selectionStart;catBusca=e.target.value;catRender();const input=document.getElementById('catBusca');input.focus();input.setSelectionRange(pos,pos);};
- document.getElementById('catPendencias').onchange=e=>{catPendencias=e.target.checked;catRender();};
-}
-function catAcao(e){
- const b=e.target.closest('[data-cat-action]');if(!b)return;
- const a=b.dataset.catAction,c=catDados(),ts=catTipos();
- if(a==='backup')return exportarDados();
- if(a==='exportar')return exportarCatalogo([currentAdminDiscId]);
- if(a==='importar')return escolherImportacaoCatalogo();
- if(a==='temas'||a==='avaliacoes'){catSecao=a;catBusca='';return catRender();}
- if(a==='celula')return catAbrirCelula(b.dataset.r,b.dataset.t);
- if(a==='linha'){
-  const nome=prompt(catSecao==='temas'?'Nome do tema:':'Nome do trabalho ou prova:');if(!nome?.trim())return;
-  if(catLinhas().some(r=>r.secao===catSecao&&normalizar(r.nome)===normalizar(nome))){showToast('Essa linha já existe.',true);return;}
-  if(catSecao==='temas')D.temas.push({id:uid('tema'),nome:nome.trim(),disciplinaId:currentAdminDiscId,ordem:temasDaDisc(currentAdminDiscId).length+1});
-  else c.linhas.push({id:uid('catlinha'),nome:nome.trim(),secao:'avaliacoes'});
- }
- if(a==='tipo'){const nome=prompt('Nome do tipo de material:');if(!nome?.trim())return;if(ts.some(t=>normalizar(t.nome)===normalizar(nome))){showToast('Esse tipo já existe.',true);return;}ts.push({id:uid('cattipo'),nome:nome.trim()});}
- if(a==='renomearTipo'){const t=ts.find(x=>x.id===b.dataset.t);const nome=prompt('Nome do tipo de material:',t.nome);if(!nome?.trim())return;t.nome=nome.trim();}
- if(a==='excluirTipo'){const t=ts.find(x=>x.id===b.dataset.t);if(!confirm('Excluir a coluna “'+t.nome+'” e suas informações deste catálogo? Os materiais da Biblioteca serão preservados.'))return;ts.splice(ts.indexOf(t),1);for(const key of Object.keys(c.celulas)){if(JSON.parse(key)[1]===t.id)delete c.celulas[key];}}
- if(a==='renomearLinha'){const r=catLinhas().find(x=>x.id===b.dataset.r);const nome=prompt('Nome no catálogo:',r.nome);if(!nome?.trim())return;c.nomes[r.id]=nome.trim();}
- if(a==='ocultar'){if(!confirm('Ocultar esta linha do catálogo? Ela poderá ser restaurada.'))return;c.ocultos.push(b.dataset.r);}
- if(a==='restaurar')c.ocultos=[];
- catGuardar();renderAdminDisc();
-}
-function catUrl(raw){try{const u=new URL(raw);return ['https:','http:'].includes(u.protocol)?u.href:'';}catch{return '';}}
-function catAbrirCelula(r,t){
- catEdicao={r,t,disc:currentAdminDiscId};
- const raw=catDados().celulas[catChave(r,t)]||{},v=catValor(r,t),linha=catLinhas().find(x=>x.id===r),tipo=catTipos().find(x=>x.id===t);
- let dialog=document.getElementById('catDialog');if(!dialog){dialog=document.createElement('dialog');dialog.id='catDialog';document.body.append(dialog);}
- const mats=D.materiais.filter(m=>m.disciplinaId===currentAdminDiscId||m.id===v.materialId);
- dialog.innerHTML=`<form id="catForm"><div class="cat-head"><div><h2>${escH(tipo.nome)}</h2><p>${escH(linha.nome)}</p></div><button type="button" class="btn btn-outline" id="catFechar" aria-label="Fechar edição">Fechar</button></div>
- <label class="form-label" for="catStatus">Situação</label><select id="catStatus" class="form-input">${Object.entries(CAT_STATUS).map(([id,nome])=>`<option value="${id}" ${v.status===id?'selected':''}>${nome}</option>`).join('')}</select>
- <label class="cat-check"><input type="checkbox" id="catNecessario" ${v.necessario?'checked':''}> Este material é necessário e deve entrar na meta</label>
- <p class="cat-note">Marcar como necessário sem definir a situação registra uma pendência. “Não se aplica” não entra no progresso.</p>
- <label class="form-label" for="catMaterial">Vincular material da Biblioteca</label><select id="catMaterial" class="form-input"><option value="">Nenhum material vinculado</option>${mats.map(m=>`<option value="${escH(m.id)}" ${v.materialId===m.id?'selected':''}>${escH(m.titulo||m.nome||'Sem título')}</option>`).join('')}</select>
- <label class="cat-check"><input type="checkbox" id="catSeguir" ${v.seguirMaterial!==false?'checked':''}> Acompanhar automaticamente a situação do material vinculado</label><p id="catSituacaoInfo" class="cat-note"></p><button type="button" class="btn btn-outline" id="catCadastrar">Cadastrar material para esta célula</button>
- <label class="form-label" for="catUrl">Link complementar (opcional)</label><input type="url" id="catUrl" class="form-input" placeholder="https://…" value="${escH(v.url||'')}">
- <label class="form-label" for="catObs">Observações</label><textarea id="catObs" class="form-input" rows="3">${escH(v.obs||'')}</textarea>
- <div id="catLinks" class="cat-tools"></div><p id="catErro" role="alert" style="color:var(--red)"></p><div class="cat-tools"><button type="button" class="btn btn-outline" id="catLimpar">Limpar célula</button><button type="submit" class="btn btn-primary">Salvar</button></div></form>`;
- const links=document.getElementById('catLinks');
- const mostrarLinks=()=>{links.replaceChildren();const m=mats.find(x=>x.id===document.getElementById('catMaterial').value);const fontes=m?materialLinks(m).map((l,i)=>[l.titulo||'Abrir material '+(i+1),l.link]):[];fontes.push(['Abrir link complementar',document.getElementById('catUrl').value]);for(const [label,raw] of fontes){const url=catUrl(raw);if(url){const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.className='btn btn-outline';a.textContent=label;links.append(a);}}};
- const atualizarInfo=()=>{mostrarLinks();const m=mats.find(x=>x.id===document.getElementById('catMaterial').value);document.getElementById('catSituacaoInfo').textContent=m?'Situação do material: '+(statusMaterialLabel(m.statusMaterial)||'não informada')+(m.archived?' · arquivado':'')+'. Com acompanhamento ativo, o catálogo usa essa situação.':'';};
- document.getElementById('catMaterial').onchange=atualizarInfo;document.getElementById('catUrl').oninput=mostrarLinks;atualizarInfo();
- if(v.materialId&&!mats.some(m=>m.id===v.materialId)){const op=document.createElement('option');op.value=v.materialId;op.textContent='Material removido — escolha outro vínculo';op.selected=true;document.getElementById('catMaterial').append(op);}
- document.getElementById('catCadastrar').onclick=()=>{const url=document.getElementById('catUrl').value.trim();if(url&&!catUrl(url)){document.getElementById('catErro').textContent='Confira o endereço antes de cadastrar.';return;}const necessario=document.getElementById('catNecessario').checked;let status=document.getElementById('catStatus').value;if(necessario&&!status)status='pendente';catDados().celulas[catChave(r,t)]={...raw,status,necessario,url,obs:document.getElementById('catObs').value.trim(),materialId:document.getElementById('catMaterial').value,seguirMaterial:document.getElementById('catSeguir').checked};if(!catGuardar())return;novoMaterialCatalogo={disc:currentAdminDiscId,r,t};dialog.close();openModal(null,currentAdminDiscId,r.startsWith('tema:')?r.slice(5):'');document.getElementById('mTitulo').value=tipo.nome+' — '+linha.nome;if(url){const linkInput=document.querySelector('#mLinksList input[type=url]');if(linkInput)linkInput.value=url;}};
- document.getElementById('catFechar').onclick=()=>dialog.close();
- document.getElementById('catLimpar').onclick=()=>{if(!confirm('Remover a situação, meta, vínculo e observações desta célula?'))return;delete catDados().celulas[catChave(r,t)];if(catGuardar()){dialog.close();catRender();}};
- document.getElementById('catForm').onsubmit=e=>{e.preventDefault();if(catEdicao.disc!==currentAdminDiscId)return dialog.close();const url=document.getElementById('catUrl').value.trim();if(url&&!catUrl(url)){document.getElementById('catErro').textContent='Use um endereço iniciado por https:// ou http://.';return;}
- const necessario=document.getElementById('catNecessario').checked;let status=document.getElementById('catStatus').value;if(necessario&&!status)status='pendente';
- catDados().celulas[catChave(r,t)]={status,necessario:necessario&&status!=='na',url,materialId:document.getElementById('catMaterial').value,seguirMaterial:document.getElementById('catSeguir').checked,obs:document.getElementById('catObs').value.trim()};if(catGuardar()){dialog.close();catRender();showToast('Catálogo salvo.');}};
- dialog.showModal();
-}
-
-
-// Entrada dedicada no menu: todas as disciplinas, depois o catálogo de cada pasta.
-let pastasBusca='';
-function pastasResumo(id){
- const c=D.catalogos?.[id];let necessarios=0,prontos=0;
- if(!c)return {necessarios,prontos};
- const rows=[...temasDaDisc(id).filter(t=>!(c.linhas||[]).some(r=>r.temaId===t.id)).map(t=>({id:'tema:'+t.id,secao:'temas'})),...(c.linhas||[])].filter(r=>!(c.ocultos||[]).includes(r.id));
- for(const r of rows)for(const t of (r.secao==='temas'?c.tipos:c.avaliacaoTipos)||[]){const v=catalogoSituacao(c.celulas?.[catChave(r.id,t.id)]||{});if(v?.necessario&&v.status!=='na'){necessarios++;if(catConcluido(v))prontos++;}}
- return {necessarios,prontos};
-}
-function renderPastasHome(){
- document.getElementById('pastasHome').style.display='';document.getElementById('pastasDisc').style.display='none';
- const home=document.getElementById('pastasHome');
- home.innerHTML=`<div class="cat-head"><div><h2 style="font-size:26px">Pastas das disciplinas</h2><p>Todas as disciplinas em um só lugar. Abra uma pasta para organizar materiais por tema, trabalhos e provas.</p></div><button class="btn btn-primary" id="pastasNovaDisc">+ Nova disciplina</button></div><div class="cat-tools"><input id="pastasBusca" class="form-input" placeholder="Buscar disciplina…" aria-label="Buscar disciplina nas pastas" value="${escH(pastasBusca)}"><span id="pastasContagem" class="cat-note"></span></div><div class="pastas-grid" id="pastasGrid"></div>`;
- const organizar=document.createElement('button');organizar.className='btn btn-outline';organizar.textContent='Organizar disciplinas e temas';organizar.onclick=()=>abrirOrganizacao();document.getElementById('pastasNovaDisc').before(organizar);
- const io=document.createElement('div');io.className='cat-tools';io.innerHTML='<button class="btn btn-outline" id="pastasImportar">Importar catálogo / planilha</button><button class="btn btn-outline" id="pastasExportar">Exportar todos os catálogos</button>';document.getElementById('pastasGrid').before(io);document.getElementById('pastasImportar').onclick=escolherImportacaoCatalogo;document.getElementById('pastasExportar').onclick=()=>exportarCatalogo();
- document.getElementById('pastasNovaDisc').onclick=()=>openDiscModal();
- const search=document.getElementById('pastasBusca');search.oninput=()=>{pastasBusca=search.value;renderPastasCards();};
- renderPastasCards();
-}
-function renderPastasCards(){
- const todas=[...D.disciplinas].sort((a,b)=>(a.ordem||0)-(b.ordem||0)||a.nome.localeCompare(b.nome,'pt-BR'));
- const list=todas.filter(d=>normalizar(d.nome).includes(normalizar(pastasBusca)));
- document.getElementById('pastasContagem').textContent=list.length+' de '+todas.length+' disciplinas';
- const grid=document.getElementById('pastasGrid');
- grid.innerHTML=list.map(d=>{const r=pastasResumo(d.id),p=r.necessarios?Math.round(r.prontos/r.necessarios*100):0;return `<button class="pasta-card" data-disc="${escH(d.id)}"><span class="pasta-icon" aria-hidden="true"><svg width="32" height="27" viewBox="0 0 32 27" fill="none"><path d="M2 6a3 3 0 0 1 3-3h7l3 4h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V6Z" fill="currentColor" opacity=".18"/><path d="M2 12h28M2 6a3 3 0 0 1 3-3h7l3 4h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V6Z" stroke="currentColor" stroke-width="1.7"/></svg></span><strong>${escH(d.nome)}</strong><span class="pasta-meta">${temasDaDisc(d.id).length} temas · ${d.modalidade==='ead'?'EaD':'Presencial'}</span><span class="pasta-progress" aria-label="${p}% concluído"><span style="width:${p}%"></span></span><span class="pasta-meta">${r.necessarios?r.prontos+' de '+r.necessarios+' necessários prontos':'Sem meta definida · preencha aos poucos'}</span><span class="pasta-open">Abrir pasta →</span></button>`;}).join('')||'<div class="cat-empty">Nenhuma disciplina encontrada.</div>';
- grid.onclick=e=>{const card=e.target.closest('[data-disc]');if(card)abrirPasta(card.dataset.disc);};
-}
-function abrirPasta(id){
- const disc=getDisc(id);if(!disc)return;
- currentAdminDiscId=id;catAberto=true;catSecao='temas';catBusca='';catPendencias=false;
- document.getElementById('pastasHome').style.display='none';document.getElementById('pastasDisc').style.display='';document.getElementById('pastasNome').textContent=disc.nome;
- catRender();window.scrollTo({top:0,behavior:'smooth'});
- let bot=document.getElementById('pastasOrganizarTemas');if(!bot){bot=document.createElement('button');bot.id='pastasOrganizarTemas';bot.className='btn btn-outline';bot.textContent='Organizar temas desta disciplina';document.querySelector('#pastasDisc .breadcrumb').append(bot);}bot.onclick=()=>abrirOrganizacao(id);
-}
-
-
-
-// Organização de disciplinas e temas com seleção em lote e desfazer.
-let orgScope='disciplinas',orgDisc='',orgSearch='',orgSelected=new Set(),orgUndo=null;
-function orgList(){return (orgScope==='disciplinas'?D.disciplinas:D.temas).filter(x=>(orgScope==='disciplinas'||!orgDisc||x.disciplinaId===orgDisc)&&normalizar(x.nome).includes(normalizar(orgSearch))).sort((a,b)=>orgScope==='temas'&&!orgDisc?(labelDisc(a.disciplinaId).localeCompare(labelDisc(b.disciplinaId),'pt-BR')||(a.ordem||0)-(b.ordem||0)):(a.ordem||0)-(b.ordem||0));}
-function abrirOrganizacao(disc=''){
- orgScope=disc?'temas':'disciplinas';orgDisc=disc;orgSearch='';orgSelected.clear();setTab('organizar',document.querySelector('[data-tab="organizar"]'));
-}
-function orgCount(id){return orgScope==='disciplinas'?matsDaDisc(id).length:D.materiais.filter(m=>m.temaId===id).length;}
-function renderOrganizar(){
- const host=document.getElementById('tabOrganizar');
- host.innerHTML=`<div class="cat-head"><div><h2 style="font-size:26px">Organizar a Biblioteca</h2><p>Edite nomes, selecione vários itens e organize disciplinas e temas.</p></div><button class="btn btn-primary" id="orgNovo">+ ${orgScope==='disciplinas'?'Nova disciplina':'Novo tema'}</button></div>
- <div class="cat-tools"><button class="btn ${orgScope==='disciplinas'?'btn-primary':'btn-outline'}" data-org-scope="disciplinas">Disciplinas</button><button class="btn ${orgScope==='temas'?'btn-primary':'btn-outline'}" data-org-scope="temas">Temas</button><button class="btn btn-outline" id="orgDesfazer" ${orgUndo?'':'disabled'}>Desfazer última alteração</button></div>
- <div class="cat-tools"><input id="orgBusca" class="form-input" placeholder="Buscar ${orgScope==='disciplinas'?'disciplina':'tema'}…" aria-label="Buscar na organização" value="${escH(orgSearch)}">${orgScope==='temas'?`<select id="orgDisc" class="form-input" aria-label="Filtrar disciplina"><option value="">Todas as disciplinas</option>${discsOrdenadas().map(d=>`<option value="${escH(d.id)}" ${orgDisc===d.id?'selected':''}>${escH(d.nome)}</option>`).join('')}</select>`:''}</div>
- <div class="org-bulk"><strong id="orgNum"></strong><button class="btn btn-outline" id="orgClear">Limpar seleção</button><button class="btn btn-outline" id="orgMover">${orgScope==='temas'?'Mover para disciplina':'Alterar modalidade'}</button><button class="btn btn-outline org-danger" id="orgExcluir">Excluir selecionados</button></div>
- <p class="cat-note">A seleção é limpa ao mudar os filtros. As setas alteram a ordem dentro da disciplina. Você pode desfazer a última alteração enquanto os dados não tiverem outras edições.</p>
- <div class="org-list" id="orgLista"></div>`;
- host.querySelectorAll('[data-org-scope]').forEach(b=>b.onclick=()=>{orgScope=b.dataset.orgScope;orgSelected.clear();orgSearch='';renderOrganizar();});
- document.getElementById('orgBusca').oninput=e=>{orgSearch=e.target.value;orgSelected.clear();orgRenderRows();};
- const sel=document.getElementById('orgDisc');if(sel)sel.onchange=()=>{orgDisc=sel.value;orgSelected.clear();orgRenderRows();};
- document.getElementById('orgNovo').onclick=()=>orgEditar();
- document.getElementById('orgClear').onclick=()=>{orgSelected.clear();orgRenderRows();};
- document.getElementById('orgMover').onclick=()=>orgMover();document.getElementById('orgExcluir').onclick=()=>orgExcluir();
- document.getElementById('orgDesfazer').onclick=()=>{if(!orgUndo)return;if(JSON.stringify(D)!==orgUndo.after){orgUndo=null;renderOrganizar();return showToast('Há outras edições depois desta alteração. O desfazer não foi aplicado.',true);}const before=orgUndo.before;orgUndo=null;D=JSON.parse(before);salvar();renderOrganizar();showToast('Alteração desfeita.');};
- orgRenderRows();
-}
-function orgRenderRows(){
- const rows=orgList(),all=rows.length&&rows.every(x=>orgSelected.has(x.id));
- const host=document.getElementById('orgLista');
- host.innerHTML=`<label class="org-select-all"><input type="checkbox" id="orgAll" ${all?'checked':''}> Selecionar os ${rows.length} itens exibidos</label>${rows.map(x=>{const group=(orgScope==='disciplinas'?discsOrdenadas():temasDaDisc(x.disciplinaId)),pos=group.findIndex(r=>r.id===x.id);return `<div class="org-row ${orgSelected.has(x.id)?'org-selected':''}"><label class="org-row-label"><input type="checkbox" data-org-select="${escH(x.id)}" ${orgSelected.has(x.id)?'checked':''}><span><strong>${escH(x.nome)}</strong><small>${orgScope==='temas'?escH(labelDisc(x.disciplinaId)):escH(modalidadeLabel(modalidadeDisciplina(x)))} · ${orgCount(x.id)} materiais${orgScope==='disciplinas'?' · '+temasDaDisc(x.id).length+' temas':''}</small></span></label><div class="org-row-actions"><button class="a-btn" data-org-up="${escH(x.id)}" aria-label="Subir ${escH(x.nome)}" ${pos<=0?'disabled':''}>↑</button><button class="a-btn" data-org-down="${escH(x.id)}" aria-label="Descer ${escH(x.nome)}" ${pos===group.length-1?'disabled':''}>↓</button><button class="a-btn" data-org-edit="${escH(x.id)}">Editar</button><button class="a-btn" data-org-move="${escH(x.id)}">${orgScope==='temas'?'Mover':'Modalidade'}</button><button class="a-btn danger" data-org-delete="${escH(x.id)}">Excluir</button></div></div>`;}).join('')||'<p class="cat-empty">Nenhum item encontrado.</p>'}`;
- document.getElementById('orgAll').onchange=e=>{rows.forEach(x=>e.target.checked?orgSelected.add(x.id):orgSelected.delete(x.id));orgRenderRows();};
- host.querySelectorAll('[data-org-select]').forEach(i=>i.onchange=()=>{i.checked?orgSelected.add(i.dataset.orgSelect):orgSelected.delete(i.dataset.orgSelect);orgRenderRows();});
- host.querySelectorAll('[data-org-edit]').forEach(b=>b.onclick=()=>orgEditar(b.dataset.orgEdit));
- host.querySelectorAll('[data-org-move]').forEach(b=>b.onclick=()=>orgMover([b.dataset.orgMove]));
- host.querySelectorAll('[data-org-delete]').forEach(b=>b.onclick=()=>orgExcluir([b.dataset.orgDelete]));
- for(const [attr,dir] of [['up',-1],['down',1]])host.querySelectorAll('[data-org-'+attr+']').forEach(b=>b.onclick=()=>{const id=b.getAttribute('data-org-'+attr);orgMutar(()=>{const x=(orgScope==='disciplinas'?D.disciplinas:D.temas).find(x=>x.id===id);const list=orgScope==='disciplinas'?discsOrdenadas():temasDaDisc(x.disciplinaId);const i=list.findIndex(x=>x.id===id);if(i+dir<0||i+dir>=list.length)return;[list[i],list[i+dir]]=[list[i+dir],list[i]];list.forEach((r,j)=>r.ordem=j+1);},'Ordem atualizada.');});
- orgUpdateSelection();
-}
-function orgUpdateSelection(){document.getElementById('orgNum').textContent=orgSelected.size+' selecionados';for(const id of ['orgMover','orgExcluir','orgClear'])document.getElementById(id).disabled=!orgSelected.size;}
-function orgMutar(fn,msg){const before=JSON.stringify(D);try{fn();salvar();orgUndo={before,after:JSON.stringify(D)};orgSelected.clear();renderOrganizar();showToast(msg);return true;}catch(e){D=JSON.parse(before);showToast(e.message||'Não foi possível salvar a alteração.',true);return false;}}
-function orgDialog(title,body,submit){
- let dialog=document.getElementById('orgDialog');if(!dialog){dialog=document.createElement('dialog');dialog.id='orgDialog';document.body.append(dialog);}
- dialog.innerHTML=`<form id="orgForm"><div class="cat-head"><h2>${escH(title)}</h2><button type="button" id="orgClose" class="btn btn-outline">Cancelar</button></div>${body}<p id="orgError" role="alert" class="org-danger"></p><div class="cat-tools"><button type="submit" class="btn btn-primary" id="orgConfirm">Confirmar</button></div></form>`;
- document.getElementById('orgClose').onclick=()=>dialog.close();document.getElementById('orgForm').onsubmit=e=>{e.preventDefault();try{if(submit()!==false)dialog.close();}catch(err){document.getElementById('orgError').textContent=err.message;}};dialog.showModal();
-}
-function orgOptions(exclude=[]){return discsOrdenadas().filter(d=>!exclude.includes(d.id)).map(d=>`<option value="${escH(d.id)}">${escH(d.nome)}</option>`).join('');}
-function orgEditar(id){
- const disc=orgScope==='disciplinas',items=disc?D.disciplinas:D.temas,x=items.find(r=>r.id===id);
- orgDialog(x?'Editar '+(disc?'disciplina':'tema'):'Criar '+(disc?'disciplina':'tema'),`<label class="form-label" for="orgNome">Nome</label><input id="orgNome" class="form-input" required value="${escH(x?.nome||'')}">${disc?`<label class="form-label" for="orgMod">Modalidade</label><select class="form-input" id="orgMod"><option value="presencial">Presencial</option><option value="ead" ${x?.modalidade==='ead'?'selected':''}>EaD</option></select>`:!x?`<label class="form-label" for="orgDestino">Disciplina</label><select class="form-input" id="orgDestino" required>${orgOptions()}</select>`:''}`,()=>{
- const nome=document.getElementById('orgNome').value.trim();if(!nome)throw Error('Preencha o nome.');const parent=disc?'':x?.disciplinaId||document.getElementById('orgDestino').value;
- if(items.some(r=>r.id!==id&&normalizar(r.nome)===normalizar(nome)&&(disc||r.disciplinaId===parent)))throw Error('Já existe um item com esse nome.');
- return orgMutar(()=>{if(x){x.nome=nome;if(disc)x.modalidade=document.getElementById('orgMod').value;}else items.push({id:uid(disc?'disc':'tema'),nome,ordem:Math.max(0,...items.filter(r=>disc||r.disciplinaId===parent).map(r=>Number(r.ordem)||0))+1,...(disc?{modalidade:document.getElementById('orgMod').value}:{disciplinaId:parent})});},'Item salvo.');
- });
- if(!disc&&!x&&orgDisc)document.getElementById('orgDestino').value=orgDisc;
-}
-// Transfere as células dos temas para o catálogo de destino, conciliando colunas por nome.
-function orgMoveCatalog(theme,sourceId,targetId){
- const src=D.catalogos?.[sourceId];if(!src)return;
- if(!D.catalogos[targetId])D.catalogos[targetId]={tipos:CAT_TIPOS.map((nome,i)=>({id:'c'+i,nome})),avaliacaoTipos:['Trabalho','Gabarito do trabalho','Prova','Gabarito da prova'].map((nome,i)=>({id:'a'+i,nome})),linhas:[],celulas:{},ocultos:[],nomes:{}};
- const dest=D.catalogos[targetId],row='tema:'+theme.id;dest.celulas=dest.celulas||{};dest.nomes=dest.nomes||{};dest.ocultos=dest.ocultos||[];
- for(const type of src.tipos||[]){const key=catChave(row,type.id);if(!src.celulas?.[key])continue;let target=dest.tipos.find(t=>normalizar(t.nome)===normalizar(type.nome));if(!target){target={id:uid('cattipo'),nome:type.nome};dest.tipos.push(target);}dest.celulas[catChave(row,target.id)]=src.celulas[key];delete src.celulas[key];}
- if(src.nomes?.[row]){dest.nomes[row]=src.nomes[row];delete src.nomes[row];}
- if((src.ocultos||[]).includes(row)){dest.ocultos.push(row);src.ocultos=src.ocultos.filter(x=>x!==row);}
-}
-function orgMover(ids=[...orgSelected]){
- if(!ids.length)return;
- const disc=orgScope==='disciplinas';
- orgDialog(disc?'Alterar modalidade de '+ids.length+' disciplinas':'Mover '+ids.length+' temas',disc?'<label class="form-label" for="orgDestino">Modalidade</label><select id="orgDestino" class="form-input"><option value="presencial">Presencial</option><option value="ead">EaD</option></select>':`<p class="cat-note">Os materiais e as informações do catálogo acompanham os temas. Temas com nomes iguais não serão mesclados.</p><label class="form-label" for="orgDestino">Disciplina de destino</label><select id="orgDestino" class="form-input" required>${orgOptions()}</select>`,()=>{
- const target=document.getElementById('orgDestino').value;
- const themes=D.temas.filter(t=>ids.includes(t.id));
- if(!disc){const moving=themes.filter(t=>t.disciplinaId!==target);if(!moving.length)throw Error('Os temas já estão nessa disciplina.');const names=new Set(D.temas.filter(t=>t.disciplinaId===target).map(t=>normalizar(t.nome)));for(const t of moving){if(names.has(normalizar(t.nome)))throw Error('Já existe o tema “'+t.nome+'” no destino ou na seleção. Renomeie antes de mover.');names.add(normalizar(t.nome));}}
- return orgMutar(()=>{if(disc)D.disciplinas.filter(d=>ids.includes(d.id)).forEach(d=>d.modalidade=target);else {let ordem=Math.max(0,...temasDaDisc(target).map(t=>Number(t.ordem)||0));for(const t of themes){if(t.disciplinaId===target)continue;orgMoveCatalog(t,t.disciplinaId,target);t.disciplinaId=target;t.ordem=++ordem;D.materiais.filter(m=>m.temaId===t.id).forEach(m=>m.disciplinaId=target);}}},disc?'Modalidades atualizadas.':'Temas e materiais movidos.');
- });
-}
-function orgExcluir(ids=[...orgSelected]){
- if(!ids.length)return;
- const disc=orgScope==='disciplinas',items=(disc?D.disciplinas:D.temas).filter(x=>ids.includes(x.id)),themeIds=new Set(disc?D.temas.filter(t=>ids.includes(t.disciplinaId)).map(t=>t.id):ids);
- const materials=D.materiais.filter(m=>disc?ids.includes(m.disciplinaId):themeIds.has(m.temaId));
- orgDialog('Excluir '+items.length+' '+(disc?'disciplinas':'temas'),`<p class="cat-note">${escH(items.slice(0,5).map(x=>x.nome).join(', '))}${items.length>5?'…':''}</p><p class="cat-note">Serão removidos ${disc?themeIds.size+' temas e os catálogos das disciplinas':'os registros desses temas no catálogo'}. Existem ${materials.length} materiais vinculados.</p>${disc&&materials.length?`<label class="form-label" for="orgDestino">Destino dos materiais preservados (ficarão sem tema)</label><select class="form-input" id="orgDestino"><option value="${escH(GERAL_ID)}">Materiais gerais</option>${orgOptions(ids)}</select>`:''}${materials.length?`<label class="cat-check"><input type="checkbox" id="orgDeleteMaterials"> Excluir também os ${materials.length} materiais vinculados</label><p class="cat-note">Desmarcado: os materiais serão mantidos ${disc?'no destino acima':'na mesma disciplina'}, sem tema.</p>`:''}<p class="cat-note">Você poderá usar “Desfazer última alteração” imediatamente após confirmar.</p>`,()=>orgMutar(()=>{
- const remove=document.getElementById('orgDeleteMaterials')?.checked;const target=disc?(document.getElementById('orgDestino')?.value||GERAL_ID):null;
- if(remove){const matIds=new Set(materials.map(m=>m.id));D.materiais=D.materiais.filter(m=>!matIds.has(m.id));for(const c of Object.values(D.catalogos||{}))for(const v of Object.values(c.celulas||{}))if(matIds.has(v.materialId))v.materialId='';}
- else materials.forEach(m=>{m.temaId='';if(disc)m.disciplinaId=target;});
- D.temas=D.temas.filter(t=>!themeIds.has(t.id));
- for(const c of Object.values(D.catalogos||{})){for(const key of Object.keys(c.celulas||{})){if(themeIds.has(JSON.parse(key)[0].replace(/^tema:/,'')))delete c.celulas[key];}for(const id of themeIds){if(c.nomes)delete c.nomes['tema:'+id];c.ocultos=(c.ocultos||[]).filter(r=>r!=='tema:'+id);}}
- if(disc){D.disciplinas=D.disciplinas.filter(d=>!ids.includes(d.id));for(const id of ids)if(D.catalogos)delete D.catalogos[id];if(ids.includes(currentAdminDiscId))currentAdminDiscId=null;if(ids.includes(orgDisc))orgDisc='';}
- },'Itens excluídos. Use Desfazer para restaurar.'));
-}
-
-// Recuperação, atualização das telas e ferramentas de manutenção.
-let melhoriasSaved=null,melhoriasSkipTrash=false;
-const RECOVERY_KEY='senai_recovery_before_import_v1';
-function melhoriasBaseline(){melhoriasSaved=JSON.parse(JSON.stringify(D));}
-const salvarAnterior=salvar;
-salvar=function(options={}){
- const previous=melhoriasSaved;
- const trashBefore=JSON.parse(JSON.stringify(D.lixeira||[]));
- if(previous&&!melhoriasSkipTrash){
-  const changes={};let count=0;
-  for(const key of ['disciplinas','temas','materiais','tipos']){
-   const now=new Map((D[key]||[]).map(x=>[x.id,x]));
-   const removed=(previous[key]||[]).filter(x=>!now.has(x.id));count+=removed.length;
-   const changed=(previous[key]||[]).filter(x=>now.has(x.id)&&JSON.stringify(x)!==JSON.stringify(now.get(x.id))).map(x=>({before:x,after:now.get(x.id)}));
-   changes[key]={removed,changed};
-  }
-  // Colunas removidas do catálogo também podem ser recuperadas.
-  for(const [id,c] of Object.entries(previous.catalogos||{})){const now=D.catalogos?.[id];if(!now)continue;for(const field of ['tipos','avaliacaoTipos','linhas'])count+=(c[field]||[]).filter(t=>!(now[field]||[]).some(x=>x.id===t.id)).length;}
-  if(count){
-   const catalogos=[];
-   for(const id of new Set([...Object.keys(previous.catalogos||{}),...Object.keys(D.catalogos||{})])){
-    const before=previous.catalogos?.[id],after=D.catalogos?.[id];if(JSON.stringify(before)!==JSON.stringify(after))catalogos.push({id,before:before||null,after:after||null});
-   }
-   D.lixeira=[...(D.lixeira||[]),JSON.parse(JSON.stringify({id:uid('exclusao'),date:isoNow(),count,changes,catalogos}))];
-  }
- }
- try{salvarAnterior(options);melhoriasBaseline();}catch(e){D.lixeira=trashBefore;throw e;}
-};
-function sameCloudPayload(a,b){
- const normalize=x=>{if(Array.isArray(x))return x.map(normalize);if(x&&typeof x==='object')return Object.fromEntries(Object.keys(x).sort().map(k=>[k,normalize(x[k])]));return x;};
- return JSON.stringify(normalize(a))===JSON.stringify(normalize(b));
-}
-function melhoriasRefresh(){
- const tab=sessionStorage.getItem('mat_admin_tab')||'materiais';
- if(currentAdminDiscId&&currentAdminDiscId!==GERAL_ID&&!D.disciplinas.some(d=>d.id===currentAdminDiscId))currentAdminDiscId=null;
- if(orgDisc&&!D.disciplinas.some(d=>d.id===orgDisc))orgDisc='';
- if(tab==='pastas'){
-  const detail=document.getElementById('pastasDisc').style.display!=='none';
-  if(detail&&currentAdminDiscId){document.getElementById('pastasNome').textContent=getDisc(currentAdminDiscId).nome;catRender();}else renderPastasHome();
- }else if(tab==='organizar'){orgSelected.clear();renderOrganizar();}
- else if(tab==='lixeira')renderLixeira();
- else if(tab==='revisao')renderReviewTab();
- else if(tab==='planejamento')renderPlanTab();
- else if(tab==='arquivo')renderArchiveTab();
-}
-const renderAfterCloudAnterior=renderAfterCloudLoad;
-renderAfterCloudLoad=function(){
- // Não substituir o conteúdo de um formulário que a pessoa ainda está editando.
- melhoriasBaseline();renderAfterCloudAnterior();if(sessionStorage.getItem('mat_mode')!=='professor')melhoriasRefresh();
-};
-const syncFromCloudAnterior=syncFromCloud;
-syncFromCloud=async function(manual=false){if(document.querySelector('dialog[open],.modal-overlay.open')||pendingSheetImport){if(manual)showToast('Conclua ou feche a edição antes de carregar os dados da nuvem.',true);return;}return syncFromCloudAnterior(manual);};
-function validarBackup(raw){
- if(!raw||typeof raw!=='object'||Array.isArray(raw))throw Error('O arquivo não é um backup da Biblioteca.');
- for(const key of ['disciplinas','temas','materiais','tipos'])if(!Array.isArray(raw[key]))throw Error('Backup inválido: falta a lista de '+key+'.');
- const p=coerceData(JSON.parse(JSON.stringify(raw)));
- for(const key of ['disciplinas','temas','materiais','tipos']){
-  const ids=new Set();for(const x of p[key]){if(!x||typeof x!=='object'||typeof x.id!=='string'||!x.id||['__proto__','constructor','prototype'].includes(x.id)||ids.has(x.id))throw Error('Há identificadores ausentes ou repetidos em '+key+'.');ids.add(x.id);if(key!=='materiais'&&typeof x.nome!=='string')throw Error('Há nomes inválidos em '+key+'.');}
- }
- const discs=new Set([GERAL_ID,...p.disciplinas.map(d=>d.id)]),themes=new Map(p.temas.map(t=>[t.id,t]));
- for(const t of p.temas)if(!discs.has(t.disciplinaId))throw Error('Um tema aponta para uma disciplina inexistente.');
- for(const m of p.materiais){if(!discs.has(m.disciplinaId))throw Error('Um material aponta para uma disciplina inexistente.');if(m.temaId&&(!themes.has(m.temaId)||themes.get(m.temaId).disciplinaId!==m.disciplinaId))throw Error('Um material está vinculado a um tema incompatível.');}
- if(p.catalogos){if(typeof p.catalogos!=='object'||Array.isArray(p.catalogos))throw Error('Catálogos inválidos.');for(const c of Object.values(p.catalogos)){if(!c||!Array.isArray(c.tipos)||!Array.isArray(c.avaliacaoTipos)||!c.celulas||typeof c.celulas!=='object')throw Error('Um catálogo está incompleto.');for(const key of Object.keys(c.celulas)){let parts;try{parts=JSON.parse(key);}catch{throw Error('Uma célula do catálogo é inválida.');}if(!Array.isArray(parts)||parts.length!==2||parts.some(v=>typeof v!=='string'))throw Error('Uma célula do catálogo é inválida.');}}}
- if(p.lixeira){if(!Array.isArray(p.lixeira))throw Error('A lixeira é inválida.');for(const e of p.lixeira){if(!e||typeof e.id!=='string'||!e.changes||!Array.isArray(e.catalogos))throw Error('Um registro da lixeira está incompleto.');for(const k of ['disciplinas','temas','materiais','tipos'])if(!Array.isArray(e.changes[k]?.removed)||!Array.isArray(e.changes[k]?.changed))throw Error('Um registro da lixeira está incompleto.');}}
- return p;
-}
-importarDados=function(input){
- const file=input.files[0];if(!file)return;const reader=new FileReader();
- reader.onload=e=>{try{const p=validarBackup(JSON.parse(e.target.result));if(!confirm(`Restaurar este backup?\n${p.disciplinas.length} disciplinas, ${p.temas.length} temas e ${p.materiais.length} materiais.\n\nOs dados atuais serão substituídos. Uma cópia de recuperação será guardada neste navegador.`))return;
- const before=JSON.stringify(D);localStorage.setItem(RECOVERY_KEY,JSON.stringify({date:isoNow(),data:D}));
- try{melhoriasSkipTrash=true;D=p;salvar();orgUndo=null;renderAfterCloudLoad();showToast('Backup restaurado. A versão anterior está disponível na Lixeira.');}catch(err){D=JSON.parse(before);throw err;}finally{melhoriasSkipTrash=false;}
- }catch(err){showToast('Importação cancelada: '+err.message,true);}};
- reader.readAsText(file);input.value='';
-};
-function renderLixeira(){
- const host=document.getElementById('tabLixeira'),items=[...(D.lixeira||[])].reverse();
- let recovery=null;try{recovery=JSON.parse(localStorage.getItem(RECOVERY_KEY)||'null');}catch{}
- host.innerHTML=`<div class="cat-head"><div><h2 style="font-size:26px">Lixeira e recuperação</h2><p>As exclusões ficam guardadas com seus vínculos. Você pode restaurar mesmo depois de fechar a página.</p></div><button class="btn btn-outline" id="trashBackup">Exportar backup completo</button></div>${recovery?`<div class="org-bulk"><span>Cópia anterior à última importação: ${escH(formatDateTime(recovery.date))}</span><button class="btn btn-outline" id="trashRecoveryDownload">Baixar cópia anterior</button><button class="btn btn-outline" id="trashRecoveryRestore">Restaurar cópia anterior</button></div>`:''}<div class="cat-tools"><button class="btn btn-outline org-danger" id="trashEmpty" ${items.length?'':'disabled'}>Esvaziar lixeira</button></div><div id="trashList">${items.map(e=>`<div class="org-row"><div><strong>${e.count} itens excluídos</strong><p class="cat-note">${escH(formatDateTime(e.date))} · ${escH(Object.entries(e.changes).filter(([,v])=>v.removed.length).map(([k,v])=>v.removed.length+' '+k).join(', '))}</p><p class="cat-note">${escH(Object.values(e.changes).flatMap(v=>v.removed).slice(0,4).map(x=>x.nome||x.titulo||'Material').join(' · '))}</p></div><div class="org-row-actions"><button class="btn btn-outline" data-trash-restore="${escH(e.id)}">Restaurar</button><button class="a-btn danger" data-trash-delete="${escH(e.id)}">Excluir definitivamente</button></div></div>`).join('')||'<p class="cat-empty">Nenhum item na lixeira.</p>'}</div>`;
- document.getElementById('trashBackup').onclick=exportarDados;
- host.querySelectorAll('[data-trash-restore]').forEach(b=>b.onclick=()=>restaurarLixeira(b.dataset.trashRestore));
- host.querySelectorAll('[data-trash-delete]').forEach(b=>b.onclick=()=>{if(!confirm('Excluir definitivamente este grupo? Esta ação não pode ser desfeita.'))return;D.lixeira=D.lixeira.filter(e=>e.id!==b.dataset.trashDelete);salvar();renderLixeira();});
- document.getElementById('trashEmpty').onclick=()=>{if(!confirm('Esvaziar definitivamente toda a lixeira?'))return;D.lixeira=[];salvar();renderLixeira();};
- if(recovery){document.getElementById('trashRecoveryDownload').onclick=()=>baixarJSON(recovery.data,'biblioteca_antes_da_importacao.json');document.getElementById('trashRecoveryRestore').onclick=()=>{if(!confirm('Restaurar a cópia anterior? Primeiro será baixado um backup da Biblioteca atual.'))return;exportarDados();const previous=JSON.parse(JSON.stringify(D));try{const restored=validarBackup(recovery.data);melhoriasSkipTrash=true;D=restored;salvar();localStorage.setItem(RECOVERY_KEY,JSON.stringify({date:isoNow(),data:previous}));renderAfterCloudLoad();}catch(err){D=previous;showToast(err.message,true);}finally{melhoriasSkipTrash=false;}};}
-}
-function restaurarLixeira(id){
- const entry=(D.lixeira||[]).find(x=>x.id===id);if(!entry)return;
- try{
-  for(const [key,v] of Object.entries(entry.changes)){
-   for(const x of v.removed)if(D[key].some(r=>r.id===x.id))throw Error('Já existe um item com o mesmo identificador. Nenhum dado foi substituído.');
-   for(const pair of v.changed){const cur=D[key].find(x=>x.id===pair.after.id);const fields=[...new Set([...Object.keys(pair.before),...Object.keys(pair.after)])].filter(k=>JSON.stringify(pair.before[k])!==JSON.stringify(pair.after[k]));if(!cur||fields.some(k=>JSON.stringify(cur[k])!==JSON.stringify(pair.after[k])))throw Error('Um vínculo relacionado recebeu outras edições. Desfaça essas edições ou use um backup para recuperar este grupo.');}
-  }
-  for(const c of entry.catalogos)if(JSON.stringify(D.catalogos?.[c.id]||null)!==JSON.stringify(c.after))throw Error('O catálogo relacionado recebeu outras edições. A restauração foi bloqueada para preservá-las.');
-  const candidate=JSON.parse(JSON.stringify(D));
-  for(const [key,v] of Object.entries(entry.changes)){candidate[key].push(...v.removed);for(const pair of v.changed){const cur=candidate[key].find(x=>x.id===pair.before.id);for(const field of new Set([...Object.keys(pair.before),...Object.keys(pair.after)]))if(JSON.stringify(pair.before[field])!==JSON.stringify(pair.after[field])){if(pair.before[field]===undefined)delete cur[field];else cur[field]=pair.before[field];}}}
-  candidate.catalogos=candidate.catalogos||{};for(const c of entry.catalogos){if(c.before)candidate.catalogos[c.id]=c.before;else delete candidate.catalogos[c.id];}
-  validarBackup(candidate);candidate.lixeira=candidate.lixeira.filter(e=>e.id!==id);
-  const before=D;try{D=candidate;salvar();}catch(err){D=before;throw err;}orgUndo=null;renderLixeira();showToast('Itens e vínculos restaurados.');
- }catch(err){showToast(err.message,true);}
-}
-function baixarJSON(data,name){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);}
-// A mesma situação acompanha o material vinculado; o controle da meta continua explícito.
-function catalogoSituacao(v){
- const out={...v},m=v.materialId?D.materiais.find(x=>x.id===v.materialId):null;
- if(v.materialId&&!m){out._aviso='Material não encontrado';return out;}
- if(m){const mapped=m.archived?'revisao':({pronto:'pronto',producao:'producao',revisar:'revisao',substituir:'revisao'})[m.statusMaterial];out._materialStatus=mapped||'';
- if(['na','imprimir','impresso'].includes(v.status))return out;
- if(v.seguirMaterial!==false&&mapped){out.status=mapped;out._automatico=true;}
- else if(mapped&&v.status&&mapped!==v.status)out._aviso='Situações diferentes';
- if(m.archived)out._aviso='Material arquivado';}
- return out;
-}
-catValor=function(r,t){return catalogoSituacao(catDados().celulas[catChave(r,t)]||{});};
-// Duplicar estrutura sem copiar prontidão ou marcar materiais como concluídos.
-function orgDuplicar(id){
- const disc=orgScope==='disciplinas',source=(disc?D.disciplinas:D.temas).find(x=>x.id===id);if(!source)return;
- orgDialog('Duplicar '+(disc?'disciplina':'tema'),`<label class="form-label" for="dupNome">Nome da cópia</label><input class="form-input" id="dupNome" required value="${escH(source.nome+' — cópia')}"><label class="cat-check"><input type="checkbox" id="dupMateriais"> Copiar também os cadastros e links dos materiais</label><p class="cat-note">As metas e tipos do catálogo são copiados. Situações, observações e vínculos ficam em branco para o novo planejamento. Copiar links não duplica os arquivos no Drive ou Canva.</p>`,()=>{
- const nome=document.getElementById('dupNome').value.trim();if(!nome)throw Error('Preencha o nome.');if((disc?D.disciplinas:D.temas.filter(t=>t.disciplinaId===source.disciplinaId)).some(x=>normalizar(x.nome)===normalizar(nome)))throw Error('Já existe esse nome.');const copyMats=document.getElementById('dupMateriais').checked;
- return orgMutar(()=>{
-  const targetId=disc?uid('disc'):source.disciplinaId;let newTheme=null;
-  if(disc)D.disciplinas.push({...source,id:targetId,nome,ordem:Math.max(0,...D.disciplinas.map(d=>Number(d.ordem)||0))+1});
-  const themes=disc?temasDaDisc(source.id):[source],srcCat=D.catalogos?.[disc?source.id:source.disciplinaId];
-  if(srcCat&&disc){const c=JSON.parse(JSON.stringify(srcCat));c.celulas={};c.nomes={};c.ocultos=[];c.linhas=(c.linhas||[]).map(r=>{const id=uid('catlinha');for(const t of srcCat.avaliacaoTipos){const v=srcCat.celulas[catChave(r.id,t.id)];if(v?.necessario)c.celulas[catChave(id,t.id)]={necessario:true,status:''};}if(srcCat.nomes?.[r.id])c.nomes[id]=srcCat.nomes[r.id];return {...r,id};});D.catalogos[targetId]=c;}
-  for(const theme of themes){newTheme={...theme,id:uid('tema'),disciplinaId:targetId,nome:disc?theme.nome:nome,ordem:temasDaDisc(targetId).length+1};D.temas.push(newTheme);
-   if(srcCat){if(!D.catalogos[targetId])D.catalogos[targetId]={tipos:JSON.parse(JSON.stringify(srcCat.tipos)),avaliacaoTipos:JSON.parse(JSON.stringify(srcCat.avaliacaoTipos)),linhas:[],celulas:{},nomes:{},ocultos:[]};const target=D.catalogos[targetId];if(srcCat.nomes?.['tema:'+theme.id])target.nomes['tema:'+newTheme.id]=srcCat.nomes['tema:'+theme.id];for(const t of srcCat.tipos){const old=srcCat.celulas[catChave('tema:'+theme.id,t.id)];if(old?.necessario)target.celulas[catChave('tema:'+newTheme.id,t.id)]={necessario:true,status:''};}}
-   if(copyMats)for(const m of D.materiais.filter(m=>m.temaId===theme.id))D.materiais.push({...JSON.parse(JSON.stringify(m)),id:uid('mat'),temaId:newTheme.id,disciplinaId:targetId,createdAt:isoNow(),updatedAt:isoNow()});
-  }
-  if(disc&&copyMats)for(const m of D.materiais.filter(m=>m.disciplinaId===source.id&&!m.temaId))D.materiais.push({...JSON.parse(JSON.stringify(m)),id:uid('mat'),disciplinaId:targetId,createdAt:isoNow(),updatedAt:isoNow()});
- },'Cópia criada.');
- });
-}
-const orgRowsAnterior=orgRenderRows;
-orgRenderRows=function(){orgRowsAnterior();document.querySelectorAll('#orgLista [data-org-edit]').forEach(b=>{const dup=document.createElement('button');dup.className='a-btn';dup.textContent='Duplicar';dup.dataset.orgDuplicate=b.dataset.orgEdit;dup.onclick=()=>orgDuplicar(b.dataset.orgEdit);b.after(dup);});};
-let novoMaterialCatalogo=null;
-const salvarMaterialAnterior=salvarMaterial;
-salvarMaterial=function(options={}){
- const links=collectModalLinks();if(links.some(l=>!catUrl(l.link))){showToast('Use links iniciados por https:// ou http://.',true);return;}
- const duplicates=D.materiais.filter(m=>m.id!==editingMaterialId&&materialLinks(m).some(l=>links.some(x=>catUrl(x.link)===catUrl(l.link))));if(duplicates.length&&!confirm('Este link já aparece em '+duplicates.length+' material(is). Deseja manter o cadastro mesmo assim?'))return;
- const ctx=novoMaterialCatalogo,ids=new Set(D.materiais.map(m=>m.id));salvarMaterialAnterior(options);
- if(ctx){const m=D.materiais.find(m=>!ids.has(m.id));if(m){const c=D.catalogos?.[ctx.disc];if(c){const key=catChave(ctx.r,ctx.t);c.celulas[key]={...(c.celulas[key]||{}),materialId:m.id,seguirMaterial:true};salvar();catRender();}novoMaterialCatalogo=null;}}
-};
-const closeModalAnterior=closeModal;
-closeModal=function(){closeModalAnterior();novoMaterialCatalogo=null;};
-const catRenderAnterior=catRender;
-catRender=function(){catRenderAnterior();const panel=document.getElementById('catalogoPanel');if(!panel||panel.hidden||!currentAdminDiscId)return;panel.querySelectorAll('[data-cat-action="celula"]').forEach(b=>{const v=catValor(b.dataset.r,b.dataset.t);if(v._aviso||v._automatico){const hint=document.createElement('small');hint.textContent=v._aviso||'Acompanha o material';if(v._aviso)hint.className='org-danger';b.append(hint);}});};
-function abrirPastaPendente(id,section='temas',only=true){
- setTab('pastas',document.querySelector('[data-tab="pastas"]'));abrirPasta(id);catSecao=section;catPendencias=only;catRender();
-}
-function resumoBiblioteca(){
- const pending=[],broken=[],duplicates=[],groups=new Map();
- for(const d of D.disciplinas){const c=D.catalogos?.[d.id];if(!c)continue;const rows=[...temasDaDisc(d.id).filter(t=>!(c.linhas||[]).some(r=>r.temaId===t.id)).map(t=>({id:'tema:'+t.id,nome:c.nomes?.['tema:'+t.id]||t.nome,secao:'temas'})),...(c.linhas||[])].filter(r=>!(c.ocultos||[]).includes(r.id));
- for(const r of rows)for(const t of (r.secao==='temas'?c.tipos:c.avaliacaoTipos)||[]){const v=catalogoSituacao(c.celulas?.[catChave(r.id,t.id)]||{});if(v.necessario&&!catConcluido(v)&&v.status!=='na')pending.push({disc:d.id,discNome:d.nome,tema:r.nome,tipo:t.nome,status:CAT_STATUS[v.status]||'Não informado',secao:r.secao});}}
- for(const m of activeMaterials())for(const link of materialLinks(m)){const url=catUrl(link.link);if(!url){broken.push({m,link});continue;}const key=url;if(!groups.has(key))groups.set(key,new Map());groups.get(key).set(m.id,m);}
- for(const [url,map] of groups)if(map.size>1)duplicates.push({url,materiais:[...map.values()]});
- return {pending,broken,duplicates};
-}
-const renderReviewAnterior=renderReviewTab;
-renderReviewTab=function(){
- renderReviewAnterior();let area=document.getElementById('melhoriasResumo');if(!area){area=document.createElement('section');area.id='melhoriasResumo';document.getElementById('tabRevisao').prepend(area);}
- const {pending,broken,duplicates}=resumoBiblioteca(),active=activeMaterials();
- area.innerHTML=`<div class="cat-head"><div><h2>Pendências da Biblioteca</h2><p>Veja o que precisa ser produzido, revisado ou conferido.</p></div><button class="btn btn-outline" id="conferirLinks">Conferir links</button></div><div class="enh-summary"><div><strong>${pending.length}</strong><span>Materiais necessários ainda não prontos</span></div><div><strong>${active.filter(needsMaterialReview).length}</strong><span>Materiais a revisar</span></div><div><strong>${duplicates.length}</strong><span>Links usados em mais de um material</span></div><div><strong>${broken.length}</strong><span>Endereços com formato inválido</span></div></div><details class="enh-details" ${pending.length?'open':''}><summary>Produção necessária (${pending.length})</summary><div class="enh-pending">${pending.slice(0,60).map((p,i)=>`<button class="enh-pending-row" data-pending="${i}"><strong>${escH(p.discNome)}</strong><span>${escH(p.tema+' · '+p.tipo)}</span><small>${escH(p.status)} · Abrir catálogo</small></button>`).join('')||'<p class="cat-note">Nenhuma pendência necessária definida. Campos vazios sem meta não são contados.</p>'}</div>${pending.length>60?'<p class="cat-note">Mostrando 60 pendências. Consulte as demais nas pastas de cada disciplina.</p>':''}</details><details class="enh-details"><summary>Possíveis duplicidades (${duplicates.length})</summary>${duplicates.slice(0,30).map(g=>`<div class="org-row"><span class="enh-break">${escH(g.url)}</span><div>${g.materiais.map(m=>`<button class="a-btn" data-edit-material="${escH(m.id)}">${escH(m.titulo||'Sem título')}</button>`).join('')}</div></div>`).join('')||'<p class="cat-note">Nenhum link repetido encontrado nos materiais ativos.</p>'}<p class="cat-note">Um link repetido pode ser intencional. Confira antes de excluir.</p></details><div class="cat-head"><h3>Revisão dos materiais</h3></div>`;
- area.querySelectorAll('[data-pending]').forEach(b=>b.onclick=()=>{const p=pending[Number(b.dataset.pending)];abrirPastaPendente(p.disc,p.secao);});area.querySelectorAll('[data-edit-material]').forEach(b=>b.onclick=()=>openModal(b.dataset.editMaterial));document.getElementById('conferirLinks').onclick=abrirConferenciaLinks;
-};
-function abrirConferenciaLinks(){
- let dialog=document.getElementById('linksDialog');if(!dialog){dialog=document.createElement('dialog');dialog.id='linksDialog';document.body.append(dialog);}
- dialog.innerHTML='<div class="cat-head"><div><h2>Conferir links</h2><p>Abra o endereço e confira o conteúdo e a permissão de acesso. A marcação é manual.</p></div><button class="btn btn-outline" id="linksFechar">Fechar</button></div><input class="form-input" id="linksBusca" placeholder="Buscar título ou disciplina…" aria-label="Buscar links"><div id="linksLista"></div>';
- const render=()=>{const search=normalizar(document.getElementById('linksBusca').value);const rows=activeMaterials().filter(m=>normalizar((m.titulo||'')+' '+labelDisc(m.disciplinaId)).includes(search)).flatMap(m=>materialLinks(m).map(l=>({m,l})));document.getElementById('linksLista').innerHTML=rows.slice(0,100).map(({m,l},i)=>{const url=catUrl(l.link),check=(m.linkChecks||[]).find(x=>x.url===l.link);return `<div class="org-row"><div><strong>${escH(m.titulo||'Sem título')}</strong><p class="cat-note enh-break">${escH(l.link)}</p><p class="cat-note">${check?'Conferido em '+escH(formatDateTime(check.checkedAt)):'Ainda não conferido'}${url?'':' · formato inválido'}</p></div><div class="org-row-actions">${url?`<a class="btn btn-outline" href="${escH(url)}" target="_blank" rel="noopener noreferrer">Abrir</a><button class="a-btn" data-link-check="${i}">Marcar conferido</button>`:''}<button class="a-btn" data-link-edit="${escH(m.id)}">Editar material</button></div></div>`;}).join('')+`<p class="cat-note">${Math.min(rows.length,100)} de ${rows.length} links. Use a busca para encontrar os demais.</p>`;
- document.querySelectorAll('[data-link-check]').forEach(b=>b.onclick=()=>{const {m,l}=rows[Number(b.dataset.linkCheck)];m.linkChecks=(m.linkChecks||[]).filter(c=>c.url!==l.link);m.linkChecks.push({url:l.link,checkedAt:isoNow()});salvar();render();});document.querySelectorAll('[data-link-edit]').forEach(b=>b.onclick=()=>{dialog.close();openModal(b.dataset.linkEdit);});};
- document.getElementById('linksBusca').oninput=render;document.getElementById('linksFechar').onclick=()=>dialog.close();render();dialog.showModal();
-}
-function sugestoesGabarito(){
- const result=[];
- for(const d of D.disciplinas){const c=D.catalogos?.[d.id];if(!c)continue;const rows=[...temasDaDisc(d.id).filter(t=>!(c.linhas||[]).some(r=>r.temaId===t.id)).map(t=>({id:'tema:'+t.id,nome:t.nome,secao:'temas'})),...(c.linhas||[])].filter(r=>!(c.ocultos||[]).includes(r.id));
- for(const row of rows){const types=(row.secao==='temas'?c.tipos:c.avaliacaoTipos)||[];for(const t of types){const name=normalizar(t.nome);if(name.includes('gabarito'))continue;const kind=['lista','atividade','quiz','jogo','trab','prova'].find(k=>name.includes(k));if(!kind)continue;const v=catalogoSituacao(c.celulas?.[catChave(row.id,t.id)]||{});if(v.status==='na'||!(catConcluido(v)||v.materialId||v.url))continue;
- const answers=types.filter(x=>normalizar(x.nome).includes('gabarito')&&(normalizar(x.nome).includes(kind)||(['quiz','jogo'].includes(kind)&&/quiz|jogo/.test(normalizar(x.nome)))));const ready=answers.some(x=>{const value=catalogoSituacao(c.celulas?.[catChave(row.id,x.id)]||{});return value.status==='pronto'||value.status==='na';});if(!ready)result.push({disc:d.id,discNome:d.nome,nome:row.nome,tipo:t.nome,secao:row.secao});
- }}
- }return result;
-}
-const renderReviewSummaryAnterior=renderReviewTab;
-renderReviewTab=function(){renderReviewSummaryAnterior();const area=document.getElementById('melhoriasResumo');if(area.lastElementChild?.classList.contains('cat-head'))area.lastElementChild.remove();const items=sugestoesGabarito(),detail=document.createElement('details');detail.className='enh-details';detail.innerHTML=`<summary>Atividades e avaliações com gabarito a conferir (${items.length})</summary><p class="cat-note">Sugestões para conferir. Elas não criam metas automaticamente; marque “Não se aplica” quando não precisar de gabarito.</p><div class="enh-pending">${items.slice(0,40).map((x,i)=>`<button class="enh-pending-row" data-answer="${i}"><strong>${escH(x.discNome)}</strong><span>${escH(x.nome+' · '+x.tipo)}</span><small>Conferir gabarito no catálogo</small></button>`).join('')||'<p class="cat-note">Nenhuma sugestão neste momento.</p>'}</div>`;detail.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>{const item=items[Number(b.dataset.answer)];abrirPastaPendente(item.disc,item.secao,false);});area.append(detail);};
-async function protegerProfessor(data,password){
- if(!crypto?.subtle)throw Error('Criptografia indisponível neste navegador.');
- const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12)),encode=new TextEncoder();
- const raw=await crypto.subtle.importKey('raw',encode.encode(String(password).normalize('NFKC').trim()),'PBKDF2',false,['deriveKey']);
- const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:310000,hash:'SHA-256'},raw,{name:'AES-GCM',length:256},false,['encrypt']);
- const encrypted=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,encode.encode(JSON.stringify(data))));
- const b64=bytes=>{let text='';for(let i=0;i<bytes.length;i+=8192)text+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(text);};
- return {version:1,iterations:310000,salt:b64(salt),iv:b64(iv),data:b64(encrypted)};
-}
-const professorOnlyJsAnterior=professorOnlyJs;
-professorOnlyJs=function(){let script=professorOnlyJsAnterior();const start=script.indexOf('async function doLoginProfessor(){'),end=script.indexOf('function logoutProfessor()',start);if(start<0||end<0)throw Error('Não foi possível preparar a versão professor.');
- const login=`async function doLoginProfessor(){
- const input=document.getElementById('loginInput'),senha=String(input.value||'').normalize('NFKC').trim();
- const err=document.getElementById('loginError');if(err)err.style.display='none';if(!senha)return showLoginError('Digite a senha para entrar.');
- const button=document.querySelector('.login-btn');if(button)button.disabled=true;
- try{if(!crypto.subtle)throw Error('Sem criptografia');const bytes=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));const p=PROFESSOR_ENCRYPTED;
- const raw=await crypto.subtle.importKey('raw',new TextEncoder().encode(senha),'PBKDF2',false,['deriveKey']);
- const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:bytes(p.salt),iterations:p.iterations,hash:'SHA-256'},raw,{name:'AES-GCM',length:256},false,['decrypt']);
- const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(p.iv)},key,bytes(p.data));DATA=JSON.parse(new TextDecoder().decode(plain));sessionStorage.setItem('mat_prof_secure_session',JSON.stringify(DATA));input.value='';openProfessorOnly();
- }catch(e){showLoginError('Senha incorreta ou arquivo inválido. Use a senha do professor configurada ao gerar esta versão.');input.value='';input.focus();}finally{if(button)button.disabled=false;}
- }
- `;return "function safeProfessorUrl(raw){try{const u=new URL(raw);return ['https:','http:'].includes(u.protocol)?u.href:'#';}catch{return '#';}}\n"+script.slice(0,start)+login+script.slice(end);
-};
-const confirmarImportacaoAnterior=confirmarImportacaoPlanilha;
-confirmarImportacaoPlanilha=function(options={}){const list=pendingSheetImport?.novos||[];if(list.some(m=>(!options.skipDuplicates||!m._duplicate)&&materialLinks(m).some(l=>!catUrl(l.link)))){showToast('A planilha contém endereços inválidos. Corrija os links antes de importar.',true);return;}return confirmarImportacaoAnterior(options);};
-
-
-
-let catalogImportSource=null;
-function novoCatalogoVazio(){return {tipos:CAT_TIPOS.map((nome,i)=>({id:'c'+i,nome})),avaliacaoTipos:['Trabalho','Gabarito do trabalho','Prova','Gabarito da prova'].map((nome,i)=>({id:'a'+i,nome})),linhas:[],celulas:{},nomes:{},ocultos:[]};}
-function catalogoPortatil(ids=D.disciplinas.map(d=>d.id)){
- return {schema:'senai-catalogo',version:1,disciplinas:ids.map(id=>{const d=getDisc(id);if(!d)return null;const c=D.catalogos?.[id]||novoCatalogoVazio();const lines=[...temasDaDisc(id).filter(t=>!(c.linhas||[]).some(r=>r.temaId===t.id)).map(t=>({id:'tema:'+t.id,nome:t.nome,secao:'temas'})),...(c.linhas||[])];return {nome:d.nome,modalidade:d.modalidade||'presencial',tipos:c.tipos.map(t=>t.nome),avaliacaoTipos:c.avaliacaoTipos.map(t=>t.nome),linhas:lines.map(r=>({nome:r.nome,rotulo:c.nomes?.[r.id]||'',secao:r.secao,oculto:(c.ocultos||[]).includes(r.id),celulas:(r.secao==='temas'?c.tipos:c.avaliacaoTipos).map(t=>{const raw=c.celulas?.[catChave(r.id,t.id)]||{},v=catalogoSituacao(raw),m=D.materiais.find(m=>m.id===v.materialId);return {tipo:t.nome,status:v.status||'',necessario:!!v.necessario,url:v.url||'',obs:v.obs||'',seguirMaterial:v.seguirMaterial!==false,materialId:m?.id||'',materialTitulo:m?.titulo||'',materialLink:m?materialLinks(m)[0]?.link||'':''};})}))};}).filter(Boolean)};
-}
-function exportarCatalogo(ids){
- const data=catalogoPortatil(ids);
- orgDialog('Exportar catálogo','<label class="form-label" for="catExportFormat">Formato</label><select class="form-input" id="catExportFormat"><option value="json">Catálogo completo (JSON, para reimportar)</option><option value="csv">Tabela para Excel (CSV)</option></select><p class="cat-note">Inclui situações, metas, observações e links. Guarde este arquivo como documento de trabalho interno.</p>',()=>{
- if(document.getElementById('catExportFormat').value==='json')baixarJSON(data,'catalogo_biblioteca_senai.json');
- else {const rows=[['Disciplina','Modalidade','Seção','Tema','Tipo','Status','Necessário','Link','Observações','Material','Link do material','Acompanhar material']];for(const d of data.disciplinas)for(const r of d.linhas)for(const v of r.celulas)rows.push([d.nome,d.modalidade,r.secao,r.rotulo||r.nome,v.tipo,CAT_STATUS[v.status]||'Não informado',v.necessario?'Sim':'Não',v.url,v.obs,v.materialTitulo,v.materialLink,v.seguirMaterial?'Sim':'Não']);const quote=x=>'"'+String(x??'').replace(/^[=+@-]/,"'$&").replace(/"/g,'""')+'"';const csv='\ufeff'+rows.map(row=>row.map(quote).join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='catalogo_biblioteca_senai.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);}
- });
-}
-function escolherImportacaoCatalogo(){const input=document.createElement('input');input.type='file';input.accept='.json,.csv,.xlsx,.xls';input.onchange=()=>{if(input.files[0])prepararImportacaoCatalogo(input.files[0]);};input.click();}
-function parseCSV(text){
- text=text.replace(/^\ufeff/,'');const first=text.split(/\r?\n/,1)[0];const sep=(first.match(/;/g)||[]).length>=(first.match(/,/g)||[]).length?';':',';const rows=[];let row=[],cell='',quoted=false;
- for(let i=0;i<text.length;i++){const ch=text[i];if(ch==='"'){if(quoted&&text[i+1]==='"'){cell+='"';i++;}else quoted=!quoted;}else if(ch===sep&&!quoted){row.push(cell);cell='';}else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(cell);if(row.some(v=>v!==''))rows.push(row);row=[];cell='';}else cell+=ch;}
- if(quoted)throw Error('Há aspas não fechadas no CSV.');row.push(cell);if(row.some(v=>v!==''))rows.push(row);return rows.map(r=>r.map(v=>v.replace(/^'(?=[=+@-])/,'')));
-}
-async function prepararImportacaoCatalogo(file){
- try{if(file.size>15*1024*1024)throw Error('Use um arquivo de até 15 MB.');const ext=file.name.split('.').pop().toLowerCase();
- if(ext==='json')catalogImportSource={kind:'json',data:JSON.parse(await file.text())};
- else if(ext==='csv')catalogImportSource={kind:'table',sheets:[{name:'Catálogo',rows:parseCSV(await file.text())}]};
- else {if(!window.XLSX)throw Error('O leitor de Excel não carregou. Confira a conexão ou use CSV/JSON.');const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});catalogImportSource={kind:'table',sheets:wb.SheetNames.map(name=>({name,rows:XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:''})}))};}
- abrirPreviaCatalogo(file.name);
- }catch(err){catalogImportSource=null;showToast('Não foi possível ler o catálogo: '+err.message,true);}
-}
-function normalizarStatusCatalogo(raw,legend){
- const text=raw===true?'1':raw===false?'0':String(raw??'').trim(),n=normalizar(text);if(!text||n==='nao informado')return '';
- if(legend&&Object.hasOwn(legend,text))return legend[text];
- if(n==='imprimir'||n==='feito falta imprimir')return 'imprimir';if(n==='impresso'||n==='feito e impresso')return 'impresso';if(n==='pronto'||n==='concluido'||n==='feito')return 'pronto';if(n==='pendente'||n==='nao iniciado')return 'pendente';if(n==='em producao'||n==='producao')return 'producao';if(n==='a revisar'||n==='revisao'||n==='revisar')return 'revisao';if(n==='nao se aplica'||n==='na')return 'na';throw Error('Situação não reconhecida: '+text);
-}
-function tabelasParaCatalogo(source,legend){
- const data={schema:'senai-catalogo',version:1,disciplinas:[]};let total=0;
- function add(discName,secao,nome,tipo,raw,extra={}){
-  if(!String(nome||'').trim()||!String(tipo||'').trim())return;
-  let d=data.disciplinas.find(d=>normalizar(d.nome)===normalizar(discName));if(!d){d={nome:discName,modalidade:extra.modalidade||'presencial',tipos:[],avaliacaoTipos:[],linhas:[]};data.disciplinas.push(d);}
-  const types=secao==='temas'?d.tipos:d.avaliacaoTipos;if(!types.some(x=>normalizar(x)===normalizar(tipo)))types.push(tipo);
-  let r=d.linhas.find(r=>r.secao===secao&&normalizar(r.nome)===normalizar(nome));if(!r){r={nome,secao,celulas:[]};d.linhas.push(r);}
-  r.celulas.push({tipo,status:normalizarStatusCatalogo(raw,legend),...extra});if(++total>50000)throw Error('O catálogo excede 50 mil células. Importe em partes.');
- }
- for(const sheet of source.sheets){const rows=sheet.rows.filter(r=>r.some(x=>String(x??'').trim()));if(!rows.length)continue;
-  const longHeader=rows.findIndex(r=>{const h=r.map(normalizarCabecalho);return h.includes('disciplina')&&h.includes('tema')&&h.includes('tipo');});
-  if(longHeader>=0){const header=rows[longHeader].map(normalizarCabecalho);const val=(r,k)=>r[header.indexOf(k)]??'';for(const r of rows.slice(longHeader+1)){const disc=String(val(r,'disciplina')).trim();if(!disc)continue;const sec=normalizar(val(r,'secao')).includes('avalia')?'avaliacoes':'temas';const extra={modalidade:normalizar(val(r,'modalidade'))==='ead'?'ead':'presencial',url:String(val(r,'link')).trim(),obs:String(val(r,'observacoes')),materialTitulo:String(val(r,'material')),materialLink:String(val(r,'link_do_material'))};if(header.includes('necessario'))extra.necessario=['sim','1','true'].includes(normalizar(val(r,'necessario')));if(header.includes('acompanhar_material'))extra.seguirMaterial=['sim','1','true'].includes(normalizar(val(r,'acompanhar_material')));add(disc,sec,String(val(r,'tema')).trim(),String(val(r,'tipo')).trim(),val(r,'status'),extra);}}
-  else {const hi=rows.findIndex(r=>r.some(x=>normalizar(x)==='capa')&&r.some(x=>normalizar(x)==='slides'));if(hi<0)throw Error('Não reconheci o formato da aba “'+sheet.name+'”. Use o modelo da Pasta Catálogo ou o CSV exportado.');const start=rows[hi].findIndex(x=>normalizar(x)==='capa'),nameIndex=start-1,disc=String(rows[hi][nameIndex]||sheet.name).trim();let headers=rows[hi],section='temas';for(const r of rows.slice(hi+1)){const nome=String(r[nameIndex]??'').trim();if(!nome)continue;if(normalizar(nome)==='trabalhos e provas'){headers=r;section='avaliacoes';continue;}for(let col=start;col<headers.length;col++){const tipo=String(headers[col]??'').trim();if(tipo)add(disc,section,nome,tipo,r[col]);}}}
- }
- if(!data.disciplinas.length)throw Error('Nenhuma disciplina com temas foi encontrada.');return data;
-}
-function planejarCatalogo(data,mode='completar'){
- if(data?.schema!=='senai-catalogo'||data.version!==1||!Array.isArray(data.disciplinas)||!data.disciplinas.length)throw Error('Este JSON não é uma exportação de catálogo reconhecida.');
- const draft=JSON.parse(JSON.stringify(D)),stats={disciplinas:0,temas:0,tipos:0,celulas:0,vinculosPendentes:0},preview=[];let total=0;
- draft.catalogos=draft.catalogos||{};
- for(const input of data.disciplinas){if(typeof input.nome!=='string'||!input.nome.trim()||!Array.isArray(input.linhas))throw Error('Uma disciplina está sem nome ou linhas.');let d=draft.disciplinas.find(d=>normalizar(d.nome)===normalizar(input.nome));if(!d){d={id:uid('disc'),nome:input.nome.trim(),modalidade:input.modalidade==='ead'?'ead':'presencial',ordem:draft.disciplinas.length+1};draft.disciplinas.push(d);stats.disciplinas++;}
- if(!draft.catalogos[d.id])draft.catalogos[d.id]=novoCatalogoVazio();const c=draft.catalogos[d.id];
- for(const [field,names] of [['tipos',input.tipos||[]],['avaliacaoTipos',input.avaliacaoTipos||[]]]){if(!Array.isArray(names))throw Error('Os tipos de material são inválidos.');for(const nome of names){if(typeof nome!=='string'||!nome.trim())throw Error('Um tipo está sem nome.');if(!c[field].some(t=>normalizar(t.nome)===normalizar(nome))){c[field].push({id:uid('cattipo'),nome:nome.trim()});stats.tipos++;}}}
- for(const row of input.linhas){if(typeof row.nome!=='string'||!row.nome.trim()||!Array.isArray(row.celulas))throw Error('Uma linha do catálogo está incompleta.');const section=row.secao==='avaliacoes'?'avaliacoes':'temas';let id;
- if(section==='temas'){let t=draft.temas.find(t=>t.disciplinaId===d.id&&normalizar(t.nome)===normalizar(row.nome));if(!t){t={id:uid('tema'),nome:row.nome.trim(),disciplinaId:d.id,ordem:draft.temas.filter(t=>t.disciplinaId===d.id).length+1};draft.temas.push(t);stats.temas++;}id='tema:'+t.id;}else {let r=c.linhas.find(r=>normalizar(r.nome)===normalizar(row.nome));if(!r){r={id:uid('catlinha'),nome:row.nome.trim(),secao:'avaliacoes'};c.linhas.push(r);}id=r.id;}
- if(row.rotulo&&(mode==='substituir'||!c.nomes[id]))c.nomes[id]=String(row.rotulo);if(row.oculto&&!c.ocultos.includes(id))c.ocultos.push(id);
- for(const cell of row.celulas){if(++total>50000)throw Error('Limite de 50 mil células por importação.');if(typeof cell.tipo!=='string'||!cell.tipo.trim())throw Error('Uma célula está sem tipo.');const types=section==='temas'?c.tipos:c.avaliacaoTipos;let type=types.find(t=>normalizar(t.nome)===normalizar(cell.tipo));if(!type){type={id:uid('cattipo'),nome:cell.tipo.trim()};types.push(type);stats.tipos++;}const status=normalizarStatusCatalogo(cell.status),url=String(cell.url||'').trim();if(url&&!catUrl(url))throw Error('Link inválido no tema '+row.nome+'.');
- const value={status,url,obs:String(cell.obs||'')};if(Object.hasOwn(cell,'necessario'))value.necessario=!!cell.necessario;if(Object.hasOwn(cell,'seguirMaterial'))value.seguirMaterial=!!cell.seguirMaterial;
- if(Object.hasOwn(cell,'materialId')||Object.hasOwn(cell,'materialLink'))value.materialId='';
- let material=cell.materialId?draft.materiais.find(m=>m.id===cell.materialId&&m.disciplinaId===d.id):null;
- if(!material&&cell.materialLink)material=draft.materiais.find(m=>m.disciplinaId===d.id&&materialLinks(m).some(l=>l.link===cell.materialLink));
- if(material)value.materialId=material.id;else if(cell.materialLink){if(!catUrl(cell.materialLink))throw Error('Link de material inválido.');if(!value.url)value.url=cell.materialLink;stats.vinculosPendentes++;}
- if(!status&&!url&&!value.obs&&!value.materialId&&!cell.materialLink&&!value.necessario)continue;
- const key=catChave(id,type.id),old=c.celulas[key]||{},next={...old};for(const [k,v] of Object.entries(value))if(mode==='substituir'||next[k]===undefined||next[k]===null||next[k]==='')next[k]=v;
- if(JSON.stringify(next)!==JSON.stringify(old)){c.celulas[key]=next;stats.celulas++;if(preview.length<12)preview.push({disc:d.nome,tema:row.nome,tipo:type.nome,status:CAT_STATUS[next.status]||'Não informado'});}
- }
- }
- }
- return {draft,stats,preview};
-}
-function abrirPreviaCatalogo(filename){
- orgDialog('Importar catálogo',`<p class="cat-note">Arquivo: ${escH(filename)}. Nenhuma alteração foi aplicada.</p><label class="form-label" for="catImportMode">Como tratar informações já preenchidas</label><select class="form-input" id="catImportMode"><option value="completar">Completar somente campos vazios</option><option value="substituir">Substituir células informadas pelo arquivo</option></select>${catalogImportSource.kind==='table'?`<div class="cat-tools"><label>1 significa <select id="catLegend1" class="form-input"><option value="pronto">Pronto</option><option value="">Não informado</option></select></label><label>0 significa <select id="catLegend0" class="form-input"><option value="pendente">Pendente</option><option value="">Não informado</option></select></label><label>– significa <select id="catLegendDash" class="form-input"><option value="na">Não se aplica</option><option value="">Não informado</option></select></label></div><p class="cat-note">Células vazias continuam não informadas. Valores 0 e 1 não definem metas automaticamente. Linhas sem nome são ignoradas.</p>`:''}<div id="catImportPreview"></div>`,()=>{
- const plan=prepare();validarBackup(plan.draft);const before=D;try{localStorage.setItem(RECOVERY_KEY,JSON.stringify({date:isoNow(),data:D}));D=plan.draft;salvar();orgUndo=null;catalogImportSource=null;melhoriasRefresh();showToast('Catálogo importado. A cópia anterior está disponível na Lixeira.');}catch(err){D=before;throw err;}
- });
- function prepare(){const legend={'1':document.getElementById('catLegend1')?.value??'pronto','0':document.getElementById('catLegend0')?.value??'pendente','-':document.getElementById('catLegendDash')?.value??'na','–':document.getElementById('catLegendDash')?.value??'na'};const data=catalogImportSource.kind==='json'?catalogImportSource.data:tabelasParaCatalogo(catalogImportSource,legend);return planejarCatalogo(data,document.getElementById('catImportMode').value);}
- const render=()=>{try{const {stats:s,preview}=prepare();document.getElementById('catImportPreview').innerHTML=`<div class="org-bulk"><strong>${s.disciplinas} novas disciplinas · ${s.temas} novos temas · ${s.celulas} células a atualizar</strong></div><p class="cat-note">${s.tipos} novos tipos. ${s.vinculosPendentes} vínculos não encontrados: os links serão preservados para vincular depois.</p><div class="enh-import-preview">${preview.map(p=>`<p>${escH(p.disc+' / '+p.tema+' / '+p.tipo+' → '+p.status)}</p>`).join('')||'<p>Nenhuma célula a atualizar. A estrutura de temas e tipos ainda pode ser adicionada.</p>'}</div>`;document.getElementById('orgConfirm').disabled=false;document.getElementById('orgError').textContent='';}catch(err){document.getElementById('orgConfirm').disabled=true;document.getElementById('orgError').textContent=err.message;}};
- document.querySelectorAll('#orgDialog select').forEach(s=>s.onchange=render);render();
-}
-
-
-// Situação rápida no controle da pasta; detalhes continuam em um botão próprio.
-const catRenderComDetalhes=catRender;
-catRender=function(){
- catRenderComDetalhes();const panel=document.getElementById('catalogoPanel');if(!panel||panel.hidden)return;
- panel.querySelectorAll('button.cat-cell[data-cat-action="celula"]').forEach(old=>{
-  const r=old.dataset.r,t=old.dataset.t,v=catValor(r,t),box=document.createElement('div');box.className=old.className;box.setAttribute('role','group');box.dataset.r=r;box.dataset.t=t;
-  const select=document.createElement('select');select.className='cat-status-select';select.setAttribute('aria-label',old.getAttribute('aria-label'));select.dataset.r=r;select.dataset.t=t;
-  for(const [value,label] of Object.entries(CAT_STATUS)){const option=document.createElement('option');option.value=value;option.textContent=label;select.append(option);}select.value=v.status||'';
-  const details=document.createElement('button');details.type='button';details.className='cat-details-button';details.textContent='Detalhes';details.dataset.catAction='celula';details.dataset.r=r;details.dataset.t=t;details.setAttribute('aria-label','Detalhes: '+old.getAttribute('aria-label'));
-  box.append(select);for(const small of [...old.querySelectorAll('small')])box.append(small);box.append(details);old.replaceWith(box);
-  select.onchange=()=>{
-   const cells=catDados().celulas,key=catChave(r,t),before=cells[key],table=panel.querySelector('.cat-table-wrap'),scroll={left:table.scrollLeft,top:table.scrollTop};
-   cells[key]={...(before||{}),status:select.value,seguirMaterial:false};
-   if(!catGuardar()){if(before===undefined)delete cells[key];else cells[key]=before;select.value=v.status||'';return;}
-   catRender();const next=panel.querySelector('.cat-table-wrap');next.scrollLeft=scroll.left;next.scrollTop=scroll.top;
-   const focus=[...panel.querySelectorAll('.cat-status-select')].find(x=>x.dataset.r===r&&x.dataset.t===t);focus?.focus({preventScroll:true});
-  };
- });
-};
-
-// Um único tema e um único material, apresentados em telas diferentes.
-function garantirTemasUnificados(){
- let changed=false;
- for(const [discId,c] of Object.entries(D.catalogos||{})){
-  if(!getDisc(discId))continue;
-  for(const [row,label] of Object.entries(c.nomes||{})){
-   if(!row.startsWith('tema:'))continue;const t=D.temas.find(t=>t.id===row.slice(5)&&t.disciplinaId===discId);
-   if(t&&label&&!D.temas.some(x=>x.id!==t.id&&x.disciplinaId===discId&&normalizar(x.nome)===normalizar(label))){if(t.nome!==label){t.nome=label;changed=true;}delete c.nomes[row];changed=true;}
-  }
-  for(const row of c.linhas||[]){
-   if(row.temaId&&!D.temas.some(t=>t.id===row.temaId)){continue;}
-   let t=D.temas.find(t=>t.id===row.temaId);
-   if(!t){t=D.temas.find(t=>t.disciplinaId===discId&&normalizar(t.nome)===normalizar(row.nome));if(!t){t={id:uid('tema'),nome:row.nome,disciplinaId:discId,ordem:temasDaDisc(discId).length+1};D.temas.push(t);}row.temaId=t.id;changed=true;}
-   if(row.nome!==t.nome){row.nome=t.nome;changed=true;}
-  }
- }
- for(const c of Object.values(D.catalogos||{}))for(const [key,value] of Object.entries(c.celulas||{})){if(!value.autoVinculo)continue;const m=D.materiais.find(m=>m.id===value.materialId),[row,col]=JSON.parse(key),themeId=row.startsWith('tema:')?row.slice(5):(c.linhas||[]).find(r=>r.id===row)?.temaId;if(!m||m.temaId!==themeId||m.catalogTipoId!==col){delete value.materialId;delete value.autoVinculo;changed=true;}}
- for(const m of activeMaterials()){
-  if(!m.temaId||!D.temas.some(t=>t.id===m.temaId&&t.disciplinaId===m.disciplinaId))continue;
-  D.catalogos=D.catalogos||{};if(!D.catalogos[m.disciplinaId]){D.catalogos[m.disciplinaId]=novoCatalogoVazio();changed=true;}const c=D.catalogos[m.disciplinaId],row=(c.linhas||[]).find(r=>r.temaId===m.temaId),types=row?c.avaliacaoTipos:c.tipos;
-  let type=types.find(t=>t.id===m.catalogTipoId)||types.find(t=>tipoCatalogoComparavel(t.nome)===tipoCatalogoComparavel(labelTipo(m.tipoId)));
-  if(!type){type={id:uid('cattipo'),nome:labelTipo(m.tipoId)};types.push(type);changed=true;}
-  if(m.catalogTipoId!==type.id){m.catalogTipoId=type.id;changed=true;}const key=catChave(row?.id||'tema:'+m.temaId,type.id),v=c.celulas[key]||{};
-  if(!v.materialId){c.celulas[key]={...v,materialId:m.id,autoVinculo:true,seguirMaterial:v.seguirMaterial!==false};changed=true;}
- }
- return changed;
-}
-const salvarUnificadoAnterior=salvar;
-salvar=function(options={}){garantirTemasUnificados();for(const c of Object.values(D.catalogos||{})){const removed=(c.linhas||[]).filter(r=>r.temaId&&!D.temas.some(t=>t.id===r.temaId));for(const row of removed){for(const key of Object.keys(c.celulas||{}))if(JSON.parse(key)[0]===row.id)delete c.celulas[key];if(c.nomes)delete c.nomes[row.id];}if(removed.length)c.linhas=c.linhas.filter(r=>!removed.includes(r));}return salvarUnificadoAnterior(options);};
-catLinhas=function(){const c=catDados(),evaluations=new Set((c.linhas||[]).map(r=>r.temaId));return [...temasDaDisc(currentAdminDiscId).filter(t=>!evaluations.has(t.id)).map(t=>({id:'tema:'+t.id,nome:t.nome,secao:'temas',temaId:t.id})),...(c.linhas||[]).map(r=>({...r,nome:D.temas.find(t=>t.id===r.temaId)?.nome||r.nome}))].filter(r=>!c.ocultos.includes(r.id));};
-function temaDaCelula(r){return r.startsWith('tema:')?r.slice(5):catDados().linhas.find(x=>x.id===r)?.temaId||'';}
-function tipoCatalogoComparavel(name){const n=normalizar(name);return ({slide:'slides',roteiros:'roteiro','resumo estudo':'resumo de estudo','resumo quadro':'resumo para o quadro','lista de exercicios':'lista de questoes','atividade grupo':'atividade em grupo'})[n]||n;}
-function materiaisDaCelula(r,t){const themeId=temaDaCelula(r);if(!themeId)return [];const c=catDados(),type=[...c.tipos,...c.avaliacaoTipos].find(x=>x.id===t);const raw=c.celulas[catChave(r,t)]||{};return activeMaterials().filter(m=>m.disciplinaId===currentAdminDiscId&&m.temaId===themeId&&(m.id===raw.materialId||m.catalogTipoId===t||(!m.catalogTipoId&&type&&tipoCatalogoComparavel(labelTipo(m.tipoId))===tipoCatalogoComparavel(type.nome))));}
-const catValorUnificadoAnterior=catValor;
-catValor=function(r,t){const raw=catDados().celulas[catChave(r,t)]||{};if(raw.materialId&&D.materiais.some(m=>m.id===raw.materialId))return catValorUnificadoAnterior(r,t);const matches=materiaisDaCelula(r,t);return matches.length===1?catalogoSituacao({...raw,materialId:matches[0].id}):catValorUnificadoAnterior(r,t);};
-const catAcaoUnificadaAnterior=catAcao;
-catAcao=function(event){const b=event.target.closest('[data-cat-action]');if(b?.dataset.catAction==='renomearLinha'){const r=b.dataset.r,theme=D.temas.find(t=>t.id===temaDaCelula(r));if(!theme)return;const value=prompt('Nome do tema em toda a Biblioteca:',theme.nome);if(!value?.trim())return;if(D.temas.some(t=>t.id!==theme.id&&t.disciplinaId===theme.disciplinaId&&normalizar(t.nome)===normalizar(value))){showToast('Já existe um tema com esse nome nesta disciplina.',true);return;}theme.nome=value.trim();delete catDados().nomes[r];salvar();catRender();showToast('Tema atualizado nas Pastas, Materiais e Acervo.');return;}return catAcaoUnificadaAnterior(event);};
-function abrirMateriaisDoTema(discId,themeId){setTab('materiais',document.querySelector('[data-tab="materiais"]'));abrirAdminDisc(discId);document.getElementById('adminMatTema').value=themeId;renderAdminDisc();document.getElementById('adminDiscContent').scrollIntoView({block:'start',behavior:'smooth'});}
-function cadastroUnificado(discId,themeId,typeId){
- const disc=getDisc(discId),theme=D.temas.find(t=>t.id===themeId);if(!disc||!theme)return;currentAdminDiscId=discId;const c=catDados(),row=(c.linhas||[]).find(r=>r.temaId===themeId),r=row?.id||'tema:'+themeId,types=row?c.avaliacaoTipos:c.tipos,type=types.find(t=>t.id===typeId)||types[0];
- orgDialog('Adicionar material',`<p class="cat-note">${escH(disc.nome+' / '+theme.nome)}. O cadastro aparecerá nas Pastas, em Materiais e no Acervo.</p><label class="form-label" for="uniTipo">Tipo de material</label><select class="form-input" id="uniTipo">${types.map(t=>`<option value="${escH(t.id)}" ${t.id===type?.id?'selected':''}>${escH(t.nome)}</option>`).join('')}</select><label class="form-label" for="uniTitulo">Título</label><input class="form-input" id="uniTitulo" value="${escH((type?.nome||'Material')+' — '+theme.nome)}" required><label class="form-label" for="uniLink">Link do arquivo (Drive, Canva, vídeo…)</label><input class="form-input" id="uniLink" type="url" placeholder="https://…" required><label class="form-label" for="uniStatus">Situação na pasta</label><select class="form-input" id="uniStatus">${Object.entries(CAT_STATUS).map(([id,label])=>`<option value="${id}">${escH(label)}</option>`).join('')}</select>`,()=>{
-  const title=document.getElementById('uniTitulo').value.trim(),url=catUrl(document.getElementById('uniLink').value),type=types.find(t=>t.id===document.getElementById('uniTipo').value),status=document.getElementById('uniStatus').value;if(!url||!title||!type)throw Error('Preencha título, tipo e um link válido.');
-  const before=JSON.stringify(D);try{let m=D.materiais.find(m=>m.disciplinaId===discId&&m.temaId===themeId&&materialLinks(m).some(l=>catUrl(l.link)===url));
-  if(!m){let tipo=D.tipos.find(t=>tipoCatalogoComparavel(t.nome)===tipoCatalogoComparavel(type.nome));if(!tipo){tipo={id:uid('tipo'),nome:type.nome,icone:'📎',cor:'#2557d6',ordem:D.tipos.length+1};D.tipos.push(tipo);}m={id:uid('mat'),titulo:title,disciplinaId:discId,temaId:themeId,tipoId:tipo.id,catalogTipoId:type.id,links:[{id:uid('lnk'),link:url,titulo:'',origem:detectarOrigem(url),ordem:1}],link:url,descricao:'',statusMaterial:['pronto','imprimir','impresso'].includes(status)?'pronto':status==='producao'?'producao':status==='revisao'?'revisar':'',createdAt:isoNow(),updatedAt:isoNow(),ordem:nextOrderFor(discId,themeId,tipo.id)};D.materiais.push(m);}else m.catalogTipoId=type.id;
-  const key=catChave(r,type.id),old=c.celulas[key]||{};c.celulas[key]={...old,materialId:m.id,...(status?{status,seguirMaterial:false}:{seguirMaterial:old.seguirMaterial!==false})};salvar();melhoriasRefresh();if(catAberto)catRender();showToast('Material disponível em toda a Biblioteca.');}catch(err){D=JSON.parse(before);throw err;}
- });
-}
-const catRenderUnificadoAnterior=catRender;
-catRender=function(){catRenderUnificadoAnterior();const panel=document.getElementById('catalogoPanel');if(!panel||panel.hidden)return;panel.querySelectorAll('.cat-cell[role="group"]').forEach(box=>{const r=box.dataset.r,t=box.dataset.t,theme=temaDaCelula(r),matches=materiaisDaCelula(r,t);const add=document.createElement('button');add.className='cat-details-button';add.textContent=matches.length?'Ver '+matches.length+' material(is)':'Adicionar material';add.onclick=()=>matches.length?abrirMateriaisDoTema(currentAdminDiscId,theme):cadastroUnificado(currentAdminDiscId,theme,t);box.append(add);});};
-const catAbrirUnificadoAnterior=catAbrirCelula;
-catAbrirCelula=function(r,t){catAbrirUnificadoAnterior(r,t);document.getElementById('catCadastrar').onclick=()=>{document.getElementById('catDialog').close();cadastroUnificado(currentAdminDiscId,temaDaCelula(r),t);};};
-const renderPlanUnificadoAnterior=renderPlanTab;
-renderPlanTab=function(){renderPlanUnificadoAnterior();const host=document.getElementById('planContent'),disc=document.getElementById('planDisc').value,search=normalizar(document.getElementById('planSearch')?.value||'');const empty=D.temas.filter(t=>(!disc||t.disciplinaId===disc)&&!activeMaterials().some(m=>m.temaId===t.id)&&(!search||normalizar(t.nome+' '+labelDisc(t.disciplinaId)).includes(search)));if(!empty.length)return;
- const section=document.createElement('section');section.className='enh-details';section.innerHTML='<h3>Temas cadastrados — aguardando materiais</h3><p class="cat-note">Estes são os mesmos temas das Pastas. Adicione o primeiro material por aqui.</p>';const grouped=new Map();for(const t of empty){if(!grouped.has(t.disciplinaId))grouped.set(t.disciplinaId,[]);grouped.get(t.disciplinaId).push(t);}for(const [id,themes] of grouped){const details=document.createElement('details');details.className='enh-details';details.open=!!disc||!!search||grouped.size===1;const summary=document.createElement('summary');summary.textContent=labelDisc(id)+' · '+themes.length+' temas';details.append(summary);for(const t of themes){const row=document.createElement('div');row.className='org-row';const text=document.createElement('strong');text.textContent=t.nome;const button=document.createElement('button');button.className='a-btn';button.textContent='Adicionar material';button.onclick=()=>cadastroUnificado(id,t.id);row.append(text,button);details.append(row);}section.append(details);}host.append(section);
-};
-const openModalUnificadoAnterior=openModal;
-openModal=function(...args){openModalUnificadoAnterior(...args);let box=document.getElementById('uniCatalogTypeBox');if(!box){box=document.createElement('div');box.id='uniCatalogTypeBox';box.className='quick-note';document.querySelector('#modalOverlay .modal-body').prepend(box);}const m=D.materiais.find(m=>m.id===args[0]);const update=()=>{const discId=document.getElementById('mDisc').value,c=D.catalogos?.[discId]||novoCatalogoVazio();box.innerHTML='<label class="form-label" for="uniCatalogType">Tipo no controle da pasta</label><select class="form-input" id="uniCatalogType"><option value="">Usar o mesmo tipo escolhido no cadastro</option>'+[...c.tipos,...c.avaliacaoTipos].map(t=>`<option value="${escH(t.id)}" ${m?.catalogTipoId===t.id?'selected':''}>${escH(t.nome)}</option>`).join('')+'</select><p class="cat-note">O material será o mesmo nas Pastas, em Materiais e no Acervo.</p>';};update();document.getElementById('mDisc').addEventListener('change',update,{once:true});};
-const salvarMaterialUnificadoAnterior=salvarMaterial;
-salvarMaterial=function(options={}){const selected=document.getElementById('uniCatalogType')?.value,editing=editingMaterialId,ids=new Set(D.materiais.map(m=>m.id)),before=JSON.stringify(D);salvarMaterialUnificadoAnterior(options);if(JSON.stringify(D)===before)return;const m=editing?D.materiais.find(m=>m.id===editing):D.materiais.find(m=>!ids.has(m.id));if(m&&selected){m.catalogTipoId=selected;salvar();}if(catAberto)catRender();};
-const orgMoveCatalogUnificadoAnterior=orgMoveCatalog;
-orgMoveCatalog=function(theme,sourceId,targetId){const src=D.catalogos?.[sourceId],row=src?.linhas?.find(r=>r.temaId===theme.id),oldTypes=[...(src?.tipos||[]),...(src?.avaliacaoTipos||[])];orgMoveCatalogUnificadoAnterior(theme,sourceId,targetId);const dest=D.catalogos?.[targetId];if(!dest)return;
- if(row){dest.linhas=dest.linhas||[];dest.linhas.push(row);src.linhas=src.linhas.filter(r=>r!==row);for(const type of src.avaliacaoTipos){const key=catChave(row.id,type.id),value=src.celulas[key];if(!value)continue;let t=dest.avaliacaoTipos.find(t=>normalizar(t.nome)===normalizar(type.nome));if(!t){t={id:uid('cattipo'),nome:type.nome};dest.avaliacaoTipos.push(t);}dest.celulas[catChave(row.id,t.id)]=value;delete src.celulas[key];}}
- for(const m of D.materiais.filter(m=>m.temaId===theme.id)){const old=oldTypes.find(t=>t.id===m.catalogTipoId);if(old){const type=[...dest.tipos,...dest.avaliacaoTipos].find(t=>normalizar(t.nome)===normalizar(old.nome));if(type)m.catalogTipoId=type.id;}}
-};
-
-
-// Tópicos em blocos responsivos, sem rolagem horizontal.
-const catTopicosAbertos=new Map();
-const catRenderGradeAnterior=catRender;
-catRender=function(){
- catRenderGradeAnterior();const panel=document.getElementById('catalogoPanel');if(!panel||panel.hidden)return;
- const wrap=panel.querySelector('.cat-table-wrap'),table=wrap?.querySelector('table');if(!table)return;
- const scope=currentAdminDiscId+':'+catSecao,headers=[...table.querySelectorAll('thead th')].slice(1),rows=[...table.querySelectorAll('tbody tr')].filter(r=>r.querySelector('.cat-cell'));
- const tools=document.createElement('div');tools.className='cat-compact-tools';
- const topics=document.createElement('div');topics.className='cat-topic-list';
- const management=document.createElement('details');management.className='cat-type-management';const managementTitle=document.createElement('summary');managementTitle.textContent='Editar tipos de material';management.append(managementTitle);const managementGrid=document.createElement('div');managementGrid.className='cat-type-grid';
- for(const th of headers){const item=document.createElement('div');item.className='cat-type-item';const name=document.createElement('strong');name.textContent=th.querySelector('span')?.textContent||'';item.append(name);const actions=th.querySelector('.cat-mini');if(actions)item.append(actions);managementGrid.append(item);}management.append(managementGrid);
- rows.forEach((tr,index)=>{
-  const first=tr.querySelector('th'),cells=[...tr.querySelectorAll('td .cat-cell')],id=cells[0].dataset.r,key=scope+':'+id,details=document.createElement('details');details.className='cat-topic';details.dataset.row=id;
-  details.open=catTopicosAbertos.has(key)?catTopicosAbertos.get(key):index===0;
-  const summary=document.createElement('summary'),title=document.createElement('strong');title.textContent=first.childNodes[0]?.textContent?.trim()||'';const count=document.createElement('span');count.className='cat-topic-count';const values=cells.map(c=>catValor(c.dataset.r,c.dataset.t));count.textContent=values.filter(catConcluido).length+' feitos · '+cells.length+' tipos';summary.append(title,count);details.append(summary);
-  const body=document.createElement('div');body.className='cat-topic-body';const actions=first.querySelector('.cat-mini');if(actions){actions.classList.add('cat-topic-actions');body.append(actions);}
-  const grid=document.createElement('div');grid.className='cat-topic-grid';cells.forEach((cell,i)=>{const label=document.createElement('label');label.className='cat-material-label';label.textContent=headers[i]?.querySelector('span')?.textContent||'';const select=cell.querySelector('select');if(select){select.id='cat-select-'+index+'-'+i;label.htmlFor=select.id;}cell.prepend(label);
-   for(const small of cell.querySelectorAll('small')){if(small.textContent==='Sem meta')small.remove();else small.textContent=small.textContent.replace('Sem meta · ','');}
-   const links=document.createElement('div');links.className='cat-cell-actions';for(const b of [...cell.querySelectorAll('button')])links.append(b);cell.append(links);grid.append(cell);
-  });body.append(grid);details.append(body);details.addEventListener('toggle',()=>catTopicosAbertos.set(key,details.open));topics.append(details);
- });
- for(const [text,open] of [['Expandir tópicos',true],['Recolher tópicos',false]]){const button=document.createElement('button');button.className='btn btn-outline';button.textContent=text;button.onclick=()=>{topics.querySelectorAll('.cat-topic').forEach(d=>{catTopicosAbertos.set(scope+':'+d.dataset.row,open);d.open=open;});};tools.append(button);}
- if(!rows.length){const empty=document.createElement('p');empty.className='cat-empty';empty.textContent=table.querySelector('tbody')?.textContent||'Nenhum tópico neste filtro.';topics.append(empty);}
- wrap.replaceChildren(tools,management,topics);wrap.classList.add('cat-responsive');wrap.removeAttribute('tabindex');wrap.setAttribute('aria-label','Controle dos tópicos e materiais');
-};
-
 // INIT
 // ════════════════════════════════════════════════════════
 carregar();
-if(garantirTemasUnificados()) salvar();
-melhoriasBaseline();
+readPlannerMaterialDraft();
 applySharedCloudConfigFromUrl();
 applyBranding();
 window.addEventListener('beforeunload',saveLibraryViewState);
